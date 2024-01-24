@@ -29,7 +29,7 @@ jobs:
           touch out/.nojekyll
 
       - name: Deploy
-        uses: mintcd/notes@v1.0
+        uses: mintcd/notes@v1
         with:
           branch: gh-pages
           folder: out

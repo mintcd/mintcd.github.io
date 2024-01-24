@@ -1,0 +1,35 @@
+name: Deploy Next
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      # https://github.com/actions/checkout
+      - uses: actions/checkout@v4
+        
+      # a standard step for GitHub actions on Node
+      # https://github.com/actions/setup-node
+      - uses: actions/setup-node@v4
+        with:
+          # update the Node version to meet your needs
+          node-version: 21
+          cache: npm
+
+      - name: Build
+        run: |
+          npm ci
+          npm run build
+          npm run export
+          touch out/.nojekyll
+
+      - name: Deploy
+        uses: mintcd/notes@0.1.0
+        with:
+          branch: gh-pages
+          folder: out

@@ -1,0 +1,19 @@
+.custom-resize {
+    resize: horizontal;
+    overflow: auto;
+    min-width: 200px;
+    max-width: 400px;
+  }
+
+  /* Custom styles to remove the triangle */
+.custom-resize::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 16px; /* Set the width of the "drag" area on the right edge */
+    height: 100%;
+    cursor: ew-resize;
+    pointer-events: auto;
+    z-index: 1;
+  }

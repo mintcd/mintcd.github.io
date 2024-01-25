@@ -4,16 +4,13 @@ import { useState } from 'react'
 import Image from 'next/image'
 
 export default function Nav() {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false)
 
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [profileOpen, setProfileOpen] = useState(false)
   const toggleDropdown = () => {
-    setDropdownOpen(!dropdownOpen);
+    setDropdownOpen(!dropdownOpen)
   };
 
-  function toggleProfile() {
-    setProfileOpen(!profileOpen);
-  }
 
   return (
     <nav className="w-[100vw] border-black dark:bg-gray-900 dark:border-gray-700 max-w-screen-xl flex flex-wrap items-center justify-between">
@@ -87,7 +84,7 @@ export default function Nav() {
               </ul>
               <div className="py-1">
                 <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-400 dark:hover:text-white">
-                  Sign out
+                  Terminology
                 </a>
               </div>
             </div>

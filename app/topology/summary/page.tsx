@@ -7,21 +7,22 @@ import 'katex/dist/katex.min.css';
 import { forwardRef, RefObject } from 'react';
 
 export default function Graph() {
-    const statements = topology.flatMap(item => item.statements)
-    const dependencies = statements.flatMap((item) => item.depending.map((depended) => [depended, item.id]));
+    // const statements = topology.flatMap(item => item.statements)
+    // const dependencies = statements.flatMap((item) => item.depending.map((depended) => [depended, item.id]));
 
-    return (
-        <div className='grid grid-cols-3'>
-            <Xwrapper>
-                {statements.map((item) => (
-                    <Block key={item.id} id={item.id} item={item} includeId={true} includeName={true} />
-                ))}
-                {dependencies.map((item, index) => (
-                    <Xarrow key={index} startAnchor='auto' endAnchor='auto' headSize={4} start={item[0]} end={item[1]} />
-                ))}
-            </Xwrapper>
-        </div>
-    );
+    // return (
+    //     <div className='grid grid-cols-3'>
+    //         <Xwrapper>
+    //             {statements.map((item) => (
+    //                 <Block key={item.id} id={item.id} item={item} includeId={true} includeName={true} />
+    //             ))}
+    //             {dependencies.map((item, index) => (
+    //                 <Xarrow key={index} startAnchor='auto' endAnchor='auto' headSize={4} start={item[0]} end={item[1]} />
+    //             ))}
+    //         </Xwrapper>
+    //     </div>
+    // );
+    return <div></div>
 }
 
 

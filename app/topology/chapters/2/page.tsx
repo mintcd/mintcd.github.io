@@ -2,14 +2,14 @@
 
 import Latex from 'react-latex-next';
 import 'katex/dist/katex.min.css';
-import Sidebar from "@app/linear-algebra/sidebar"
+import Sidebar from "@components/sidebar"
 
 export default function Chapter() {
 
 
   return (
     <div className='py-5 grid grid-cols-4 gap-3'>
-      <div className='col-span-1'><Sidebar current={2} /></div>
+      <div className='col-span-1'><Sidebar topic='topology' current={2} /></div>
       <div className='col-span-3'>
         Generally, vector space is an algebraic structure specified by the set of vectors <Latex> $V$ </Latex> and the set of scalars <Latex>{`$\\mathbb{F}$`}</Latex>. So we concern about the homomorphism between two vector spaces in the normal sense - operation preservation. Concretely, if <Latex>{`$f: V\\to W$`}</Latex> is a homomorphism, then it preserves vector addition and scalar multiplication.
         <Latex>$$f(x+y) = f(x)+f(y),\,\,\forall x,y\in V$$</Latex>

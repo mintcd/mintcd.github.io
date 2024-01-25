@@ -45,7 +45,7 @@ export default function Graph() {
                 console.log(`Node ${nodeId} - Height: ${nodeHeight}px, Width: ${nodeWidth}px`);
             }
         }
-    }, []); // Empty dependency array to run the effect once
+    }, []);
 
     const nodes = [
         {

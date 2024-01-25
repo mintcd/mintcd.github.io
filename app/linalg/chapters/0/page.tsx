@@ -2,15 +2,13 @@
 
 import Latex from 'react-latex-next';
 import 'katex/dist/katex.min.css';
-import Sidebar from '@app/linear-algebra/sidebar';
-import Nav from "@components/nav"
+import Sidebar from '@components/sidebar';
 
 export default function Chapter() {
 	return (
 		<div>
-			<Nav />
 			<div className='py-5 grid grid-cols-5 gap-3'>
-				<Sidebar current={0} />
+				<Sidebar topic='linalg' current={0} />
 
 				<div className="col-span-4">
 

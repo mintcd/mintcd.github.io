@@ -64,5 +64,10 @@ export default [
                 depending: []
             },
         ]
+    },
+    {
+        chapter: 2,
+        name: "Connectedness and Compactness",
+        statements: []
     }
 ]

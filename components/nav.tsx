@@ -80,7 +80,7 @@ export default function Nav() {
                 </li>
 
                 <li>
-                  <a href="/topology/chapters/1" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-400 dark:hover:text-white">
+                  <a href="/topology/chapters/0" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-400 dark:hover:text-white">
                     Topology
                   </a>
                 </li>

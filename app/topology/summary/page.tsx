@@ -14,10 +14,10 @@ export default function Graph() {
         <div className='grid grid-cols-3'>
             <Xwrapper>
                 {statements.map((item) => (
-                    <Block id={item.id} item={item} includeId={true} includeName={true} />
+                    <Block key={item.id} id={item.id} item={item} includeId={true} includeName={true} />
                 ))}
-                {dependencies.map((item) => (
-                    <Xarrow startAnchor='auto' endAnchor='auto' headSize={4} start={item[0]} end={item[1]} />
+                {dependencies.map((item, index) => (
+                    <Xarrow key={index} startAnchor='auto' endAnchor='auto' headSize={4} start={item[0]} end={item[1]} />
                 ))}
             </Xwrapper>
         </div>

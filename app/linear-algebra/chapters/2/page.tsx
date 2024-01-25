@@ -14,7 +14,7 @@ export default function Chapter() {
         Generally, vector space is an algebraic structure specified by the set of vectors <Latex> $V$ </Latex> and the set of scalars <Latex>{`$\\mathbb{F}$`}</Latex>. So we concern about the homomorphism between two vector spaces in the normal sense - operation preservation. Concretely, if <Latex>{`$f: V\\to W$`}</Latex> is a homomorphism, then it preserves vector addition and scalar multiplication.
         <Latex>$$f(x+y) = f(x)+f(y),\,\,\forall x,y\in V$$</Latex>
         <Latex>{`$$f(ax) = af(x),\\,\\,\\forall x\\in V, c\\in\\mathbb{F}$$`}</Latex>
-        The above properties are similar to that of linear function in analysis. So we use the term "linear transformation" interchangeably with "homomorphism" in the case of vector spaces.
+        The above properties are similar to that of linear function in analysis. So we use the term linear transformation interchangeably with homomorphism in the case of vector spaces.
         <div className="border rounded p-4 bg-blue-100 m-3">
           <span className="text-lg font-semibold mb-2"> Definition. </span>
           <Latex>

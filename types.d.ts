@@ -1,6 +1,7 @@
 declare module 'react-latex'
 declare module 'd3'
 
+
 type Chapter = {
     chapter: number;
     name: string;

@@ -13,7 +13,7 @@ export default [
             {
                 id: '2',
                 type: "definition",
-                content: "A subset $W$ of a vector space $V$ is called a subspace of $V$ if itself is a vector space, denoted by $W\\le V$.",
+                content: "A subset $W$ of a vector space $V$ is called a subspace of $V$ if $W$ itself is a vector space, denoted by $W\\le V$.",
                 depending: [],
             },
             {
@@ -137,7 +137,11 @@ export default [
                 id: '1',
                 type: 'definition',
                 name: "Linear transformations",
-                content: "A linear transformation is a homomorphism between two vector spaces",
+                content: `A map $f:V\\to W$ is called a linear transformation if it satisfies the following conditions
+                $$\\begin{aligned} 
+                &\\textbf{1. } f(x+y) = f(x)+f(y) \\\\
+                &\\textbf{2. } f(cx) = cf(x)\\\\
+                \\end{aligned}.$$ Or equivalently, $f(cx+y) = cf(x)+f(y)$. If $W=V$, $f$ is called a linear operator.`,
                 depending: [],
             },
             {

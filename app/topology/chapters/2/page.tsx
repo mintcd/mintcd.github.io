@@ -7,14 +7,16 @@ import TheoremBox from '@components/theorem-box';
 import topology from '@models/topology';
 
 export default function Chapter() {
-  const statement = topology.find(chapter => chapter.chapter === 1)?.statements[0]
+  const statements = topology.find(chapter => chapter.chapter === 2)?.statements
 
   return (
     <div className='py-5 grid grid-cols-4 gap-3'>
 
       <div className='col-span-1'><Sidebar topic='topology' current={2} /></div>
       <div className='col-span-3'>
-        {statement && <TheoremBox statement={statement} />}
+        {statements && statements[0] && <TheoremBox statement={statements[0]} />}
+        {statements && statements[0] && <TheoremBox statement={statements[1]} />}
+        {statements && statements[0] && <TheoremBox statement={statements[2]} />}
       </div>
     </div>
   )

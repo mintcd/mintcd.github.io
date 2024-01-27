@@ -1,6 +1,5 @@
 import React, { ReactNode } from 'react';
 import '@styles/global.css';
-import { Inter } from 'next/font/google';
 import Nav from '@components/nav'
 
 export const metadata = {

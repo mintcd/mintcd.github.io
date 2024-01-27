@@ -3,82 +3,33 @@
 import Latex from 'react-latex-next';
 import 'katex/dist/katex.min.css';
 import Sidebar from '@components/sidebar';
+import linalg from '@models/linear-algebra';
+import TheoremBox from '@components/theorem-box';
 
 export default function Chapter() {
+	const chapter = linalg.find(chapter => chapter.chapter === 1)
+	const lintrans = linalg.find(chapter => chapter.chapter === 2)?.statements[0]
 	return (
 		<div>
 			<div className='py-5 grid grid-cols-5 gap-3'>
-				<Sidebar topic='linalg' current={0} />
+				<Sidebar topic='linear-algebra' current={0} />
 
 				<div className="col-span-4">
 
-					Linear algebra provides computational means for many other scientific fields, such as machine learning and physics. Motivated by solving linear equations, mathematicians have developed a theoretical algebraic approach rooted from the definition of vector space and relevant objects.
-					<br />
 
-					<div className="border rounded p-4 bg-blue-100 m-3">
-						<Latex>
-							{`$\\textbf{Definition. }$ A set $V$ is called a vector space over a field $\\mathbb{F}$ if it is qualified with two operations`}
-						</Latex>
-						<div className='grid grid-cols-2'>
-							<Latex>
-								{`$$\\begin{aligned} + : V\\times V &\\to V \\\\ (x,y) &\\mapsto x+y,\\end{aligned}$$`}
-							</Latex>
-							<Latex>
-								{`$$\\begin{aligned} \\cdot : \\mathbb{F}\\times V &\\to V \\\\ (c,x) &\\mapsto cx. \\end{aligned}$$`}
-							</Latex>
-						</div>
-						<Latex>
-							{`such that for any $x,y,z\\in V$ and $a,b\\in\\mathbb{F}$, the following axioms are satisfied
-		                $$\\begin{aligned} 
-		                &\\textbf{1. } x + y = y + x. \\\\
-		                &\\textbf{2. } (x + y) + z = x + (y + z).\\\\
-		                &\\textbf{3. } \\exists 0\\in V, x + 0 = x.\\\\
-		                &\\textbf{4. } \\exists -x\\in V, x + (-x) = 0. \\\\
-		                &\\textbf{5. } 1x = x. \\\\
-		                &\\textbf{6. } (ab)x = a(bx). \\\\
-		                &\\textbf{7. } a(x+y) = ax+ay. \\\\
-		                &\\textbf{8. } (a+b)x = ax+bx.
-		                \\end{aligned}$$
-		                `}
-						</Latex>
-					</div>
+					{chapter?.statements[0] && <TheoremBox statement={chapter.statements[0]} />}
 
 					<Latex>
-						{`Elements of $V$ are called vectors. Element of $\\mathbb{F}$ are called scalars because they are able to "scale" a vector. Hence the two operators are called vector addition and scalar multiplication. The four first axioms state that a vector space is an abelian group of addtion. The last axioms define rules for scalar multiplication. Similar to sub-structure of other algebraic structures, it is natural to define subspaces of a vector space.`}
+						{`The first four axioms indicate that a vector space is an abelian group of addtion and the last axioms define rules for scalar multiplication. Similar to sub-structure of other algebraic structures, it is natural to define subspaces of a vector space.`}
 					</Latex>
 
-					<div className="border rounded p-4 bg-blue-100 m-4">
-						<span className="text-lg font-semibold mb-2"> Definition. </span>
-						<Latex>
-							{`A subset $W$ of a vector space $V$ is subspace of $V$ if itself is a vector space.`}
-						</Latex>
-					</div>
-
-					<div>
-						Then we studied specific types of mappings related to vector spaces, namely linear transformations and linear forms.
-					</div>
-
-					<div className="border rounded p-4 bg-blue-100 m-4">
-						<span className="text-lg font-semibold mb-2"> Definition. </span>
-						<Latex>
-							{`A map $f:V\\to W$ is called a linear transformation if it satisfies the following conditions
-		                     $$\\begin{aligned} 
-		                     &\\textbf{1. } f(x+y) = f(x)+f(y). \\\\
-		                     &\\textbf{2. } f(cx) = cf(x).\\\\
-		                     \\end{aligned}.$$ Or equivalently, $f(cx+y) = cf(x)+f(y)$. If $W=V$, $f$ is called a linear operator.`}
-						</Latex>
-					</div>
+					{chapter?.statements[1] && <TheoremBox statement={chapter.statements[1]} />}
+					{lintrans && <TheoremBox statement={lintrans} />}
 
 					<Latex>
-						{`A linear transformation between two vector spaces is itself a homomorphism, so a vector space is also called a linear space. We study the matrix representation of a linear transformation and seek an equivalence between a linear transformation and its representation to extend results on linear transformations to matrices. Then we concern the following characteristics of linear transformations
+						{`A linear transformation between two vector spaces is also a homomorphism. This is the reason why a vector space is also called a linear space. Every vector space has a dimension. Later we will prove that an $n$-dimensional vector space is isomorphic to $\\mathbb{R}^n$. Consequently, we can use a matrix as a representation of a linear transformation. Then we concern characteristics of linear transformations, namely invertibility, diagonalizability and invariance.
 					`}
 					</Latex>
-
-					<ul className='list-disc ml-10'>
-						<li> Invertibility </li>
-						<li> Diagonalizability </li>
-						<li> Invariance, specifically the eigenvalues and eigenvectors </li>
-					</ul>
 
 					<div className="border rounded p-4 bg-blue-100 m-4">
 						<span className="text-lg font-semibold mb-2"> Definition. </span>

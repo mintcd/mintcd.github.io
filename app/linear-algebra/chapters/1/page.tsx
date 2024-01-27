@@ -9,7 +9,7 @@ export default function Chapter() {
 
   return (
     <div className='py-5 grid grid-cols-4 gap-3'>
-      <div className='col-span-1'><Sidebar topic='linalg' current={1} /></div>
+      <div className='col-span-1'><Sidebar topic='linear-algebra' current={1} /></div>
       <div className='col-span-3'>
 
       </div>

@@ -60,7 +60,6 @@ export default [
                 name: "",
                 type: "definition",
                 content: "An $\\textbf{order topology}$ is whose basis contains elements of the form $(a,b), [a_0,b), (a,b_0]$, where $a,b\\in X$, $a_0$ is the smallest element if any, $b_0$ is the largest element if any.",
-                type: "definition",
                 depending: []
             },
         ]
@@ -68,6 +67,35 @@ export default [
     {
         chapter: 2,
         name: "Connectedness and Compactness",
-        statements: []
+        statements: [
+            {
+                id: "1",
+                type: "definition",
+                content: "Let $X$ be a topological space. A separation of $X$ is a pair $U$, $V$ of disjoint nonempty open subsets of $X$ whose union is $X$.",
+                short: "",
+                depending: []
+            },
+            {
+                id: "2",
+                type: "definition",
+                content: "A topological space $X$ is said to be connected if there exists no seperation of $X$.",
+                short: "",
+                depending: []
+            },
+            {
+                id: "3",
+                type: "lemma",
+                content: "Let $X$ be a topological space and $Y$ is a subspace of $X$. Then $Y$ is connected if there exists no seperation $A$, $B$ of $Y$ such that neither $A$ nor $B$ contains a limit point of the other.",
+                short: "",
+                depending: []
+            },
+            {
+                id: "4",
+                type: "lemma",
+                content: "Let $X$ be a topological space and $Y$ is a subspace of $X$. If $U$ and $V$ form a separation of $X$, and $Y$ is connected, then $Y$ lies entirely in $U$ or $V$.",
+                short: "",
+                depending: []
+            },
+        ]
     }
 ]

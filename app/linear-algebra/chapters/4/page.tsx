@@ -1,6 +1,6 @@
 import Latex from 'react-latex-next';
 import 'katex/dist/katex.min.css';
-import linalg from '@models/linalg';
+import linalg from '@models/linear-algebra';
 
 export default function Chapter() {
 

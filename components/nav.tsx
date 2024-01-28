@@ -19,20 +19,20 @@ export default function Nav() {
         <Image
           src="/favicon.ico"
           alt="scrum pillars"
-          width={50}
+          width={100}
           height={0}
         // className="mr-3 h-6 sm:h-9"
         />
         <span className="self-center whitespace-nowrap dark:text-white ml-2">
-          <div className='text-2xl font-semibold'>Computer Science Blocks</div>
-          <div className='text-sm'> From Abacus to Artificial intelligence </div>
+          <div className='text-2xl font-semibold'>Research for Meanings</div>
+          <div className='text-sm'> May I learn out the meaning of life? </div>
         </span>
       </a>
 
 
       <div className="hidden w-full md:block md:w-auto relative" id="navbar-multi-level">
         <ul className="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-          <li className="relative">
+          {/* <li className="relative">
             <button
               id="dropdownNavbarLink"
               data-dropdown-toggle="dropdownNavbar"
@@ -70,6 +70,18 @@ export default function Nav() {
                 </a>
               </div>
             </div>
+          </li> */}
+
+          <li>
+            <a href="/study-notes" className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
+              Thoughts
+            </a>
+          </li>
+
+          <li>
+            <a href="/study-notes" className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
+              Study Notes
+            </a>
           </li>
 
           <li>

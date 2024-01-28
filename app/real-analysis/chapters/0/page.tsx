@@ -8,11 +8,9 @@ export default function RealAnalysis() {
       <div className='py-5 grid grid-cols-5 gap-3'>
         <Sidebar topic='real-analysis' current={0} />
 
-        <div className="col-span-4">
+        {/* <div className="col-span-4">
           Hello from Real Analysis
-        </div>
-
-
+        </div> */}
 
       </div >
     </div>

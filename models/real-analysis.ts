@@ -1,7 +1,7 @@
 export default [
   {
     chapter: 1,
-    name: "The Real Number",
+    name: "The Real Numbers",
     statements: [
       {
         id: "1",

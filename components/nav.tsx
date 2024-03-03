@@ -21,7 +21,7 @@ export default function Nav() {
           height={0}
         />
         <span className="self-center whitespace-nowrap dark:text-white ml-2">
-          <div className="text-lg sm:text-2xl font-semibold">Research for Meanings</div>
+          <div className="text-lg sm:text-2xl font-semibold">In Reseek of Meanings</div>
           <div className="text-sm sm:text-lg"> May computer science reveal the meaning of life? </div>
         </span>
       </a>

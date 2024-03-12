@@ -1,1 +1,1 @@
-My study notes on different subjects.
+Everything I am concerning about.

@@ -26,3 +26,9 @@ type GraphNode = {
     opacity: string = "200",
     type: string = "text"
 };
+
+type Term = {
+    name: string,
+    definition: string = ""
+    categories: string[] = []
+}

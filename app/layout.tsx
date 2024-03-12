@@ -3,7 +3,7 @@ import '@styles/global.css';
 import Nav from '@components/nav'
 
 export const metadata = {
-  title: 'Study Notes',
+  title: 'My Deeds',
   description: 'From Physics and Mathematics to Computer Science',
 };
 

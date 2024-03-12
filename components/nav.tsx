@@ -22,7 +22,7 @@ export default function Nav() {
         />
         <span className="self-center whitespace-nowrap dark:text-white ml-2">
           <div className="text-lg sm:text-2xl font-semibold">In Reseek of Meanings</div>
-          <div className="text-sm sm:text-lg"> What's worth it? How to find? </div>
+          <div className="text-sm sm:text-lg"> What&apos;s worth it? How to find? </div>
         </span>
       </a>
 

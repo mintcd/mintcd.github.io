@@ -4,7 +4,7 @@ import Nav from '@components/nav'
 
 export const metadata = {
   title: 'My Deeds',
-  description: 'From Physics and Mathematics to Computer Science',
+  description: 'The meaning of them all.',
 };
 
 interface RootLayoutProps {

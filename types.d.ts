@@ -29,6 +29,7 @@ type GraphNode = {
 
 type Term = {
     name: string,
-    definition: string = ""
-    categories: string[] = []
+    definition: string = "",
+    categories: string[] = [],
+    dependants?: string[] = []
 }

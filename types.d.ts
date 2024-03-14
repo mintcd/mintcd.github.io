@@ -31,5 +31,6 @@ type Term = {
     name: string,
     definition: string = "",
     categories: string[] = [],
+    subcategories?: string[] = [],
     dependants?: string[] = []
 }

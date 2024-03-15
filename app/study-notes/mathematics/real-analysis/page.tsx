@@ -1,15 +1,21 @@
-import * as React from 'react';
 import Timeline from '@mui/lab/Timeline';
 import TimelineItem, { timelineItemClasses } from '@mui/lab/TimelineItem';
 import TimelineSeparator from '@mui/lab/TimelineSeparator';
 import TimelineConnector from '@mui/lab/TimelineConnector';
 import TimelineContent from '@mui/lab/TimelineContent';
 import TimelineDot from '@mui/lab/TimelineDot';
-import TimelineOppositeContent, {
-  timelineOppositeContentClasses,
-} from '@mui/lab/TimelineOppositeContent';
+import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent';
+import statementList from '@models/real-analysis-timeline';
 
 export default function NoOppositeContent() {
+  const timeline = statementList as Statement[];
+
+  const color: { [key: string]: 'info' | 'secondary' | 'success' } = {
+    definition: 'info',
+    axiom: 'secondary',
+    theorem: 'success'
+  };
+
   return (
     <div className='m-5'>
       <Timeline
@@ -20,31 +26,21 @@ export default function NoOppositeContent() {
           },
         }}
       >
-        <TimelineItem>
-          <TimelineOppositeContent sx={{ marginLeft: -100 }} color="textSecondary">
-            09:30 am
-          </TimelineOppositeContent>
-          <TimelineSeparator>
-            <TimelineDot color="info" />
-            <TimelineConnector />
-          </TimelineSeparator>
-          <TimelineContent>
-            <div>Eat</div>
-          </TimelineContent>
-        </TimelineItem>
-        <TimelineItem>
-          <TimelineOppositeContent sx={{ marginLeft: -100 }} color="textSecondary">
-            10:30 am
-          </TimelineOppositeContent>
-          <TimelineSeparator>
-            <TimelineDot />
-          </TimelineSeparator>
-          <TimelineContent>
-            <div>Code</div>
-          </TimelineContent>
-        </TimelineItem>
+        {timeline.map((item, index) => (
+          <TimelineItem key={index}>
+            <TimelineOppositeContent sx={{ marginLeft: -100 }} color="textSecondary">
+              {item.type.charAt(0).toUpperCase() + item.type.slice(1)} {index + 1}
+            </TimelineOppositeContent>
+            <TimelineSeparator>
+              <TimelineDot color={color[item.type]} />
+              {index !== timeline.length - 1 && <TimelineConnector />}
+            </TimelineSeparator>
+            <TimelineContent>
+              {item.name}
+            </TimelineContent>
+          </TimelineItem>
+        ))}
       </Timeline>
     </div>
-
   );
 }

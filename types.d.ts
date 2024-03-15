@@ -15,7 +15,7 @@ type Statement = {
     content: string,
     short?: string,
     proof?: string,
-    depending?: Array<string>,
+    dependants?: Array<string>,
 }
 
 type GraphNode = {

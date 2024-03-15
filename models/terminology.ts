@@ -21,6 +21,36 @@ export default [
     categories: ["topology"]
   },
   {
+    name: "intersection",
+    definition: "",
+    categories: ["set theory"]
+  },
+  {
+    name: "union",
+    definition: "",
+    categories: ["set theory"]
+  },
+  {
+    name: "complement",
+    definition: "",
+    categories: ["set theory"]
+  },
+  {
+    name: "set difference",
+    definition: "",
+    categories: ["set theory"]
+  },
+  {
+    name: "disjoint",
+    definition: "",
+    categories: ["set theory"]
+  },
+  {
+    name: "De Morgan's Laws",
+    definition: "",
+    categories: ["set theory"]
+  },
+  {
     name: "measure",
     definition: "",
     categories: ["analysis"]
@@ -30,6 +60,11 @@ export default [
     definition: "",
     categories: ["analysis"],
     dependants: ["measurable space"]
+  },
+  {
+    name: "well-ordering property",
+    definition: "",
+    categories: ["set theory", "algebra"],
   },
   {
     name: "counting measure",
@@ -42,6 +77,36 @@ export default [
     definition: "",
     categories: ["analysis"],
     dependants: ["measure"]
+  },
+  {
+    name: "upper bound",
+    definition: "",
+    categories: ["analysis"],
+    dependants: ["order"]
+  },
+  {
+    name: "ordered field",
+    definition: "",
+    categories: ["algebra", "analysis"],
+    dependants: ["order", "field"]
+  },
+  {
+    name: "Archimedian property",
+    definition: "",
+    categories: ["algebra", "analysis"],
+    dependants: ["order", "field"]
+  },
+  {
+    name: "triangle inequality",
+    definition: "",
+    categories: ["algebra", "analysis"],
+    dependants: ["absolute value"]
+  },
+  {
+    name: "least upper bound",
+    definition: "",
+    categories: ["analysis"],
+    dependants: ["upper bound"]
   },
   {
     name: "Lebesgue measure",

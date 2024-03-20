@@ -8,7 +8,7 @@ import { forwardRef, RefObject } from 'react';
 
 export default function Graph() {
     // const statements = topology.flatMap(item => item.statements)
-    // const dependencies = statements.flatMap((item) => item.depending.map((depended) => [depended, item.id]));
+    // const dependencies = statements.flatMap((item) => item.dependants.map((depended) => [depended, item.id]));
 
     // return (
     //     <div className='grid grid-cols-3'>

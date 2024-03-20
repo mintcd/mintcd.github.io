@@ -46,4 +46,4 @@ export default [
     content: "If $x, y\\in\\mathbb{R}$ and $x > 0$, then $\\exist n \\in \\mathbb{N}$ such that $nx > y$.",
     dependants: []
   },
-]
+] as Statement[]

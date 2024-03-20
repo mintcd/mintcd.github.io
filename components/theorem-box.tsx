@@ -12,7 +12,7 @@ export default function TheoremBox({ statement }: { statement: Statement }) {
     else return 'bg-gray-100';
   }
 
-  function borderColor(type: string) {
+  function borderColor(type: 'axiom' | 'theorem' | 'definition' | 'corollary' | 'lemma') {
     if (type === 'theorem') return 'border-blue-400';
     else if (type === 'lemma') return 'border-blue-400';
     else if (type === 'definition') return 'border-green-400';

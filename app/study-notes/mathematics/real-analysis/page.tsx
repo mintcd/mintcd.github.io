@@ -68,6 +68,7 @@ export default function NoOppositeContent() {
                   <Latex>
                     {item.name}
                   </Latex>
+
                 </div>
                 <div>
                   {showed[index] && item.content !== "" &&

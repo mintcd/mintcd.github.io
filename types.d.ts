@@ -15,7 +15,7 @@ type Statement = {
     content: string,
     short?: string,
     proof?: string,
-    dependants?: Array<string>,
+    dependants?: string[],
     implications?: Statement[]
 }
 

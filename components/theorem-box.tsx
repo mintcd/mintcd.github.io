@@ -5,7 +5,7 @@ import Latex from 'react-latex-next';
 export default function TheoremBox({ statement }: { statement: Statement }) {
   const [isExpanded, setIsExpanded] = useState(true);
 
-  function bgColor(type: string) {
+  function bgColor(type: 'axiom' | 'theorem' | 'definition' | 'corollary' | 'lemma') {
     if (type === 'theorem') return 'bg-blue-50';
     else if (type === 'lemma') return 'bg-blue-50';
     else if (type === 'definition') return 'bg-green-50';

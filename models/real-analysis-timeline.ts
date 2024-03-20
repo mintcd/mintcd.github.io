@@ -40,4 +40,10 @@ export default [
     content: "",
     dependants: []
   },
+  {
+    name: "Archimedian Property",
+    type: "theorem",
+    content: "",
+    dependants: []
+  },
 ]

@@ -10,12 +10,13 @@ type Chapter = {
 
 type Statement = {
     id: string,
-    type: string,
+    type: 'axiom' | 'theorem' | 'definition' | 'corollary',
     name?: string,
     content: string,
     short?: string,
     proof?: string,
     dependants?: Array<string>,
+    implications?: Statement[]
 }
 
 type GraphNode = {

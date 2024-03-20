@@ -53,6 +53,12 @@ export default function Home() {
               <h2 className="text-lg font-bold">Linear Algebra</h2>
             </div>
           </Link>
+
+          <Link href="/study-notes/mathematics/probability">
+            <div className="box bg-white shadow-md rounded-lg p-4 cursor-pointer text-center">
+              <h2 className="text-lg font-bold">Probability Theory</h2>
+            </div>
+          </Link>
         </div>
       )}
     </div>

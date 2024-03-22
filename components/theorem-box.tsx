@@ -5,14 +5,14 @@ import Latex from 'react-latex-next';
 export default function TheoremBox({ statement }: { statement: Statement }) {
   const [isExpanded, setIsExpanded] = useState(true);
 
-  function bgColor(type: 'axiom' | 'theorem' | 'definition' | 'corollary' | 'lemma') {
+  function bgColor(type: 'axiom' | 'theorem' | 'definition' | 'corollary' | 'lemma' | 'note') {
     if (type === 'theorem') return 'bg-blue-50';
     else if (type === 'lemma') return 'bg-blue-50';
     else if (type === 'definition') return 'bg-green-50';
     else return 'bg-gray-100';
   }
 
-  function borderColor(type: 'axiom' | 'theorem' | 'definition' | 'corollary' | 'lemma') {
+  function borderColor(type: 'axiom' | 'theorem' | 'definition' | 'corollary' | 'lemma' | 'note') {
     if (type === 'theorem') return 'border-blue-400';
     else if (type === 'lemma') return 'border-blue-400';
     else if (type === 'definition') return 'border-green-400';

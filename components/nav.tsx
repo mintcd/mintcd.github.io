@@ -15,10 +15,10 @@ export default function Nav() {
       <a href="/" className="flex items-center">
         <Image
           src="/favicon.ico"
-          alt="scrum pillars"
+          alt="bagel"
           className="logo-image"
           width={75}
-          height={0}
+          height={75}
         />
         <span className="self-center whitespace-nowrap dark:text-white ml-2">
           <div className="text-lg sm:text-2xl font-semibold">In Reseek of Meanings</div>

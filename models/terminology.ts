@@ -311,4 +311,10 @@ export default [
     definition: "",
     categories: ["analysis"]
   },
+  {
+    name: "Cauchy sequence",
+    definition: "",
+    categories: ["analysis"],
+    subcategories: ["real analysis"],
+  },
 ]

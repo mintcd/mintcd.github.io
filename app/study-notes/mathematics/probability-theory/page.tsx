@@ -1,7 +1,7 @@
-import timeline from '@models/real-analysis-timeline';
+import timeline from '@models/probability-theory-timeline';
 import TheoremDependency from '@components/theorem-dependency';
 
-export default function RealAnalysis() {
+export default function ProbabilityTheory() {
   return (
     <div>
       <TheoremDependency data={timeline} />

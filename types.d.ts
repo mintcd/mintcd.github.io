@@ -9,8 +9,8 @@ type Chapter = {
 }
 
 type Statement = {
-    id: string,
-    type: 'axiom' | 'theorem' | 'definition' | 'corollary' | 'lemma',
+    id?: string,
+    type: 'axiom' | 'theorem' | 'definition' | 'corollary' | 'lemma' | 'note',
     name?: string,
     content: string,
     short?: string,

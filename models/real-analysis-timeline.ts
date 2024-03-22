@@ -46,4 +46,22 @@ export default [
     content: "If $x, y\\in\\mathbb{R}$ and $x > 0$, then $\\exist n \\in \\mathbb{N}$ such that $nx > y$.",
     dependants: []
   },
+  {
+    name: "Density of $\\mathbb{Q}$",
+    type: "theorem",
+    content: "If $x, y\\in \\mathbb{R}$ and $x < y$ then $\\exist r\\in\\mathbb{Q}$ such that $x < r < y$.",
+    dependants: []
+  },
+  {
+    name: "Absolute value",
+    type: "definition",
+    content: "",
+    dependants: []
+  },
+  {
+    name: "Triangle inequality",
+    type: "theorem",
+    content: "$\\forall x,y\\in\\mathbb{R}, |x+y|\\le |x|+|y|$.",
+    dependants: []
+  },
 ] as Statement[]

@@ -54,7 +54,7 @@ export default function Home() {
             </div>
           </Link>
 
-          <Link href="/study-notes/mathematics/probability">
+          <Link href="/study-notes/mathematics/probability-theory">
             <div className="box bg-white shadow-md rounded-lg p-4 cursor-pointer text-center">
               <h2 className="text-lg font-bold">Probability Theory</h2>
             </div>

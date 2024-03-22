@@ -5,7 +5,7 @@ import realAnalysis from '@public/real-analysis.png';
 import Image from 'next/image';
 import Link from 'next/link';
 
-export default function Home() {
+export default function Mathematics() {
   const [isMathVisible, setIsMathVisible] = useState(true);
 
   const toggleMathematics = () => {
@@ -15,7 +15,7 @@ export default function Home() {
   return (
     <div className="container mx-auto mt-8">
 
-      <Link href="/study-notes/mathematics/terminology">
+      <Link href="/study-notes/terminology">
         <div className="my-3 text-center mb-8">
           <h2 className="text-2xl font-bold cursor-pointer">Terminology</h2>
         </div>
@@ -23,7 +23,7 @@ export default function Home() {
 
       <div className="my-3 text-center mb-8">
         <h1 className="text-2xl font-bold cursor-pointer" onClick={toggleMathematics}>
-          Subjects
+          Mathematics
         </h1>
       </div>
 
@@ -57,6 +57,12 @@ export default function Home() {
           <Link href="/study-notes/mathematics/probability-theory">
             <div className="box bg-white shadow-md rounded-lg p-4 cursor-pointer text-center">
               <h2 className="text-lg font-bold">Probability Theory</h2>
+            </div>
+          </Link>
+
+          <Link href="/study-notes/mathematics/optimization">
+            <div className="box bg-white shadow-md rounded-lg p-4 cursor-pointer text-center">
+              <h2 className="text-lg font-bold">Optimization</h2>
             </div>
           </Link>
         </div>

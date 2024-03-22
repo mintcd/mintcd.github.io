@@ -68,11 +68,14 @@ export default function TheoremDependency({ data }: { data: Statement[] }) {
                 </Latex>
 
               </div>
-              <div>
+              <div className={`mt-2 transition-all duration-500 ${showed[index] ? 'h-auto opacity-100' : 'h-0 opacity-0'}`}>
                 {showed[index] && item.content !== "" &&
-                  <Latex>
-                    {item.content}
-                  </Latex>}
+                  <div className='bg-lime-200 p-2 rounded-xl'>
+                    <Latex>
+                      {item.content}
+                    </Latex>
+                  </div>
+                }
                 {showed[index] && item.implications && item.implications.length !== 0 &&
                   item.implications.map((implication, corollaryIndex) => (
                     <TimelineItem key={`${index}-${corollaryIndex}`}>
@@ -88,7 +91,12 @@ export default function TheoremDependency({ data }: { data: Statement[] }) {
                           sx={{ backgroundColor: 'white' }} />
                       </TimelineSeparator>
                       <TimelineContent>
-                        {implication.name}
+                        <b>
+                          {implication.name}
+                        </b>
+
+                        {': '}
+
                         <Latex>
                           {implication.content}
                         </Latex>

@@ -1,4 +1,4 @@
-import timeline from '@models/optimization-timeline';
+import timeline from '@models/markov-chain';
 import TheoremDependency from '@components/theorem-dependency';
 
 export default function ProbabilityTheory() {

@@ -1,5 +1,151 @@
 export default [
   {
+    name: "continuous function",
+    definition: "",
+    categories: ["analysis"],
+    subcategories: ["real analysis"],
+    dependants: ["function"]
+  },
+  {
+    name: "norm",
+    definition: "",
+    categories: ["analysis", "linear algebra"],
+    subcategories: ["real analysis"],
+    dependants: ["function", "triangle inequality", "positive semidefiniteness", "homogeneity"]
+  },
+  {
+    name: "inner product space",
+    definition: "",
+    categories: ["analysis", "linear algebra"],
+    subcategories: ["real analysis"],
+    dependants: ["dot product"]
+  },
+  {
+    name: "convex combination",
+    definition: "",
+    categories: ["analysis"],
+    subcategories: ["real analysis", "convex analysis"],
+    dependants: ["convexity"]
+  },
+  {
+    name: "convexity",
+    definition: "",
+    categories: ["analysis"],
+    subcategories: ["real analysis", "convex analysis"]
+  },
+  {
+    name: "unit sphere",
+    definition: "",
+    categories: ["analysis"],
+    subcategories: ["real analysis"]
+  },
+  {
+    name: "unit ball",
+    definition: "",
+    categories: ["analysis"],
+    subcategories: ["real analysis"]
+  },
+  {
+    name: "box",
+    definition: "",
+    categories: ["analysis"],
+    subcategories: ["real analysis"]
+  },
+  {
+    name: "triangle inequality",
+    definition: "",
+    categories: ["linear algebra", "analysis"],
+    subcategories: ["real analysis"]
+  },
+  {
+    name: "positive (semi)definiteness",
+    definition: "",
+    categories: ["linear algebra", "analysis"],
+    subcategories: ["real analysis"]
+  },
+  {
+    name: "dot product",
+    definition: "",
+    categories: ["linear algebra", "analysis"],
+    subcategories: ["real analysis"]
+  },
+  {
+    name: "interval",
+    definition: "",
+    categories: ["algebra", "analysis"],
+  },
+  {
+    name: "translation",
+    definition: "",
+    categories: ["algebra", "analysis"],
+  },
+  {
+    name: "trichotomy",
+    definition: "",
+    categories: ["algebra"],
+  },
+  {
+    name: "symmetry",
+    definition: "",
+    categories: ["algebra"],
+  },
+  {
+    name: "associativity",
+    definition: "",
+    categories: ["algebra"],
+  },
+  {
+    name: "rational cut",
+    definition: "",
+    categories: ["analysis"],
+    dependants: ["Dedekind cut"]
+  },
+  {
+    name: "Dedekind cut",
+    definition: "",
+    categories: ["analysis"]
+  },
+  {
+    name: "equivalence class",
+    definition: "",
+    categories: ["algebra"]
+  },
+  {
+    name: "equivalence relation",
+    definition: "",
+    categories: ["algebra"]
+  },
+  {
+    name: "class",
+    definition: "",
+    categories: ["set theory"]
+  },
+  {
+    name: "difference",
+    definition: "",
+    categories: ["set theory"]
+  },
+  {
+    name: "symmetric difference",
+    definition: "",
+    categories: ["set theory"]
+  },
+  {
+    name: "disjoint sets",
+    definition: "",
+    categories: ["set theory"]
+  },
+  {
+    name: "singleton set",
+    definition: "",
+    categories: ["set theory"]
+  },
+  {
+    name: "empty set",
+    definition: "",
+    categories: ["set theory"]
+  },
+  {
     name: "sigma algebra",
     definition: "",
     categories: ["analysis"]
@@ -294,6 +440,12 @@ export default [
   {
     name: "measurable map",
     definition: "",
+    categories: ["analysis"],
+    dependants: ["map"]
+  },
+  {
+    name: "map",
+    definition: "",
     categories: ["analysis"]
   },
   {
@@ -313,7 +465,8 @@ export default [
   },
   {
     name: "Cauchy sequence",
-    definition: "",
+    definition: `A sequence $\\{u_n\\}$ of real numbers is called Cauchy if
+    $$\\forall \\epsilon > 0, \\exists N\\in\\mathbb{N}, \\forall m,n>N, |u_n-u_m|<\\epsilon.$$`,
     categories: ["analysis"],
     subcategories: ["real analysis"],
   },

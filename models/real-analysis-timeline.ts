@@ -23,21 +23,27 @@ export default [
     ]
   },
   {
+    name: "Dedekind's cuts construction of $\\mathbb{R}$",
+    type: "definition",
+    content: "",
+    implications: [
+      {
+        name: "",
+        type: "theorem",
+        content: ""
+      },
+    ]
+  },
+  {
     name: "Least upper bound property",
     type: "definition",
     content: "An ordered set $S$ has the least upper bound property if every $E \\subset S$ which is nonempty and bounded above has a supremum in $S$.",
     dependants: []
   },
   {
-    name: "Field",
-    type: "definition",
-    content: "",
-    dependants: []
-  },
-  {
-    name: "Existence and uniqueness of $\\mathbb{R}$",
+    name: "The $\\epsilon$-principle",
     type: "theorem",
-    content: "",
+    content: "If $x,y\\in\mathbb{R}$ and for any $\\epsilon>0$, $|x-y|<\\epsilon$, then $x=y$.",
     dependants: []
   },
   {

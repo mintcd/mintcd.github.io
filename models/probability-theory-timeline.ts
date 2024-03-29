@@ -88,7 +88,23 @@ export default [
     ]
   },
   {
+    name: "Convergence of random variables",
+    type: "definition",
+    content: "",
+    dependants: [],
+    implications: [
+      {
+      },
+    ]
+  },
+  {
     name: "Expectation and Conditional expectation",
+    type: "definition",
+    content: "",
+    dependants: [],
+  },
+  {
+    name: "Stochastic Process",
     type: "definition",
     content: "",
     dependants: [],

@@ -14,8 +14,12 @@ export default function Mathematics() {
 
   return (
     <div className="container mx-auto mt-8">
+      <div className='text-center'>
+        The picture of mathematics is drawn up by the language of set theory.
+      </div>
 
-      <Link href="/study-notes/terminology">
+
+      <Link href="/study-notes/mathematics/terminology">
         <div className="my-3 text-center mb-8">
           <h2 className="text-2xl font-bold cursor-pointer">Terminology</h2>
         </div>
@@ -23,7 +27,7 @@ export default function Mathematics() {
 
       <div className="my-3 text-center mb-8">
         <h1 className="text-2xl font-bold cursor-pointer" onClick={toggleMathematics}>
-          Mathematics
+          Subjects
         </h1>
       </div>
 
@@ -35,7 +39,7 @@ export default function Mathematics() {
             </div>
           </Link>
 
-          <Link href="/study-notes/mathematics/real-analysis/chapters/0">
+          <Link href="/study-notes/mathematics/real-analysis">
             <div className="box bg-white shadow-md rounded-lg p-4 cursor-pointer text-center">
               <Image src={realAnalysis} alt="Real Analysis" className="rounded-lg" />
               <h2 className="text-lg font-bold mt-2">Real Analysis</h2>

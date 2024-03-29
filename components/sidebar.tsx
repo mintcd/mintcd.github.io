@@ -39,13 +39,11 @@ export default function Sidebar({ topic, current }: { topic: string, current: nu
     fetchData();
   });
 
-  console.log(data)
-
   return (
     <div>
       <div id="side-bar" className="p-4 max-h-[100vh] text-gray-800">
-        <a href={`/${topicModuleMap[topic].link}/chapters/0`} className="hover:opacity-75 cursor-pointer my-10">
-          <div className={`p-2 ${current === 0 ? 'bg-slate-200' : ''}`}> Introduction to {topicModuleMap[topic].name} </div>
+        <a href={`/study-notes/mathematics/${topicModuleMap[topic].link}`} className="hover:opacity-75 cursor-pointer my-10">
+          <div className={`p-2 ${current === 0 ? 'bg-slate-200' : ''}`}> Summary of {topicModuleMap[topic].name} </div>
         </a>
 
         {data.map((chapter: Chapter) => (

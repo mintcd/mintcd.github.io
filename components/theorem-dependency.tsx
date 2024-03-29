@@ -12,6 +12,8 @@ import TimelineOppositeContent, {
 } from '@mui/lab/TimelineOppositeContent';
 
 import { FaRegLightbulb } from "react-icons/fa";
+import TipsAndUpdatesRoundedIcon from '@mui/icons-material/TipsAndUpdatesRounded';
+
 
 import Latex from 'react-latex-next';
 import 'katex/dist/katex.min.css';
@@ -21,13 +23,54 @@ export default function TheoremDependency({ data }: { data: Statement[] }) {
 
   const [implicationShowed, setImplicationShowed] = useState(Array(data.length).fill(false));
 
-  const color: { [key: string]: 'info' | 'secondary' | 'success' | 'grey' | 'warning' | 'primary' } = {
-    definition: 'info',
-    axiom: 'secondary',
-    theorem: 'success',
-    corollary: 'grey',
-    example: 'warning',
-    note: 'primary'
+  const statementProps: {
+    [key in 'definition' | 'axiom' | 'theorem' | 'corollary' | 'example' | 'note' | 'lemma']: {
+      color: 'info' | 'secondary' | 'success' | 'grey' | 'warning' | 'primary';
+      image: (index: number) => JSX.Element;
+    };
+  } = {
+    definition: {
+      color: 'info',
+      image: (index) => (
+        <TipsAndUpdatesRoundedIcon className={showed[index] ? 'text-white' : 'text-[#0288d1]'} />
+      ),
+    },
+    axiom: {
+      color: 'secondary',
+      image: (index) => (
+        <TipsAndUpdatesRoundedIcon className={showed[index] ? 'text-[#0288d1]' : 'text-gray-700'} />
+      ),
+    },
+    theorem: {
+      color: 'success',
+      image: (index) => (
+        <TipsAndUpdatesRoundedIcon className={showed[index] ? 'text-[#0288d1]' : 'text-gray-700'} />
+      ),
+    },
+    corollary: {
+      color: 'grey',
+      image: (index) => (
+        <TipsAndUpdatesRoundedIcon className={showed[index] ? 'text-[#0288d1]' : 'text-gray-700'} />
+      ),
+    },
+    example: {
+      color: 'warning',
+      image: (index) => (
+        <TipsAndUpdatesRoundedIcon className={showed[index] ? 'text-[#0288d1]' : 'text-gray-700'} />
+      ),
+    },
+    note: {
+      color: 'primary',
+      image: (index) => (
+        <TipsAndUpdatesRoundedIcon className={showed[index] ? 'text-[#0288d1]' : 'text-gray-700'} />
+      ),
+    },
+    lemma: {
+      color: 'primary',
+      image: (index) => (
+        <TipsAndUpdatesRoundedIcon className={showed[index] ? 'text-[#0288d1]' : 'text-gray-700'} />
+      ),
+    },
   };
 
   const toggleState = (index: number) => {
@@ -57,19 +100,34 @@ export default function TheoremDependency({ data }: { data: Statement[] }) {
       >
         {data.map((item, index) => (
           <TimelineItem key={index}>
-            <TimelineOppositeContent
-              className='text-lg'
-              color="textSecondary">
-              {item.type.charAt(0).toUpperCase() + item.type.slice(1)} {index + 1}
-            </TimelineOppositeContent>
+            <div
+              itemProp='timeline-opposite-content-container'
+              className='text-lg'>
+              <TimelineOppositeContent>
+                {item.type.charAt(0).toUpperCase() + item.type.slice(1)} {index + 1}
+              </TimelineOppositeContent>
+            </div>
 
             <TimelineSeparator>
-              <TimelineDot
+              <div
+                itemProp='timeline-dot-container'
                 className='cursor-pointer'
-                sx={{ width: 15, height: 15 }}
-                color={color[item.type]}
-                variant={showed[index] ? 'filled' : 'outlined'} // Variant based on mouse interaction
-                onClick={() => toggleState(index)} />
+                onClick={() => toggleState(index)}
+              >
+                <TimelineDot
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                  color={statementProps[item.type].color}
+                  variant={showed[index] ? 'filled' : 'outlined'}
+                >
+                  {statementProps[item.type].image(index)}
+                </TimelineDot>
+              </div>
               {index !== data.length - 1 &&
                 <TimelineConnector
                   sx={showed[index] && item.content !== "" ? { height: 80 } : { height: 20 }} />}
@@ -110,7 +168,7 @@ export default function TheoremDependency({ data }: { data: Statement[] }) {
                         >
 
                         </TimelineOppositeContent>
-                        <TimelineDot color={color[implication.type]} />
+                        <TimelineDot color={statementProps[implication.type].color} />
                         <TimelineContent>
                           <b>
                             {implication.type.charAt(0).toUpperCase() + implication.type.slice(1)} {corollaryIndex + 1}. {implication.name !== '' && `(${implication.name})`}

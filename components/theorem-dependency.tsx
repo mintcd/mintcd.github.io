@@ -98,6 +98,7 @@ export default function TheoremDependency({ data }: { data: Statement[] }) {
                 {showed[index] && implicationShowed[index] && item.implications && item.implications.length !== 0 &&
                   item.implications.map((implication, corollaryIndex) => (
                     <Timeline
+                      key={`implications-${index}`}
                       sx={{
                         [`& .${timelineOppositeContentClasses.root}`]: {
                           flex: 0,

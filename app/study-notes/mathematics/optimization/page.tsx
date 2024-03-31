@@ -4,7 +4,7 @@ import TheoremDependency from '@components/theorem-dependency';
 export default function ProbabilityTheory() {
   return (
     <div>
-      <TheoremDependency data={timeline} />
+      <TheoremDependency data={timeline.statements} />
     </div>
   )
 }

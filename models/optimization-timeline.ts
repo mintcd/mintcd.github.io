@@ -1,5 +1,6 @@
-export default [
-  {
+export default {
+  notations: [],
+  statements: [{
     name: "Optimization taxonomy",
     type: "definition",
     content: `1) Linear and nonlinear,
@@ -35,10 +36,78 @@ export default [
       {
         name: "",
         type: "note",
-        content: `The exclusive condition means that $p_i\\ne 0$ if and only if $g_i(x^*) = 0$. If $g_i(x^*) = 0$, we call $g_i$ a <i>saturated</i> condition.`,
+        content: `
+        </br>
+        (i) The exclusive condition means that $p_i\\ne 0$ if and only if $g_i(x^*) = 0$. 
+        </br>
+        (ii) For each $x\\in K$ we call $I(x) = \\{i\\in I : g_i(x) = 0\\}$ the set of <i>saturated</i> conditions.`,
+        dependants: [],
+      },
+    ]
+  },
+  {
+    name: "Qualification",
+    type: "definition",
+    content: `The set $K$ of <b>nonlinear</b> constraints is qualified at point $x^*\\in K$ if for all $\\lambda\\in\\RR^\\ell_+$ and $\\mu\\in\\RR^m$ satisfying
+    $$\\begin{cases}
+    \\sum\\limits_{i\\in I} \\lambda_i g_i(x^*) = 0; \\\\
+    \\sum\\limits_{i\\in I} \\lambda_i \\nabla g_i(x^*) + \\sum\\limits_{j\\in J} \\mu_j \\nabla h_j(x^*)  = 0.
+    \\end{cases}$$
+    Then we necessarily have $\\lambda = 0$ and $\\mu = 0$.`
+    ,
+    dependants: [],
+    implications: [
+      {
+        name: "",
+        type: "note",
+        content: `The constraint set $K$ is itself said to be qualified if it is qualified at every point $x\\in K$.`,
+        dependants: [],
+      },
+    ]
+  },
+  {
+    name: "KKT conditions at a qualified point",
+    type: "theorem",
+    content: `If $K$ is qualified at a minimum point $x^*$, then there exist $\\lambda\\in\\RR^\\ell_+$ and $\\mu\\in\\RR^m$ such that
+    $$\\begin{cases}
+    \\sum\\limits_{i\\in I} \\lambda_i g_i(x^*) = 0; \\\\
+    \\nabla f(x^*) + \\sum\\limits_{i\\in I} \\lambda_i \\nabla g_i(x^*) + \\sum\\limits_{j\\in J} \\mu_j \\nabla h_j(x^*)  = 0.
+    \\end{cases}$$`
+    ,
+    dependants: [],
+    implications: [
+      {
+        name: "",
+        type: "note",
+        content: `This theorem permits $p$ in the first theorem to be taken as $1$ at qualified minimum point.`,
+        dependants: [],
+      },
+    ]
+  },
+  {
+    name: "Qualification criteria",
+    type: "theorem",
+    content: `If $x\\in K$ satisfying two following conditions
+    </br>
+    (i) The family $\\{\\nabla h_1(x),\\cdots,\\nabla h_m(x)\\}$ is linear independent;
+    </br>
+    (ii) There exists a vector $v\\in\\R^n$ such that
+    $$\\langle g_i(x), v \\rangle < 0, \\forall i\\in I(x) \\text{ and } \\langle h_j(x), v \\rangle = 0, \\forall j\\in j.$$
+    `
+    ,
+    dependants: [],
+    implications: [
+      {
+        name: "",
+        type: "note",
+        content: `This theorem permits $p$ in the first theorem to be taken as $1$ at qualified minimum point.`,
         dependants: [],
       },
     ]
   },
 
-] as Statement[]
+
+
+
+  ] as Statement[]
+}

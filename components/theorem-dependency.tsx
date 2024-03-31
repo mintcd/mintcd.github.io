@@ -13,10 +13,9 @@ import TimelineOppositeContent, {
 
 import { FaRegLightbulb } from "react-icons/fa";
 import TipsAndUpdatesRoundedIcon from '@mui/icons-material/TipsAndUpdatesRounded';
+import NotificationsActiveRoundedIcon from '@mui/icons-material/NotificationsActiveRounded';
 
-
-import Latex from 'react-latex-next';
-import 'katex/dist/katex.min.css';
+import MyLatex from './my-latex';
 
 export default function TheoremDependency({ data }: { data: Statement[] }) {
   const [showed, setShowed] = useState(Array(data.length).fill(false));
@@ -27,6 +26,7 @@ export default function TheoremDependency({ data }: { data: Statement[] }) {
     [key in 'definition' | 'axiom' | 'theorem' | 'corollary' | 'example' | 'note' | 'lemma']: {
       color: 'info' | 'secondary' | 'success' | 'grey' | 'warning' | 'primary';
       image: (index: number) => JSX.Element;
+      contentBackground: string;
     };
   } = {
     definition: {
@@ -34,42 +34,52 @@ export default function TheoremDependency({ data }: { data: Statement[] }) {
       image: (index) => (
         <TipsAndUpdatesRoundedIcon className={showed[index] ? 'text-white' : 'text-[#0288d1]'} />
       ),
+      contentBackground: 'bg-[#aad7ef]'
     },
     axiom: {
       color: 'secondary',
       image: (index) => (
         <TipsAndUpdatesRoundedIcon className={showed[index] ? 'text-[#0288d1]' : 'text-gray-700'} />
       ),
+      contentBackground: 'bg-[#a0d7f5]'
+
     },
     theorem: {
       color: 'success',
       image: (index) => (
-        <TipsAndUpdatesRoundedIcon className={showed[index] ? 'text-[#0288d1]' : 'text-gray-700'} />
+        <NotificationsActiveRoundedIcon className={showed[index] ? 'text-white' : 'text-[#2e7d32]'} />
       ),
+      contentBackground: 'bg-[#a3cca5]'
+
     },
     corollary: {
       color: 'grey',
       image: (index) => (
         <TipsAndUpdatesRoundedIcon className={showed[index] ? 'text-[#0288d1]' : 'text-gray-700'} />
       ),
+      contentBackground: 'bg-[#77c7f2]'
+
     },
     example: {
       color: 'warning',
       image: (index) => (
         <TipsAndUpdatesRoundedIcon className={showed[index] ? 'text-[#0288d1]' : 'text-gray-700'} />
       ),
+      contentBackground: 'bg-[#77c7f2]'
     },
     note: {
       color: 'primary',
       image: (index) => (
         <TipsAndUpdatesRoundedIcon className={showed[index] ? 'text-[#0288d1]' : 'text-gray-700'} />
       ),
+      contentBackground: 'bg-[#77c7f2]'
     },
     lemma: {
       color: 'primary',
       image: (index) => (
         <TipsAndUpdatesRoundedIcon className={showed[index] ? 'text-[#0288d1]' : 'text-gray-700'} />
       ),
+      contentBackground: 'bg-[#77c7f2]'
     },
   };
 
@@ -100,13 +110,13 @@ export default function TheoremDependency({ data }: { data: Statement[] }) {
       >
         {data.map((item, index) => (
           <TimelineItem key={index}>
-            <div
-              itemProp='timeline-opposite-content-container'
-              className='text-lg'>
-              <TimelineOppositeContent>
+            <TimelineOppositeContent>
+              <div
+                itemProp='timeline-opposite-content-container'
+                className='text-lg'>
                 {item.type.charAt(0).toUpperCase() + item.type.slice(1)} {index + 1}
-              </TimelineOppositeContent>
-            </div>
+              </div>
+            </TimelineOppositeContent>
 
             <TimelineSeparator>
               <div
@@ -135,17 +145,16 @@ export default function TheoremDependency({ data }: { data: Statement[] }) {
 
             <TimelineContent>
               <div className='text-lg'>
-                <Latex>
-                  {item.name}
-                </Latex>
-
+                <MyLatex>
+                  {item.name ? item.name.charAt(0).toUpperCase() + item.name.slice(1) : ""}
+                </MyLatex>
               </div>
               <div className={`mt-2 transition-all duration-500 ${showed[index] ? 'h-auto opacity-100' : 'h-0 opacity-0'}`}>
                 {showed[index] && item.content !== "" &&
-                  <div className='relative bg-green-200 p-3 rounded-xl'>
-                    <Latex>
+                  <div className={`relative text-black ${statementProps[item.type].contentBackground} p-3 rounded-xl`}>
+                    <MyLatex>
                       {item.content}
-                    </Latex>
+                    </MyLatex>
                     {item.implications && item.implications.length !== 0 &&
                       <FaRegLightbulb className='absolute bottom-3 right-3 w-6 h-6 cursor-pointer'
                         onClick={() => toggleImplicationState(index)} />
@@ -174,9 +183,9 @@ export default function TheoremDependency({ data }: { data: Statement[] }) {
                             {implication.type.charAt(0).toUpperCase() + implication.type.slice(1)} {corollaryIndex + 1}. {implication.name !== '' && `(${implication.name})`}
                           </b>
 
-                          <Latex>
+                          <MyLatex>
                             {implication.content}
-                          </Latex>
+                          </MyLatex>
                         </TimelineContent>
                       </TimelineItem>
                     </Timeline>

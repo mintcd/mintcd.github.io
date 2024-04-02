@@ -8,7 +8,7 @@ type Chapter = {
     statements: Statement[];
 }
 
-type StatementType = 'axiom' | 'theorem' | 'definition' | 'corollary' | 'lemma' | 'note' | 'thought bubble' | 'example';
+type StatementType = 'axiom' | 'theorem' | 'definition' | 'corollary' | 'lemma' | 'note' | 'thoughtBubble' | 'example';
 
 type Statement = {
     id?: string,

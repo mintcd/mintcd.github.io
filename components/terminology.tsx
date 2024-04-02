@@ -6,7 +6,7 @@ import { GoSearch } from 'react-icons/go';
 import Fuse from 'fuse.js';
 import Latex from 'react-latex-next';
 import 'katex/dist/katex.min.css';
-import terms from '@models/terminology';
+import terms from '@models/mathematics-terminology';
 
 export default function Terminology({ subject }: { subject: 'all' | 'real analysis' | 'probability theory' }) {
   const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({});

@@ -68,7 +68,7 @@ export default [
     dependants: []
   },
   {
-    name: "The $\\epsilon$-principle",
+    statementName: "The $\\epsilon$-principle",
     type: "theorem",
     content: "If $x,y\\in\\RR$ and for any $\\epsilon>0$, $|x-y|<\\epsilon$, then $x=y$.",
     dependants: []

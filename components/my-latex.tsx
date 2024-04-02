@@ -13,7 +13,9 @@ export default function MyLatex({ children }: { children: string | undefined }) 
     "\\VV": "\\mathbb{V}",
 
     "\\B": "\\mathcal{B}",
+    "\\D": "\\mathcal{D}",
     "\\F": "\\mathcal{F}",
+    "\\L": "\\mathcal{L}",
     "\\P": "\\mathcal{P}",
   }
 

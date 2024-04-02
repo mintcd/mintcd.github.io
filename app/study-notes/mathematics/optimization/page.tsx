@@ -1,10 +1,8 @@
 import timeline from '@models/optimization-timeline'
 import TheoremDependency from '@components/theorem-dependency'
 
-export default function ProbabilityTheory() {
+export default function Optimization() {
   return (
-    <div>
-      <TheoremDependency data={timeline.statements} />
-    </div>
+    <TheoremDependency data={timeline} />
   )
 }

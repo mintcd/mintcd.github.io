@@ -1,5 +1,11 @@
 export default [
   {
+    name: "statistic",
+    definition: "",
+    categories: ["statistics"],
+    dependants: ["function"]
+  },
+  {
     name: "continuous function",
     definition: "",
     categories: ["analysis"],

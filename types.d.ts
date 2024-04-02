@@ -1,30 +1,22 @@
-declare module 'react-latex'
-declare module 'd3'
-
-
 type Chapter = {
-    chapter: number;
-    name: string;
-    statements: Statement[];
+    chapterName: string,
+    subtitle?: string,
+    notations: Notation[],
+    statements: Statement[]
 }
 
-type StatementType = 'axiom' | 'theorem' | 'definition' | 'corollary' | 'lemma' | 'note' | 'thoughtBubble' | 'example';
 
 type Statement = {
     id?: string,
     type: StatementType,
-    name?: string,
-    content: string,
+    statementName?: string,
     short?: string,
+    content: string,
     proof?: string,
     dependants?: string[],
     implications?: Statement[]
 }
 
-type Notation = {
-    name: string,
-    content: string
-}
 
 type GraphNode = {
     nodeId: number,
@@ -42,3 +34,10 @@ type Term = {
     subcategories?: string[] = [],
     dependants?: string[] = []
 }
+
+type Notation = {
+    name: string,
+    content: string
+}
+
+type StatementType = 'axiom' | 'theorem' | 'definition' | 'corollary' | 'lemma' | 'note' | 'thoughtBubble' | 'example';

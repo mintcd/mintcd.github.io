@@ -14,7 +14,7 @@ export default function Nav() {
   };
 
   return (
-    <nav className={`w-full
+    <nav className={`w-full bg-slate-100
                     flex flex-wrap items-center justify-between`}>
       <a href="/" className={`flex items-center`}>
         <Image src="/favicon.ico" alt="bagel" width={75} height={75} className='mr-3' />
@@ -43,10 +43,12 @@ export default function Nav() {
 
       <div
         itemID='nav-item-container'
-        className={`flex justify-end items-center space-x-4 
+        className={`flex justify-end items-center
                   text-gray-900`}>
         {navItems.map((item, index) => (
-          <a key={`nav-item-${index}`} href={item.toLowerCase().replace(" ", "-")}>
+          <a key={`nav-item-${index}`}
+            href={item.toLowerCase().replace(" ", "-")}
+            className='mr-4 hover:text-blue-500'>
             {item}
           </a>))}
       </div>

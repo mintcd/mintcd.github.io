@@ -16,8 +16,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <html lang="en" rel="preload">
       {/* <body className="bg-gradient-to-r from-cyan-200 to-blue-200"> */}
       <body>
-        <main className="m-4">
-          <Nav />
+        <Nav />
+        <main className={`mt-4`}>
           {children}
         </main>
       </body>

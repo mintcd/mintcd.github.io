@@ -13,202 +13,250 @@ import TimelineOppositeContent, {
   timelineOppositeContentClasses,
 } from '@mui/lab/TimelineOppositeContent'
 
-import { FaRegLightbulb } from "react-icons/fa"
-import { HiOutlineChatBubbleBottomCenter } from "react-icons/hi2";
+import ExpandMoreOutlinedIcon from '@mui/icons-material/ExpandMoreOutlined';
 
 import TipsAndUpdatesRoundedIcon from '@mui/icons-material/TipsAndUpdatesRounded'
 import NotificationsActiveRoundedIcon from '@mui/icons-material/NotificationsActiveRounded'
 
-import MyLatex from './my-latex'
+import MyLatex from '@components/my-latex'
 
-export default function TheoremDependency({ data }: { data: Statement[] }) {
-  const [showed, setShowed] = useState(Array(data.length).fill(false))
+export default function TheoremDependency({ data }: { data: Chapter[] }) {
 
-  const [implicationShowed, setImplicationShowed] = useState(Array(data.length).fill(false))
+  const [showedItems, setShowedItems] = useState(data.map(chapter => ({
+    showedChapter: false,
+    showedStatements: chapter.statements.map(() => false),
+    showedImplications: chapter.statements.map(() => false),
+  })));
 
-  const statementProps: {
-    [key in StatementType]: {
-      color: TimelineDotProps["color"],
-      image: (index: number) => JSX.Element,
-      contentBackground: string
-    }
-  } = {
+  function toggleChapter(chapterIndex: number) {
+    const newShowedItems = [...showedItems]
+    newShowedItems[chapterIndex].showedChapter = !newShowedItems[chapterIndex].showedChapter
+    setShowedItems(newShowedItems)
+  }
+
+  function toggleStatement(chapterIndex: number, statementIndex: number) {
+    const newShowedItems = [...showedItems]
+    newShowedItems[chapterIndex].showedStatements[statementIndex] = !newShowedItems[chapterIndex].showedStatements[statementIndex]
+    setShowedItems(newShowedItems)
+  };
+
+  function toggleImplication(chapterIndex: number, statementIndex: number) {
+    const newShowedItems = [...showedItems]
+    newShowedItems[chapterIndex].showedImplications[statementIndex] = !newShowedItems[chapterIndex].showedImplications[statementIndex]
+    setShowedItems(newShowedItems)
+  }
+
+  const statementProps: { [key in StatementType]: {
+    color: TimelineDotProps["color"],
+    image: (chapterIndex: number, statementIndex: number) => JSX.Element,
+    contentBackground: string
+  } } = {
     axiom: {
       color: 'secondary',
-      image: (index) => (
-        <TipsAndUpdatesRoundedIcon className={showed[index] ? 'text-[#0288d1]' : 'text-gray-700'} />
+      image: (chapterIndex, statementIndex) => (
+        <TipsAndUpdatesRoundedIcon
+          className={showedItems[chapterIndex].showedChapter === true
+            && showedItems[chapterIndex].showedStatements[statementIndex] === true
+            ? 'text-[#0288d1]' : 'text-gray-700'} />
       ),
       contentBackground: 'bg-[#a0d7f5]'
 
     },
     definition: {
       color: 'info',
-      image: (index) => (
-        <TipsAndUpdatesRoundedIcon className={showed[index] ? 'text-white' : 'text-[#0288d1]'} />
+      image: (chapterIndex, statementIndex) => (
+        <TipsAndUpdatesRoundedIcon
+          className={showedItems[chapterIndex].showedStatements[statementIndex]
+            ? 'text-white' : 'text-[#0288d1]'} />
       ),
       contentBackground: 'bg-[#aad7ef]'
     },
     lemma: {
       color: 'primary',
-      image: (index) => (
-        <TipsAndUpdatesRoundedIcon className={showed[index] ? 'text-[#0288d1]' : 'text-gray-700'} />
+      image: (chapterIndex, statementIndex) => (
+        <TipsAndUpdatesRoundedIcon
+          className={showedItems[chapterIndex].showedChapter === true
+            && showedItems[chapterIndex].showedStatements[statementIndex] === true
+            ? 'text-[#0288d1]' : 'text-gray-700'} />
       ),
       contentBackground: 'bg-[#77c7f2]'
     },
     theorem: {
       color: 'success',
-      image: (index) => (
-        <NotificationsActiveRoundedIcon className={showed[index] ? 'text-white' : 'text-[#2e7d32]'} />
+      image: (chapterIndex, statementIndex) => (
+        <NotificationsActiveRoundedIcon
+          className={showedItems[chapterIndex].showedChapter === true
+            && showedItems[chapterIndex].showedStatements[statementIndex] === true
+            ? 'text-white' : 'text-[#2e7d32]'} />
       ),
       contentBackground: 'bg-[#a3cca5]'
 
     },
     corollary: {
       color: 'grey',
-      image: (index) => (
-        <TipsAndUpdatesRoundedIcon className={showed[index] ? 'text-[#0288d1]' : 'text-gray-700'} />
+      image: (chapterIndex, statementIndex) => (
+        <TipsAndUpdatesRoundedIcon
+          className={showedItems[chapterIndex].showedChapter === true
+            && showedItems[chapterIndex].showedStatements[statementIndex] === true
+            ? 'text-[#0288d1]' : 'text-gray-700'} />
       ),
       contentBackground: 'bg-[#77c7f2]'
 
     },
     example: {
       color: 'warning',
-      image: (index) => (
-        <TipsAndUpdatesRoundedIcon className={showed[index] ? 'text-[#0288d1]' : 'text-gray-700'} />
+      image: (chapterIndex, statementIndex) => (
+        <TipsAndUpdatesRoundedIcon
+          className={showedItems[chapterIndex].showedChapter === true
+            && showedItems[chapterIndex].showedStatements[statementIndex] === true
+            ? 'text-[#0288d1]' : 'text-gray-700'} />
       ),
       contentBackground: 'bg-[#77c7f2]'
     },
     note: {
       color: 'primary',
-      image: (index) => (
-        <TipsAndUpdatesRoundedIcon className={showed[index] ? 'text-[#0288d1]' : 'text-gray-700'} />
+      image: (chapterIndex, statementIndex) => (
+        <TipsAndUpdatesRoundedIcon
+          className={showedItems[chapterIndex].showedChapter === true
+            && showedItems[chapterIndex].showedStatements[statementIndex] === true
+            ? 'text-[#0288d1]' : 'text-gray-700'} />
       ),
       contentBackground: 'bg-[#77c7f2]'
     },
     thoughtBubble: {
       color: 'primary',
-      image: (index) => (
-        <TipsAndUpdatesRoundedIcon className={showed[index] ? 'text-[#0288d1]' : 'text-gray-700'} />
+      image: (chapterIndex, statementIndex) => (
+        <TipsAndUpdatesRoundedIcon
+          className={showedItems[chapterIndex].showedChapter === true
+            && showedItems[chapterIndex].showedStatements[statementIndex] === true
+            ? 'text-[#0288d1]' : 'text-gray-700'} />
       ),
       contentBackground: 'bg-[#77c7f2]'
     },
   }
 
-  function toggleState(index: number) {
-    setShowed(prevState => {
-      const newState = [...prevState]
-      newState[index] = !newState[index]
-      return newState
-    })
-  }
-
-  function toggleImplicationState(index: number) {
-    setImplicationShowed(prevState => {
-      const newState = [...prevState]
-      newState[index] = !newState[index]
-      return newState
-    })
-  }
-
   return (
     <div className='m-5'>
-      <Timeline
-        sx={{
-          [`& .${timelineOppositeContentClasses.root}`]: {
-            flex: 0.2,
-          },
-        }}>
-        {data.map((item, index) => (
-          item.type !== 'thoughtBubble' ?
-            <TimelineItem key={index}>
-              <TimelineOppositeContent>
-                <div
-                  itemID='timeline-opposite-content-container'
-                  className='text-lg'>
-                  {item.type.charAt(0).toUpperCase() + item.type.slice(1)} {index + 1}
-                </div>
-              </TimelineOppositeContent>
+      {data.map((chapter, chapterIndex) => (
+        <Timeline
+          key={chapterIndex}
+          sx={{
+            [`& .${timelineOppositeContentClasses.root}`]: {
+              flex: 0.2,
+            },
+          }}>
+          <div onClick={() => toggleChapter(chapterIndex)}
+            className={`text-lg font-bold mb-3 cursor-pointer`}>
+            {chapter.chapterName}
+          </div>
 
-              <TimelineSeparator>
-                <div
-                  itemID='timeline-dot-container'
-                  className='cursor-pointer'
-                  onClick={() => toggleState(index)}
-                >
-                  <TimelineDot
-                    sx={{
-                      width: 40,
-                      height: 40,
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}
-                    color={statementProps[item.type].color}
-                    variant={showed[index] ? 'filled' : 'outlined'}
+          {showedItems[chapterIndex].showedChapter &&
+            chapter.statements.map((statement, statementIndex) => (
+              statement.type !== 'thoughtBubble' ?
+                <TimelineItem
+                  key={`${chapterIndex}-${statementIndex}`}>
+
+                  <TimelineOppositeContent>
+                    <div
+                      itemID='timeline-opposite-content-container'
+                      className='text-lg'>
+                      {statement.type.charAt(0).toUpperCase() + statement.type.slice(1)} {chapterIndex + 1}.{statementIndex + 1}
+                    </div>
+                  </TimelineOppositeContent>
+
+                  <TimelineSeparator
+
                   >
-                    {statementProps[item.type].image(index)}
-                  </TimelineDot>
-                </div>
-                {index !== data.length - 1 && data[index + 1].type !== 'thoughtBubble' &&
-                  <TimelineConnector sx={showed[index] && item.content !== "" ? { height: 80 } : { height: 20 }} />}
-              </TimelineSeparator>
+                    <TimelineDot
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        cursor: 'pointer'
+                      }}
+                      color={statementProps[statement.type].color}
+                      variant={showedItems[chapterIndex].showedStatements[statementIndex] ? 'filled' : 'outlined'}
+                      onClick={() => toggleStatement(chapterIndex, statementIndex)}>
+                      {statementProps[statement.type].image(chapterIndex, statementIndex)}
+                    </TimelineDot>
 
-              <TimelineContent>
-                <div className='text-lg'>
+                    {statementIndex !== chapter.statements.length - 1 && chapter.statements[statementIndex + 1].type !== 'thoughtBubble' &&
+                      <TimelineConnector sx={showedItems[chapterIndex].showedStatements[statementIndex] && statement.content !== "" ? { height: 80 } : { height: 20 }} />}
+                  </TimelineSeparator>
+
+                  <TimelineContent>
+                    <div className='text-lg'>
+                      <MyLatex>
+                        {statement.statementName ? statement.statementName.charAt(0).toUpperCase() + statement.statementName.slice(1) : ""}
+                      </MyLatex>
+                    </div>
+                    <div className={`mt-2 transition-all duration-500 ${showedItems[chapterIndex].showedStatements[statementIndex] ? 'h-auto opacity-100' : 'h-0 opacity-0'}`}>
+                      {showedItems[chapterIndex].showedStatements[statementIndex]
+                        && statement.content !== ""
+                        && <div className={`relative text-black ${statementProps[statement.type].contentBackground} p-3 rounded-xl`}>
+                          <MyLatex>
+                            {statement.content}
+                          </MyLatex>
+                          {statement.implications
+                            && statement.implications.length !== 0
+                            &&
+                            <ExpandMoreOutlinedIcon
+                              onClick={() => toggleImplication(chapterIndex, statementIndex)}
+                              className={`absolute bottom-3 right-3 w-6 h-6 cursor-pointer 
+                                          text-${statementProps[statement.type].color}`} />
+                          }
+                        </div>
+                      }
+
+                      {showedItems[chapterIndex].showedStatements[statementIndex]
+                        && showedItems[chapterIndex].showedImplications[statementIndex]
+                        && statement.implications
+                        && statement.implications.length !== 0
+                        && statement.implications.map((implication, implicationIndex) => (
+                          <Timeline
+                            key={`implications-${implicationIndex}`}
+                            sx={{
+                              [`& .${timelineOppositeContentClasses.root}`]: {
+                                flex: 0,
+                              },
+                            }}
+                          >
+                            <TimelineItem key={`${statementIndex}-${implicationIndex}`}>
+                              <TimelineOppositeContent />
+                              <TimelineDot color={statementProps[implication.type].color} />
+                              <TimelineContent>
+                                <b>
+                                  {implication.type.charAt(0).toUpperCase() + implication.type.slice(1)} {implicationIndex + 1}. {implication.statementName !== '' && `(${implication.statementName})`}
+                                </b>
+                                <MyLatex>
+                                  {implication.content}
+                                </MyLatex>
+                              </TimelineContent>
+                            </TimelineItem>
+                          </Timeline>
+                        ))}
+                    </div>
+                  </TimelineContent>
+                </TimelineItem>
+                :
+                <div key={statementIndex}
+                  className={`p-5 rounded-md
+                          h-auto 
+                         bg-blue-300`}>
                   <MyLatex>
-                    {item.name ? item.name.charAt(0).toUpperCase() + item.name.slice(1) : ""}
+                    {`<b>
+                    ${statement.statementName ?
+                        statement.statementName.charAt(0).toUpperCase() + statement.statementName.slice(1) :
+                        ''}.
+                  </b> 
+              ${statement.content}`}
                   </MyLatex>
                 </div>
-                <div className={`mt-2 transition-all duration-500 ${showed[index] ? 'h-auto opacity-100' : 'h-0 opacity-0'}`}>
-                  {showed[index] && item.content !== "" &&
-                    <div className={`relative text-black ${statementProps[item.type].contentBackground} p-3 rounded-xl`}>
-                      <MyLatex>
-                        {item.content}
-                      </MyLatex>
-                      {item.implications && item.implications.length !== 0 &&
-                        <FaRegLightbulb className='absolute bottom-3 right-3 w-6 h-6 cursor-pointer'
-                          onClick={() => toggleImplicationState(index)} />
-                      }
-                    </div>
-                  }
-
-                  {showed[index] && implicationShowed[index] && item.implications && item.implications.length !== 0 &&
-                    item.implications.map((implication, corollaryIndex) => (
-                      <Timeline
-                        key={`implications-${index}`}
-                        sx={{
-                          [`& .${timelineOppositeContentClasses.root}`]: {
-                            flex: 0,
-                          },
-                        }}
-                      >
-                        <TimelineItem key={`${index}-${corollaryIndex}`}>
-                          <TimelineOppositeContent />
-                          <TimelineDot color={statementProps[implication.type].color} />
-                          <TimelineContent>
-                            <b>
-                              {implication.type.charAt(0).toUpperCase() + implication.type.slice(1)} {corollaryIndex + 1}. {implication.name !== '' && `(${implication.name})`}
-                            </b>
-                            <MyLatex>
-                              {implication.content}
-                            </MyLatex>
-                          </TimelineContent>
-                        </TimelineItem>
-                      </Timeline>
-                    ))}
-                </div>
-              </TimelineContent>
-            </TimelineItem> :
-            <div key={index}
-              className={`p-5 rounded-md
-                            h-auto 
-                           bg-blue-300`}>
-              <MyLatex>
-                {`<b>${item.name ? item.name.charAt(0).toUpperCase() + item.name.slice(1) : ''}.</b> 
-                ${item.content}`}</MyLatex>
-            </div>
-        ))}
-      </Timeline>
+            ))}
+        </Timeline>
+      ))}
     </div>
   )
 }

@@ -1,10 +1,10 @@
 'use client'
 
-import Latex from 'react-latex-next';
-import 'katex/dist/katex.min.css';
+import Latex from 'react-latex-next'
+import 'katex/dist/katex.min.css'
 
-const MyLatex = ({ children }: { children: string | undefined }) => {
-  const macros: { [key: string]: string; } = {
+export default function MyLatex({ children }: { children: string | undefined }) {
+  const macros: { [key: string]: string } = {
     "\\EE": "\\mathbb{E}",
     "\\NN": "\\mathbb{N}",
     "\\PP": "\\mathbb{P}",
@@ -14,9 +14,12 @@ const MyLatex = ({ children }: { children: string | undefined }) => {
 
     "\\B": "\\mathcal{B}",
     "\\F": "\\mathcal{F}",
-  };
+    "\\P": "\\mathcal{P}",
+  }
 
-  return <Latex macros={macros}>{children}</Latex>;
-};
-
-export default MyLatex;
+  return (
+    <div itemID='latex-container' className='font-modern'>
+      <Latex macros={macros}>{children}</Latex>
+    </div>
+  )
+}

@@ -9,7 +9,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        satoshi: ['Satoshi', 'sans-serif'],
+        modern: ['Computer Modern', 'sans-serif'],
         inter: ['Inter', 'sans-serif'],
       },
       colors: {

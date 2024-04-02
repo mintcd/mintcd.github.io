@@ -1,5 +1,5 @@
-import timeline from '@models/optimization-timeline';
-import TheoremDependency from '@components/theorem-dependency';
+import timeline from '@models/optimization-timeline'
+import TheoremDependency from '@components/theorem-dependency'
 
 export default function ProbabilityTheory() {
   return (

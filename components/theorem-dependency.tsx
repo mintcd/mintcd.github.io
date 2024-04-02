@@ -1,33 +1,33 @@
 'use client'
 
-import { useState } from 'react';
-import Timeline from '@mui/lab/Timeline';
-import TimelineItem from '@mui/lab/TimelineItem';
-import TimelineSeparator from '@mui/lab/TimelineSeparator';
-import TimelineConnector from '@mui/lab/TimelineConnector';
-import TimelineContent from '@mui/lab/TimelineContent';
-import TimelineDot from '@mui/lab/TimelineDot';
+import { useState } from 'react'
+import Timeline from '@mui/lab/Timeline'
+import TimelineItem from '@mui/lab/TimelineItem'
+import TimelineSeparator from '@mui/lab/TimelineSeparator'
+import TimelineConnector from '@mui/lab/TimelineConnector'
+import TimelineContent from '@mui/lab/TimelineContent'
+import TimelineDot from '@mui/lab/TimelineDot'
 import TimelineOppositeContent, {
   timelineOppositeContentClasses,
-} from '@mui/lab/TimelineOppositeContent';
+} from '@mui/lab/TimelineOppositeContent'
 
-import { FaRegLightbulb } from "react-icons/fa";
-import TipsAndUpdatesRoundedIcon from '@mui/icons-material/TipsAndUpdatesRounded';
-import NotificationsActiveRoundedIcon from '@mui/icons-material/NotificationsActiveRounded';
+import { FaRegLightbulb } from "react-icons/fa"
+import TipsAndUpdatesRoundedIcon from '@mui/icons-material/TipsAndUpdatesRounded'
+import NotificationsActiveRoundedIcon from '@mui/icons-material/NotificationsActiveRounded'
 
-import MyLatex from './my-latex';
+import MyLatex from './my-latex'
 
 export default function TheoremDependency({ data }: { data: Statement[] }) {
-  const [showed, setShowed] = useState(Array(data.length).fill(false));
+  const [showed, setShowed] = useState(Array(data.length).fill(false))
 
-  const [implicationShowed, setImplicationShowed] = useState(Array(data.length).fill(false));
+  const [implicationShowed, setImplicationShowed] = useState(Array(data.length).fill(false))
 
   const statementProps: {
-    [key in 'definition' | 'axiom' | 'theorem' | 'corollary' | 'example' | 'note' | 'lemma']: {
-      color: 'info' | 'secondary' | 'success' | 'grey' | 'warning' | 'primary';
-      image: (index: number) => JSX.Element;
-      contentBackground: string;
-    };
+    [key in StatementType]: {
+      color: 'info' | 'secondary' | 'success' | 'grey' | 'warning' | 'primary'
+      image: (index: number) => JSX.Element
+      contentBackground: string
+    }
   } = {
     definition: {
       color: 'info',
@@ -81,23 +81,30 @@ export default function TheoremDependency({ data }: { data: Statement[] }) {
       ),
       contentBackground: 'bg-[#77c7f2]'
     },
-  };
+    'thought bubble': {
+      color: 'primary',
+      image: (index) => (
+        <TipsAndUpdatesRoundedIcon className={showed[index] ? 'text-[#0288d1]' : 'text-gray-700'} />
+      ),
+      contentBackground: 'bg-[#77c7f2]'
+    },
+  }
 
   const toggleState = (index: number) => {
     setShowed(prevState => {
-      const newState = [...prevState];
-      newState[index] = !newState[index];
-      return newState;
-    });
-  };
+      const newState = [...prevState]
+      newState[index] = !newState[index]
+      return newState
+    })
+  }
 
   const toggleImplicationState = (index: number) => {
     setImplicationShowed(prevState => {
-      const newState = [...prevState];
-      newState[index] = !newState[index];
-      return newState;
-    });
-  };
+      const newState = [...prevState]
+      newState[index] = !newState[index]
+      return newState
+    })
+  }
 
   return (
     <div className='m-5'>
@@ -112,7 +119,7 @@ export default function TheoremDependency({ data }: { data: Statement[] }) {
           <TimelineItem key={index}>
             <TimelineOppositeContent>
               <div
-                itemProp='timeline-opposite-content-container'
+                itemID='timeline-opposite-content-container'
                 className='text-lg'>
                 {item.type.charAt(0).toUpperCase() + item.type.slice(1)} {index + 1}
               </div>
@@ -120,7 +127,7 @@ export default function TheoremDependency({ data }: { data: Statement[] }) {
 
             <TimelineSeparator>
               <div
-                itemProp='timeline-dot-container'
+                itemID='timeline-dot-container'
                 className='cursor-pointer'
                 onClick={() => toggleState(index)}
               >
@@ -196,5 +203,5 @@ export default function TheoremDependency({ data }: { data: Statement[] }) {
         ))}
       </Timeline>
     </div>
-  );
+  )
 }

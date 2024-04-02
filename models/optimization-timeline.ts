@@ -1,5 +1,14 @@
 export default {
-  notations: [],
+  notations: [
+    {
+      name: "Optimization problem",
+      content: ""
+    },
+    {
+      name: "The set of constraints",
+      content: "$K$"
+    }
+  ] as Notation[],
   statements: [{
     name: "Optimization taxonomy",
     type: "definition",
@@ -21,7 +30,7 @@ export default {
   {
     name: "KKT conditions",
     type: "theorem",
-    content: `Consider the problem $\\mathcal{P}$ of minimizing a function $f$ over the constraint set
+    content: `Consider the problem $\\mathcal{P}$ of minimizing a function $f$ over the set of constraints
               $$K=\\{x\\in\\mathbb{R}^n : g_i(x) \\le 0, i\\in I \\text{ and } h_j(x) = 0, j\\in J\\},$$
               where $I=\\{1,\\cdots,\\ell\\}$ is the index set of inequality constraints and $J=\\{1,\\cdots,m\\}$ is the index set of equality constraints. The function $g_i, i\\in I$ and $h_j,j\\in J$ are assumed to be differentiable. If a point $x^*$ is a minimum of $f$, then there exist $p_0\\in\\mathbb{R}_+, p\\in\\mathbb{R}^\\ell$ and $q\\in\\mathbb{R}^m$ such that
               $$\\begin{cases}
@@ -37,7 +46,6 @@ export default {
         name: "",
         type: "note",
         content: `
-        </br>
         (i) The exclusive condition means that $p_i\\ne 0$ if and only if $g_i(x^*) = 0$. 
         </br>
         (ii) For each $x\\in K$ we call $I(x) = \\{i\\in I : g_i(x) = 0\\}$ the set of <i>saturated</i> conditions.`,
@@ -105,9 +113,26 @@ export default {
       },
     ]
   },
-
-
-
-
+  {
+    name: "Lagrangian function and dual variables",
+    type: "definition",
+    content: `If $x\\in K$ satisfying two following conditions
+    </br>
+    (i) The family $\\{\\nabla h_1(x),\\cdots,\\nabla h_m(x)\\}$ is linear independent;
+    </br>
+    (ii) There exists a vector $v\\in\\R^n$ such that
+    $$\\langle g_i(x), v \\rangle < 0, \\forall i\\in I(x) \\text{ and } \\langle h_j(x), v \\rangle = 0, \\forall j\\in j.$$
+    `
+    ,
+    dependants: [],
+    implications: [
+      {
+        name: "",
+        type: "note",
+        content: `This theorem permits $p$ in the first theorem to be taken as $1$ at qualified minimum point.`,
+        dependants: [],
+      },
+    ]
+  },
   ] as Statement[]
 }

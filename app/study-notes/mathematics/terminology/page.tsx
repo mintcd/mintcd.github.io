@@ -1,4 +1,4 @@
-import Terminology from "@components/terminology"
+import Terminology from "@components/mathematics-terminology"
 
 export default function TerminologyDisplay() {
   return <Terminology subject='all' />

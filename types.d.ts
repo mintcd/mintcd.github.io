@@ -8,15 +8,22 @@ type Chapter = {
     statements: Statement[];
 }
 
+type StatementType = 'axiom' | 'theorem' | 'definition' | 'corollary' | 'lemma' | 'note' | 'thought bubble' | 'example';
+
 type Statement = {
     id?: string,
-    type: 'axiom' | 'theorem' | 'definition' | 'corollary' | 'lemma' | 'note',
+    type: StatementType,
     name?: string,
     content: string,
     short?: string,
     proof?: string,
     dependants?: string[],
     implications?: Statement[]
+}
+
+type Notation = {
+    name: string,
+    content: string
 }
 
 type GraphNode = {

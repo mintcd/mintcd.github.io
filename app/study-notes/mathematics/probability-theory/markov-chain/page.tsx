@@ -1,10 +1,10 @@
 import timeline from '@models/markov-chain';
-import TheoremDependency from '@components/theorem-dependency';
+import SubjectMap from '@components/subject-map';
 
 export default function ProbabilityTheory() {
   return (
     <div>
-      <TheoremDependency data={timeline} />
+      <SubjectMap data={timeline} />
     </div>
   )
 }

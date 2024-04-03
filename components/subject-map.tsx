@@ -20,7 +20,7 @@ import NotificationsActiveRoundedIcon from '@mui/icons-material/NotificationsAct
 
 import MyLatex from '@components/my-latex'
 
-export default function TheoremDependency({ data }: { data: Chapter[] }) {
+export default function SubjectMap({ data }: { data: Chapter[] }) {
 
   const [showedItems, setShowedItems] = useState(data.map(chapter => ({
     showedChapter: false,

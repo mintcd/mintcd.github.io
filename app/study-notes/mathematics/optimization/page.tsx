@@ -1,8 +1,8 @@
 import timeline from '@models/optimization-timeline'
-import TheoremDependency from '@components/theorem-dependency'
+import SubjectMap from '@components/subject-map'
 
 export default function Optimization() {
   return (
-    <TheoremDependency data={timeline} />
+    <SubjectMap data={timeline} />
   )
 }

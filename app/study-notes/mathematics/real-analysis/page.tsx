@@ -1,6 +1,6 @@
 import timeline from '@models/real-analysis-timeline';
 import Sidebar from '@components/sidebar';
-import TheoremDependency from '@components/theorem-dependency';
+import SubjectMap from '@components/subject-map';
 
 export default function RealAnalysis() {
   return (
@@ -10,7 +10,7 @@ export default function RealAnalysis() {
       </div>
 
       <div className="col-span-4">
-        <TheoremDependency data={timeline} />
+        <SubjectMap data={timeline} />
       </div>
 
     </div >

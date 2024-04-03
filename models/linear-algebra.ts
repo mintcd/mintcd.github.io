@@ -1,7 +1,7 @@
 export default [
     {
-        chapter: 1,
-        name: "Vector spaces",
+        chapterName: "Vector spaces",
+        notations: [],
         statements: [
             {
                 id: '1',
@@ -130,8 +130,7 @@ export default [
         ]
     },
     {
-        chapter: 2,
-        name: "Linear transformations and Matrices",
+        chapterName: "Linear transformations and Matrices",
         statements: [
             {
                 id: '1',

@@ -135,6 +135,10 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
     },
   }
 
+  const numberOfThoughtBubbles = data.map((chapter) => (
+    chapter.statements.filter((statement) => (statement.type === 'thoughtBubble')).length
+  ))
+
   return (
     <div className='m-5'>
       {data.map((chapter, chapterIndex) => (
@@ -146,7 +150,9 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
             },
           }}>
           <div onClick={() => toggleChapter(chapterIndex)}
-            className={`text-lg font-bold mb-3 cursor-pointer`}>
+            className={`mb-3 
+                        cursor-pointer hover:bg-slate-200
+                        text-lg font-bold `}>
             {chapter.chapterName}
           </div>
 
@@ -160,13 +166,11 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
                     <div
                       itemID='timeline-opposite-content-container'
                       className='text-lg'>
-                      {statement.type.charAt(0).toUpperCase() + statement.type.slice(1)} {chapterIndex + 1}.{statementIndex + 1}
+                      {statement.type.charAt(0).toUpperCase() + statement.type.slice(1)} {chapterIndex + 1}.{statementIndex + 1 - numberOfThoughtBubbles[chapterIndex]}
                     </div>
                   </TimelineOppositeContent>
 
-                  <TimelineSeparator
-
-                  >
+                  <TimelineSeparator>
                     <TimelineDot
                       sx={{
                         width: 40,

@@ -1,7 +1,7 @@
 export default [
     {
-        chapter: 1,
-        name: "Topological Spaces and Continuous Functions",
+        chapterName: "Topological Spaces and Continuous Functions",
+        notations: [],
         statements: [
             {
                 id: "1",
@@ -65,32 +65,28 @@ export default [
         ]
     },
     {
-        chapter: 2,
-        name: "Connectedness and Compactness",
+        chapterName: "Connectedness and Compactness",
+        notations: [],
         statements: [
             {
-                id: "1",
                 type: "definition",
                 content: "Let $X$ be a topological space. A separation of $X$ is a pair $U$, $V$ of disjoint nonempty open subsets of $X$ whose union is $X$.",
                 short: "",
                 dependants: []
             },
             {
-                id: "2",
                 type: "definition",
                 content: "A topological space $X$ is said to be connected if there exists no seperation of $X$.",
                 short: "",
                 dependants: []
             },
             {
-                id: "3",
                 type: "lemma",
                 content: "Let $X$ be a topological space and $Y$ is a subspace of $X$. Then $Y$ is connected if there exists no seperation $A$, $B$ of $Y$ such that neither $A$ nor $B$ contains a limit point of the other.",
                 short: "",
                 dependants: []
             },
             {
-                id: "4",
                 type: "lemma",
                 content: "Let $X$ be a topological space and $Y$ is a subspace of $X$. If $U$ and $V$ form a separation of $X$, and $Y$ is connected, then $Y$ lies entirely in $U$ or $V$.",
                 short: "",

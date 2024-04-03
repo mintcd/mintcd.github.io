@@ -46,10 +46,10 @@ export default function Sidebar({ topic, current }: { topic: string, current: nu
           <div className={`p-2 ${current === 0 ? 'bg-slate-200' : ''}`}> Summary of {topicModuleMap[topic].name} </div>
         </a>
 
-        {data.map((chapter: Chapter) => (
-          <a key={`${chapter.chapter}`} href={`/${topicModuleMap[topic].link}/chapters/${chapter.chapter}`} className="hover:opacity-75 cursor-pointer my-10">
-            <div className={`p-2 ${current === chapter.chapter ? 'bg-slate-200' : ''}`}>
-              Chapter {chapter.chapter} - {chapter.name}
+        {data.map((chapter, index) => (
+          <a key={`${index}`} href={`/${topicModuleMap[topic].link}/chapters/${index}`} className="hover:opacity-75 cursor-pointer my-10">
+            <div className={`p-2 ${current === index ? 'bg-slate-200' : ''}`}>
+              Chapter {index} - {chapter.chapterName}
             </div>
           </a>
         ))}

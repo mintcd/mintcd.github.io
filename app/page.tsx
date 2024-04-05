@@ -10,6 +10,7 @@ export default function Home() {
     <div className="m-8 sm:m-16">
       <div className="text-center">
         <div className={`lg:w-[50%] inline-block justify-between lg:space-x-4`}>
+
           <a href='https://github.com/mintcd' target="_blank">
             <GitHubIcon className='text-[50px]' />
           </a>

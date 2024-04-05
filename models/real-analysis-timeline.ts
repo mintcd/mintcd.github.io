@@ -78,9 +78,16 @@ export default [
       },
       {
         statementName: "Least upper bound property",
-        type: "definition",
-        content: "An ordered set $S$ has the least upper bound property if every $E \\subset S$ which is nonempty and bounded above has a supremum in $S$.",
-        dependants: []
+        type: "theorem",
+        content: "The set $\\RR$ constructed as above has the Least upper bound property: every nonempty and bounded subset $S$ of $\\RR$ has a supremum in $\\RR$.",
+        dependants: [],
+        implications: [
+          {
+            statementName: "",
+            type: "note",
+            content: "From now on, when we write comparative statements like $a>b$ without further explanation, it means $a,b\\in\\RR$.",
+          },
+        ]
       },
       {
         statementName: "The $\\epsilon$-principle",

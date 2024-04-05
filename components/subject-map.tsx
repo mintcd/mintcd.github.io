@@ -231,9 +231,12 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
                               <TimelineOppositeContent />
                               <TimelineDot color={statementProps[implication.type].color} />
                               <TimelineContent>
-                                <b>
-                                  {implication.type.charAt(0).toUpperCase() + implication.type.slice(1)} {implicationIndex + 1}. {implication.statementName !== '' && `(${implication.statementName})`}
-                                </b>
+                                <MyLatex>
+                                  {`<b>
+                                      ${implication.type.charAt(0).toUpperCase() + implication.type.slice(1)} ${implicationIndex + 1}. 
+                                      ${implication.statementName && implication.statementName}
+                                    </b>`}
+                                </MyLatex>
                                 <MyLatex>
                                   {implication.content}
                                 </MyLatex>

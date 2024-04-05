@@ -1,18 +1,18 @@
 export default [
     {
-        chapter: 1,
-        name: "",
+        chapterName: "",
+        notations: [],
         statements: [
             {
-                id: "1",
+                type: 'theorem',
                 content: "Given sets $A$ and $B$. A rule of assignment is a subset $R$ of $A\\times B$, such that if $(x,y), (x,z)\\in R$, then $y=z$.",
                 dependants: []
             },
             {
-                id: "2",
+                type: 'theorem',
                 content: "",
                 dependants: []
             }
         ]
     }
-]
+] as Chapter[]

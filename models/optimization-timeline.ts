@@ -12,79 +12,98 @@ export default [
       }
     ],
     statements: [
+      // {
+      //   statementName: "Optimization taxonomy",
+      //   type: "definition",
+      //   content: `1) Linear and nonlinear,
+      //           <br/>
+      //           2) Discrete and continuous,
+      //           <br/>
+      //           3) Constrained and Unconstrained,
+      //           <br/>
+      //           4) Convex and non-convex,
+      //           <br/>
+      //           5) Deterministic and stochastic,
+      //           <br/>
+      //           6) Differentiable and non-differentiable.
+      //           `
+      //   ,
+      //   dependants: [],
+      // },
       {
-        statementName: "Optimization taxonomy",
+        statementName: "Smooth Problem",
         type: "definition",
-        content: `1) Linear and nonlinear,
-                <br/>
-                2) Discrete and continuous,
-                <br/>
-                3) Constrained and Unconstrained,
-                <br/>
-                4) Convex and non-convex,
-                <br/>
-                5) Deterministic and stochastic,
-                <br/>
-                6) Differentiable and non-differentiable.
-                `
-        ,
+        content: `Consider the problem 
+        $$\\begin{aligned}
+        (\\P) : \\text{minimize } & f(x) \\\\
+        \\text{s.t }              & g(x) = 0, \\\\
+                                  & h(x) \\le 0.
+        \\end{aligned}
+        $$
+      where the functions $f:\\RR^n\\to\\RR$, $g:\\RR^n\\to\\RR^m$ and $h:\\RR^n\\to\\RR^p$ are smooth on some
+      domain of $\\RR^n$.`,
+        implications: [
+          {
+            statementName: "terminology",
+            type: "definition",
+            content: `1) The feasible set is defined by 
+                      $$\\F=\\{x\\in\\RR^n : g(x)=0 \\text{ and } h(x) \\le 0\\}.$$
+                      </br>
+                      2) A local solution is a feasible solution $x^*\\in\\F$ for which
+                      $$\\exists\\epsilon>0, \\forall x\\in B(x^*,\\epsilon)\\cap\\F: f(x^*)\\le f(x).$$`,
+          },
+        ]
+      },
+      {
+        statementName: "Fritz John Conditions",
+        type: "theorem",
+        content: `If $x^*$ is a local minimum of $(\\P)$, and $f,g$ and $h$ are are continuously differentiable in a neighborhood of
+        $x^*$, then there exists $(\\lambda^*, y^*, z^*)\\in\\RR_+\\times\\RR^m\\times\\RR^p_+\\setminus\\{0\\}$, such that
+                $$\\begin{cases}
+                (z^*)^\\top h(x^*)^  = 0 \\\\
+                \\lambda^*\\nabla f(x^*) + \\nabla g(x^*)y^* + \\nabla h(x^*)z^* = 0.
+                \\end{cases}$$
+                `,
         dependants: [],
       },
       {
-        statementName: "KKT conditions",
-        type: "theorem",
-        content: `Consider the problem 
-                    $$\\begin{aligned}
-                    (\\P) : \\text{minimize } & f(x) \\\\
-                    \\text{s.t }              & g_i(x) \\le 0, i\\in I, \\\\
-                                              & h_j(x) = 0, j\\in J,
-                    \\end{aligned}
-                    $$
-                    where $I=\\{1,\\cdots,\\ell\\}$ is the index set of inequality constraints and $J=\\{1,\\cdots,m\\}$ is the index set of equality constraints. The functions $g_i, i\\in I$ and $h_j,j\\in J$ are assumed to be differentiable. If a point $x^*$ is a minimum of $f$, then there exist $p_0\\in\\mathbb{R}_+, p\\in\\mathbb{R}^\\ell$ and $q\\in\\mathbb{R}^m$ such that
-                $$\\begin{cases}
-                (p_0,p,q) \\ne 0; \\\\
-                p_0\\nabla f(x^*) + \\sum\\limits_{i\\in I} p_i \\nabla g_i(x^*) +  \\sum\\limits_{j\\in J} q_j \\nabla g_j(x^*)= 0 & \\text{(necessary condition)};\\\\
-                \\sum\\limits_{i} p_ig_i(x^*) = 0 & \\text{(exclusive condition)}.
-                \\end{cases}$$
-                `
-        ,
+        statementName: "Lagrangian function",
+        type: "definition",
+        content: `The function $\\L(x,y,z) = f(x) + y^\\top g(x) + z^\\top h(x)$.`,
         dependants: [],
         implications: [
           {
             statementName: "",
-            type: "note",
-            content: ``,
+            type: "definition",
+            content: `The vectors $y$ and $z$ are called Lagrange multiplier vectors. Each component of $y$ and $z$ is called a Lagrange multiplier. There is one multiplier per constraint.`,
             dependants: [],
           },
           {
             statementName: "",
-            type: "note",
-            content: `
-          1) We call $K=\\{x\\in\\mathbb{R}^n : g_i(x) \\le 0, i\\in I\\text{ and } h_j(x) = 0, j\\in J\\}$ the set of constraints.
-          </br>
-          2) The exclusive condition means that $p_i\\ne 0$ if and only if $g_i(x^*) = 0$. 
-          </br>
-          3) For each $x\\in K$ we call $I(x) = \\{i\\in I : g_i(x) = 0\\}$ the set of <i>saturated</i> conditions.`,
+            type: "theorem",
+            content: `We have $$\\inf\\limits_{x\\in K}\\sup\\limits_{(\\lambda,\\mu)\\in\\R^{\ell+m}}\\L(x,\\lambda,\\mu) = f(x),\\forall x\\in\\RR^n,\\lambda\\in\\RR^\\ell_+,\\mu\\in\\RR^m.$$`,
             dependants: [],
           },
         ]
       },
       {
-        statementName: "Qualification",
+        statementName: "Mangasarian-Fromovitz Constraint Qualification",
         type: "definition",
-        content: `The set $K$ of <b>nonlinear</b> constraints is qualified at point $x^*\\in K$ if for all $\\lambda\\in\\RR^\\ell_+$ and $\\mu\\in\\RR^m$ satisfying
-      $$\\begin{cases}
-      \\sum\\limits_{i\\in I} \\lambda_i g_i(x^*) = 0; \\\\
-      \\sum\\limits_{i\\in I} \\lambda_i \\nabla g_i(x^*) + \\sum\\limits_{j\\in J} \\mu_j \\nabla h_j(x^*)  = 0.
-      \\end{cases}$$
-      Then we necessarily have $\\lambda = 0$ and $\\mu = 0$.`
-        ,
+        content: `Define the set of active inequalities for each $x\\in \\F$ as
+        $$\\I(x) = \\{i\\in\\{1,\\cdots,p\\} : h_i(x)=0\\}.$$
+        We said $x$ to be qualified if 
+        $$\\forall (y,z)\\in\\RR^m\\times\\RR^p: \\nabla g(x) y + \\nabla h(x)_{\\I(x)}(x)z = 0 \\Rightarrow (y,z)=0.$$`,
         dependants: [],
         implications: [
           {
             statementName: "",
-            type: "note",
-            content: `The constraint set $K$ is itself said to be qualified if it is qualified at every point $x\\in K$.`,
+            type: "theorem",
+            content: `The qualification condition is equivalent to
+                      </br>
+                      (i) the matrix $\\nabla g(x)$ is full column-rank;
+                      </br>
+                      (ii) there exists $d\\in\\RR^n\\setminus\\{0\\}$ such that
+                      $$\\nabla g(x)^\\top d = 0 \\text{ and } \\nabla h(x)_{\\I(x)}(x)^\\top d < 0.$$`,
             dependants: [],
           },
         ]
@@ -125,20 +144,6 @@ export default [
             statementName: "",
             type: "note",
             content: `This theorem permits $p$ in the first theorem to be taken as $1$ at qualified minimum point.`,
-            dependants: [],
-          },
-        ]
-      },
-      {
-        statementName: "Lagrangian function",
-        type: "definition",
-        content: `The function $\\L(x,\\lambda,\\mu) = f(x) + \\lambda^\\top g(x) + \\mu^\\top h(x)$.`,
-        dependants: [],
-        implications: [
-          {
-            statementName: "",
-            type: "theorem",
-            content: `We have $$\\inf\\limits_{x\\in K}\\sup\\limits_{(\\lambda,\\mu)\\in\\R^{\ell+m}}\\L(x,\\lambda,\\mu) = f(x),\\forall x\\in\\RR^n,\\lambda\\in\\RR^\\ell_+,\\mu\\in\\RR^m.$$`,
             dependants: [],
           },
         ]

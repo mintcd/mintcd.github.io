@@ -28,7 +28,7 @@ export default function Home() {
       </div>
       <h1 className="font-bold text-lg"> Welcome visitor! </h1>
       <br />
-      I am Chau Dang Minh. I am dreaming of becoming a well-trained researcher in Computer Science and Mathematics. My ultimate scientific question is the ontology of humans comparing to computing entities, which then may contribute to whether there is a meaning for our existence. I am unsure there is a path through Philosophy, Mathematics and Computer Science to the Meaning of Life. As I have been trained on Mathematics and Computer Science, I hope there is!
+      I am Chau Dang Minh. I am dreaming of becoming a well-trained researcher in Computer Science and Mathematics. My ultimate scientific question is the ontology of humans comparing to computing entities, which then may contribute to whether there is a meaning for our existence. I am unsure there is a path through Philosophy, Mathematics and Computer Science to the Meaning of Life. As I have been being trained on Mathematics and Computer Science, I hope there is!
       <br />
       <br />
       What keeps me alive is the fact that what I have to do possible takes longer time than my live. In these wonders, I found my only. I shall love her forever, Thanh Ngan. If you have found a contradiction between my claim of meaninglessness and my love, I will explain this in my later blog. Keep following!

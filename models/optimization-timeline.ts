@@ -1,6 +1,28 @@
 export default [
   {
     chapterName: "Introduction to Optimization",
+    notations: [],
+    statements: [
+      {
+        statementName: "Optimization taxonomy",
+        type: "definition",
+        content: `1) Linear and nonlinear,
+                <br/>
+                2) Discrete and continuous,
+                <br/>
+                3) Constrained and Unconstrained,
+                <br/>
+                4) Convex and non-convex,
+                <br/>
+                5) Deterministic and stochastic,
+                <br/>
+                6) Differentiable and non-differentiable.
+                `
+      },
+    ]
+  },
+  {
+    chapterName: "General Smooth Problem",
     notations: [
       {
         name: "Optimization problem",
@@ -12,24 +34,6 @@ export default [
       }
     ],
     statements: [
-      // {
-      //   statementName: "Optimization taxonomy",
-      //   type: "definition",
-      //   content: `1) Linear and nonlinear,
-      //           <br/>
-      //           2) Discrete and continuous,
-      //           <br/>
-      //           3) Constrained and Unconstrained,
-      //           <br/>
-      //           4) Convex and non-convex,
-      //           <br/>
-      //           5) Deterministic and stochastic,
-      //           <br/>
-      //           6) Differentiable and non-differentiable.
-      //           `
-      //   ,
-      //   dependants: [],
-      // },
       {
         statementName: "Smooth Problem",
         type: "definition",
@@ -60,7 +64,7 @@ export default [
         content: `If $x^*$ is a local minimum of $(\\P)$, and $f,g$ and $h$ are are continuously differentiable in a neighborhood of
         $x^*$, then there exists $(\\lambda^*, y^*, z^*)\\in\\RR_+\\times\\RR^m\\times\\RR^p_+\\setminus\\{0\\}$, such that
                 $$\\begin{cases}
-                (z^*)^\\top h(x^*)^  = 0 \\\\
+                (z^*)^\\top h(x^*) = 0 \\\\
                 \\lambda^*\\nabla f(x^*) + \\nabla g(x^*)y^* + \\nabla h(x^*)z^* = 0.
                 \\end{cases}$$
                 `,
@@ -103,20 +107,27 @@ export default [
                       (i) the matrix $\\nabla g(x)$ is full column-rank;
                       </br>
                       (ii) there exists $d\\in\\RR^n\\setminus\\{0\\}$ such that
-                      $$\\nabla g(x)^\\top d = 0 \\text{ and } \\nabla h(x)_{\\I(x)}(x)^\\top d < 0.$$`,
+                      $$\\nabla g(x)^\\top d = 0 \\text{ and } \\nabla h_{\\I(x)}(x)^\\top d < 0.$$`,
+            dependants: [],
+          },
+          {
+            statementName: "Linear Independence Constraint Qualification",
+            type: "definition",
+            content: `The linear constraint qualification holds at $x\\in\\F$ if columns of  $\\nabla g(x)$ and $\\nabla h_{\\I(x)}(x)$ are independent.`,
             dependants: [],
           },
         ]
       },
       {
-        statementName: "KKT conditions at a qualified point",
+        statementName: "Karush-Kuhn-Tucker conditions",
         type: "theorem",
-        content: `If $K$ is qualified at a minimum point $x^*$, then there exist $\\lambda\\in\\RR^\\ell_+$ and $\\mu\\in\\RR^m$ such that
-      $$\\begin{cases}
-      \\sum\\limits_{i\\in I} \\lambda_i g_i(x^*) = 0; \\\\
-      \\nabla f(x^*) + \\sum\\limits_{i\\in I} \\lambda_i \\nabla g_i(x^*) + \\sum\\limits_{j\\in J} \\mu_j \\nabla h_j(x^*)  = 0.
-      \\end{cases}$$`
-        ,
+        content: `If $x^*$ is a qualified local minimum of $(\\P)$, and $f,g$ and $h$ are are continuously differentiable in a neighborhood of
+        $x^*$, there exists $(y^*, z^*)\\in\\times\\RR^m\\times\\RR^p_+\\setminus\\{0\\}$, such that
+                $$\\begin{cases}
+                (z^*)^\\top h(x^*)  = 0 \\\\
+                \\nabla_x\\L(x^*,y^*,z^*) = 0.
+                \\end{cases}$$
+                `,
         dependants: [],
         implications: [
           {
@@ -127,6 +138,7 @@ export default [
           },
         ]
       },
+
       {
         statementName: "Qualification criteria",
         type: "theorem",

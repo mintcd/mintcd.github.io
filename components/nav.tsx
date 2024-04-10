@@ -47,7 +47,7 @@ export default function Nav() {
                   text-gray-900`}>
         {navItems.map((item, index) => (
           <a key={`nav-item-${index}`}
-            href={item.toLowerCase().replace(" ", "-")}
+            href={`/${item.toLowerCase().replace(" ", "-")}`}
             className='mr-4 hover:text-blue-500'>
             {item}
           </a>))}

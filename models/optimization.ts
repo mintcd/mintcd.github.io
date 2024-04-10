@@ -22,7 +22,7 @@ export default [
     ]
   },
   {
-    chapterName: "General Smooth Problem",
+    chapterName: "Smooth and Constrained Problems",
     notations: [
       {
         name: "Optimization problem",
@@ -35,13 +35,13 @@ export default [
     ],
     statements: [
       {
-        statementName: "Smooth Problem",
+        statementName: "General Form of a Smooth Problem",
         type: "definition",
         content: `Consider the problem 
         $$\\begin{aligned}
-        (\\P) : \\text{minimize } & f(x) \\\\
-        \\text{s.t }              & g(x) = 0, \\\\
-                                  & h(x) \\le 0.
+        (\\P) : \\min\\limits_{x\\in\\RR^n} & f(x) \\\\
+        \\text{s.t }              & c_i = 0, i\\in\\I \\\\
+                                  & c_i \\ge 0, i\\in\\E
         \\end{aligned}
         $$
       where the functions $f:\\RR^n\\to\\RR$, $g:\\RR^n\\to\\RR^m$ and $h:\\RR^n\\to\\RR^p$ are smooth on some

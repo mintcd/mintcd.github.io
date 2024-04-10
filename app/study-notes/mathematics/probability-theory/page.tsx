@@ -1,4 +1,4 @@
-import timeline from '@models/probability-theory-timeline';
+import timeline from '@models/probability-theory';
 import SubjectMap from '@components/subject-map';
 
 export default function ProbabilityTheory() {

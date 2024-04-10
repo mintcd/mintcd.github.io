@@ -10,6 +10,7 @@ type Statement = {
     id?: string,
     type: StatementType,
     statementName?: string,
+    dashedStatementName?: string,
     short?: string,
     content: string,
     proof?: string,

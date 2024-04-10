@@ -17,6 +17,7 @@ const MyLatex: React.FC<MyLatexProps> = ({ children }) => {
 
     "\\B": "\\mathcal{B}",
     "\\D": "\\mathcal{D}",
+    "\\E": "\\mathcal{E}",
     "\\F": "\\mathcal{F}",
     "\\I": "\\mathcal{I}",
     "\\L": "\\mathcal{L}",

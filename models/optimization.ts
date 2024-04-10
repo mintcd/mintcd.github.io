@@ -39,8 +39,8 @@ export default [
         type: "definition",
         content: `Consider the problem 
         $$\\begin{aligned}
-        (\\P) : \\min\\limits_{x\\in\\RR^n} & f(x) \\\\
-        \\text{s.t }              & c_i = 0, i\\in\\I \\\\
+        (\\P) : \\min\\limits_{x\\in\\RR^n}\\,\\,\\,\\,\\, & f(x) \\\\
+        \\text{s.t}  \\,\\,\\,\\,\\,             & c_i = 0, i\\in\\I \\\\
                                   & c_i \\ge 0, i\\in\\E
         \\end{aligned}
         $$

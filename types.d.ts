@@ -10,9 +10,8 @@ type Statement = {
     id?: string,
     type: StatementType,
     statementName?: string,
-    dashedStatementName?: string,
-    short?: string,
     content: string,
+    short?: string,
     proof?: string,
     dependants?: string[],
     implications?: Statement[]

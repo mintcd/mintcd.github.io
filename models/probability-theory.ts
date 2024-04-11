@@ -161,6 +161,12 @@ export default [
             content: `If $S$ is discrete, we can establish a map $S\\to\\{1,\\cdots,n\\}\\subset\\NN$. Then $\\Pi$ is a stochastic matrix whose $p_{ij}$ is the $(i,j)$ entry.`,
             dependants: [],
           },
+          {
+            statementName: "transition after $t$ steps",
+            type: "theorem",
+            content: `Let $\\Pi^t = \\{p_{ij}^{(t)}\\}$. Each entry $p_{ij}^{(t)}$ is the probability of reaching state $j$ from state $i$ after $t$ steps.`,
+            dependants: [],
+          },
         ]
       },
 

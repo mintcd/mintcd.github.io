@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Timeline from '@mui/lab/Timeline'
 import TimelineItem from '@mui/lab/TimelineItem'
 import TimelineSeparator from '@mui/lab/TimelineSeparator'
@@ -22,11 +22,41 @@ import MyLatex from '@components/my-latex'
 
 export default function SubjectMap({ data }: { data: Chapter[] }) {
 
+  const proofRef = useRef(null);
+
   const [showedItems, setShowedItems] = useState(data.map(chapter => ({
     showedChapter: false,
     showedStatements: chapter.statements.map(() => false),
     showedImplications: chapter.statements.map(() => false),
   })));
+
+  const [showedProof, setShowedProof] = useState<{
+    chapterIndex: number | null;
+    statementIndex: number | null;
+    implicationIndex: number | null
+  }>({ chapterIndex: null, statementIndex: null, implicationIndex: null });
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (proofRef.current && !(proofRef.current as HTMLElement).contains(event.target as Node)) {
+        // Clicked outside the proof element, reset showedProof state to null
+        setShowedProof({ chapterIndex: null, statementIndex: null, implicationIndex: null });
+      }
+    }
+
+    // Attach event listener when the proof is shown
+    if (showedProof.chapterIndex !== null && showedProof.statementIndex !== null) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      // Remove event listener when the proof is hidden
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+
+    // Clean up
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showedProof]);
 
   function toggleChapter(chapterIndex: number) {
     const newShowedItems = [...showedItems]
@@ -44,6 +74,15 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
     const newShowedItems = [...showedItems]
     newShowedItems[chapterIndex].showedImplications[statementIndex] = !newShowedItems[chapterIndex].showedImplications[statementIndex]
     setShowedItems(newShowedItems)
+  }
+
+  function changeProof(chapterIndex: number, statementIndex: number, implicationIndex: number | null) {
+    if (chapterIndex == showedProof.chapterIndex && statementIndex == showedProof.statementIndex) {
+      setShowedProof({ chapterIndex: null, statementIndex: null, implicationIndex: null })
+    }
+    else {
+      setShowedProof({ chapterIndex: chapterIndex, statementIndex: statementIndex, implicationIndex: implicationIndex })
+    }
   }
 
   const statementProps: { [key in StatementType]: {
@@ -187,14 +226,20 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
                     </TimelineDot>
 
                     {statementIndex !== chapter.statements.length - 1 && chapter.statements[statementIndex + 1].type !== 'thoughtBubble' &&
-                      <TimelineConnector sx={showedItems[chapterIndex].showedStatements[statementIndex] && statement.content !== "" ? { height: 80 } : { height: 20 }} />}
+                      <TimelineConnector sx={showedItems[chapterIndex].showedStatements[statementIndex]
+                        && statement.content !== ""
+                        ? { height: 80 }
+                        : { height: 20 }} />}
                   </TimelineSeparator>
 
                   <TimelineContent>
                     <div className='text-lg'>
                       <MyLatex>
-                        {statement.statementName ? statement.statementName.charAt(0).toUpperCase() + statement.statementName.slice(1) : ""}
+                        {statement.statementName
+                          ? statement.statementName.charAt(0).toUpperCase() + statement.statementName.slice(1)
+                          : ""}
                       </MyLatex>
+
                     </div>
                     <div className={`mt-2 transition-all duration-500 ${showedItems[chapterIndex].showedStatements[statementIndex] ? 'h-auto opacity-100' : 'h-0 opacity-0'}`}>
                       {showedItems[chapterIndex].showedStatements[statementIndex]
@@ -203,14 +248,22 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
                           <MyLatex>
                             {statement.content}
                           </MyLatex>
-                          {statement.implications
-                            && statement.implications.length !== 0
-                            &&
-                            <ExpandMoreOutlinedIcon
-                              onClick={() => toggleImplication(chapterIndex, statementIndex)}
-                              className={`absolute bottom-3 right-3 w-6 h-6 cursor-pointer 
+                          <div itemID='proof-and-implications-button' className='flex justify-end'>
+                            {statement.type === 'theorem'
+                              && <div onClick={() => changeProof(chapterIndex, statementIndex, null)}
+                                className='cursor-pointer mr-3 italic'>
+                                Proof
+                              </div>}
+                            {statement.implications
+                              && statement.implications.length !== 0
+                              &&
+                              <ExpandMoreOutlinedIcon
+                                onClick={() => toggleImplication(chapterIndex, statementIndex)}
+                                className={`w-6 h-6 cursor-pointer
                                           text-${statementProps[statement.type].color}`} />
-                          }
+                            }
+                          </div>
+
                         </div>
                       }
 
@@ -234,12 +287,20 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
                                 <MyLatex>
                                   {`<b>
                                       ${implication.type.charAt(0).toUpperCase() + implication.type.slice(1)} ${implicationIndex + 1}. 
-                                      ${implication.statementName && implication.statementName}
+                                      (${implication.statementName && implication.statementName})
                                     </b>`}
                                 </MyLatex>
                                 <MyLatex>
                                   {implication.content}
                                 </MyLatex>
+                                <div itemID='implication-proof-button' className='flex justify-end'>
+                                  {implication.type === 'theorem'
+                                    && <div onClick={() => changeProof(chapterIndex, statementIndex, implicationIndex)}
+                                      className='cursor-pointer mr-3 italic'>
+                                      Proof
+                                    </div>}
+
+                                </div>
                               </TimelineContent>
                             </TimelineItem>
                           </Timeline>
@@ -249,9 +310,10 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
                 </TimelineItem>
                 :
                 <div key={statementIndex}
+                  itemID='thought-bubble-container'
                   className={`p-5 rounded-md
-                          h-auto 
-                         bg-blue-300`}>
+                            h-auto 
+                          bg-blue-300`}>
                   <MyLatex>
                     {`<b>
                     ${statement.statementName ?
@@ -264,6 +326,41 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
             ))}
         </Timeline>
       ))}
+
+      {showedProof.chapterIndex !== null && showedProof.statementIndex !== null && (
+        <div
+          className={`absolute top-0 left-0 right-0 bottom-0 
+                    bg-gray-800 bg-opacity-50 z-50
+                      flex items-center justify-center `}>
+          <div ref={proofRef}
+            className="p-5 bg-white rounded-lg">
+            {showedProof.implicationIndex === null
+              ?
+              <MyLatex>
+                {`<b>
+                Proof of Theorem ${showedProof.chapterIndex + 1}.${showedProof.statementIndex + 1}.
+              </b> 
+              ${data[showedProof.chapterIndex].statements[showedProof.statementIndex].proof
+                  || "Have not provided yet :(("}`}
+              </MyLatex>
+              :
+              (
+                <MyLatex>
+                  {`<b>
+                    Proof of ${data[showedProof.chapterIndex]
+                      .statements[showedProof.statementIndex]
+                      .implications?.[showedProof.implicationIndex].type || ""}
+                    ${showedProof.chapterIndex + 1}.${showedProof.statementIndex + 1}.${showedProof.implicationIndex + 1}
+                    </b> 
+                    ${data[showedProof.chapterIndex]
+                      .statements[showedProof.statementIndex]
+                      .implications?.[showedProof.implicationIndex].proof
+                    || "Have not provided yet :(("}`}
+                </MyLatex>)
+            }
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -286,8 +286,11 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
                               <TimelineContent>
                                 <MyLatex>
                                   {`<b>
-                                      ${implication.type.charAt(0).toUpperCase() + implication.type.slice(1)} ${implicationIndex + 1}. 
-                                      (${implication.statementName && implication.statementName})
+                                      ${implication.type.charAt(0).toUpperCase() + implication.type.slice(1)}
+                                      ${chapterIndex + 1}.${statementIndex + 1}.${implicationIndex + 1} 
+                                      (${implication.statementName
+                                    &&
+                                    implication.statementName.charAt(0)?.toUpperCase() + implication.statementName.slice(1)}).
                                     </b>`}
                                 </MyLatex>
                                 <MyLatex>
@@ -329,6 +332,21 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
 
       {showedProof.chapterIndex !== null && showedProof.statementIndex !== null && (
         <div
+          ref={(element) => {
+            if (element) {
+              // Calculate the middle of the viewport
+              const middleOfViewport = window.scrollY + window.innerHeight / 2;
+              // Calculate the top position of the proof element
+              const proofTopPosition = element.getBoundingClientRect().top;
+              // Calculate the offset to scroll to the middle of the proof element
+              const scrollToOffset = proofTopPosition - middleOfViewport;
+              // Scroll to the middle of the proof element
+              window.scrollTo({
+                top: window.scrollY + scrollToOffset,
+                behavior: 'smooth',
+              });
+            }
+          }}
           className={`absolute top-0 left-0 right-0 bottom-0 
                     bg-gray-800 bg-opacity-50 z-50
                       flex items-center justify-center `}>

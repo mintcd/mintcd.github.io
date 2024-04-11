@@ -163,13 +163,27 @@ export default [
           },
           {
             statementName: "transition after $t$ steps",
+            type: "definition",
+            content: `Define $\\{p_{ij}^{(t)}\\}$ to be the probability of reaching state $j$ from state $i$ after $t$ steps. By convention, $\\begin{cases}
+                            p_{ij}^{(0)} = 1, \\text{ if } i = j, \\\\
+                            p_{ij}^{(0)} = 0, \\text{ if } i \\ne j.
+                        \\end{cases}$`,
+            dependants: [],
+          },
+          {
+            statementName: "stochastic matrix for $t$-step transitions",
             type: "theorem",
-            content: `Let $\\Pi^t = \\{p_{ij}^{(t)}\\}$. Each entry $p_{ij}^{(t)}$ is the probability of reaching state $j$ from state $i$ after $t$ steps.`,
+            content: `If $S=\\{1,\\cdots,n\\}$, define $\\Pi^0 = \\mathbf{I}$. Then $\\Pi^t$ contains the transition probabilities after $t$ steps.`,
             dependants: [],
           },
         ]
       },
-
+      {
+        statementName: "reachability and communicativity",
+        type: "definition",
+        content: `A state $j$ is reachable from a state $i$ if there exists $t\\in\\N$ such that $p_{ij}^{(t)}>0$. Two stages $i$ and $j$ communicate if they are reachable from each other.`,
+        dependants: [],
+      },
       {
         statementName: "Markov chain from i.i.d random variables",
         type: "theorem",

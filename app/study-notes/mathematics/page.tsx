@@ -66,7 +66,7 @@ export default function NetworkGraph() {
       .style("fill", "white")
       .attr("dx", nodeWidth / 2)
       .attr("dy", nodeHeight / 2)
-      .on("click", function (event, v: Vertex) {
+      .on("click", function (event: any, v: Vertex) {
         const currentUrl = window.location.href; // Get the current URL
         const newUrl = `${currentUrl}/${v.name}`; // Concatenate v.name to the current URL
         console.log("Clicked on node:", v.name);

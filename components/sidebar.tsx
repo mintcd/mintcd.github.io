@@ -22,7 +22,7 @@ export default function Sidebar({ topic, current }: { topic: string, current: nu
 
   const loadData = async () => {
     try {
-      const data = await import(`@models/${topic}`);
+      const data = await import(`@models/mathematics/${topic}`);
       return data.default || []; // Return an empty array if topologyData.default is falsy
     } catch (error) {
       console.error('Error loading file:', error);

@@ -1,4 +1,4 @@
-import timeline from '@models/real-analysis';
+import timeline from '@models/mathematics/real-analysis';
 import Sidebar from '@components/sidebar';
 import SubjectMap from '@components/subject-map';
 

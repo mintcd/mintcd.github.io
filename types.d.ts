@@ -1,3 +1,5 @@
+declare module 'd3'
+
 type Chapter = {
     chapterName: string,
     subtitle?: string,
@@ -17,6 +19,36 @@ type Statement = {
     implications?: Statement[]
 }
 
+
+type Graph = {
+    vertices: Vertex[]
+    edges: Edge[]
+}
+
+type Vertex = {
+    name: string
+}
+
+type Edge = {
+    source: string
+    target: string
+}
+
+type VertexCoordinate = {
+    x: number
+    y: number
+}
+
+type EdgeCoordinate = {
+    source: {
+        x: number
+        y: number
+    },
+    target: {
+        x: number
+        y: number
+    }
+}
 
 type GraphNode = {
     nodeId: number,

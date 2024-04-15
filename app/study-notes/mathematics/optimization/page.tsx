@@ -1,4 +1,4 @@
-import timeline from '@models/optimization'
+import timeline from '@models/mathematics/optimization'
 import SubjectMap from '@components/subject-map'
 
 export default function Optimization() {

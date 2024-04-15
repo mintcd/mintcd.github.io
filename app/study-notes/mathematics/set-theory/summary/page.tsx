@@ -1,7 +1,7 @@
 "use client"
 
 import Xarrow, { Xwrapper } from 'react-xarrows';
-import linalg from '@models/linear-algebra';
+import linalg from '@models/mathematics/linear-algebra';
 import Latex from 'react-latex-next';
 import 'katex/dist/katex.min.css';
 import { forwardRef } from 'react';

@@ -183,6 +183,20 @@ export default [
         type: "definition",
         content: `A state $j$ is reachable from a state $i$ if there exists $t\\in\\N$ such that $p_{ij}^{(t)}>0$. Two stages $i$ and $j$ communicate if they are reachable from each other.`,
         dependants: [],
+        implications: [
+          {
+            statementName: "irreducible Markov chain",
+            type: "definition",
+            content: `Communicativity is an equivalence relation. Hence $S$ contains partitions of equivalence classes, called called communication classes. A Markov chain is irreducible if there exists only one partition of $S$.`,
+            dependants: [],
+          },
+          {
+            statementName: "class property",
+            type: "definition",
+            content: `A property $P$ is said to be a class property if whenever $i\\in S$ satisfies $P$, then $[i]$ satisfy $P$.`,
+            dependants: [],
+          },
+        ]
       },
       {
         statementName: "Markov chain from i.i.d random variables",
@@ -194,9 +208,9 @@ export default [
         dependants: [],
       },
       {
-        statementName: "transient state",
-        type: "theorem",
-        content: ``,
+        statementName: "Recurrent and transient states",
+        type: "definition",
+        content: `A state $s_i$ is recurrent if starting from $s_i$, one will eventually return to $s_i$. Otherwise, $s_i$ is transient.`,
         dependants: [],
       },
     ]

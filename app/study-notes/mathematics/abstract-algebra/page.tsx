@@ -1,6 +1,6 @@
 "use client"
 
-import absalg from '@models/abstract-algebra';
+import absalg from '@models/mathematics/abstract-algebra';
 
 export default function Graph() {
   const theorems = absalg.flatMap(item => item.theorems).filter(theorem => theorem.id.includes("."));

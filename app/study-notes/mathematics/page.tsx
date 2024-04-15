@@ -1,79 +1,121 @@
 'use client'
 
-import { useState } from 'react';
-import realAnalysis from '@public/real-analysis.png';
-import Image from 'next/image';
-import Link from 'next/link';
+import React, { useState, useEffect, useRef } from 'react';
+import * as d3 from 'd3';
 
-export default function Mathematics() {
-  // const [isMathVisible, setIsMathVisible] = useState(true);
+import data from '@models/mathematics/subject-dependencies'
 
-  // const toggleMathematics = () => {
-  //   setIsMathVisible(!isMathVisible);
-  // };
+export default function NetworkGraph() {
+  const svgRef = useRef(null);
+
+  const margin = { top: 10, right: 30, bottom: 30, left: 40 };
+  const graphWidth = 1000 - margin.left - margin.right;
+  const graphHeight = 1000 - margin.top - margin.bottom;
+
+  const nodeWidth = 150
+  const nodeHeight = 60
+
+  useEffect(() => {
+    const svg = d3.select(svgRef.current)
+      .attr("width", graphWidth + margin.left + margin.right)
+      .attr("height", graphHeight + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+    const link = svg.selectAll("line")
+      .data(data.edges)
+      .join("line")
+      .style("stroke", "#aaa")
+      .attr("marker-end", "url(#arrow)");
+
+    // Define the arrowhead marker
+    svg.append("svg:defs")
+      .append("svg:marker")
+      .attr("id", "arrow")
+      .attr("viewBox", "0 -5 10 10")
+      .attr("refX", 8)
+      .attr("markerWidth", 10)
+      .attr("markerHeight", 10)
+      .attr("orient", "auto")
+      .append("svg:path")
+      .attr("d", "M0,-5L10,0L0,5")
+      .style("fill", "#aaa");
+
+    const node = svg
+      .selectAll(".node")
+      .data(data.vertices)
+      .enter()
+      .append("g")
+      .attr("class", "node");
+
+    node.append("rect")
+      .attr("width", nodeWidth)
+      .attr("height", nodeHeight)
+      .style("fill", "#69b3a2");
+
+    node.append("text")
+      .text(function (v: Vertex) {
+        return v.name
+          .replace(/-/g, ' ')
+          .replace(/\b\w/g, function (char) {
+            return char.toUpperCase();
+          });
+      })
+      .style("text-anchor", "middle")
+      .style("dominant-baseline", "middle")
+      .style("fill", "white")
+      .attr("dx", nodeWidth / 2)
+      .attr("dy", nodeHeight / 2)
+      .on("click", function (event, v: Vertex) {
+        const currentUrl = window.location.href; // Get the current URL
+        const newUrl = `${currentUrl}/${v.name}`; // Concatenate v.name to the current URL
+        console.log("Clicked on node:", v.name);
+        console.log("Navigating to:", newUrl);
+        window.location.href = newUrl; // Navigate to the new URL
+      })
+      .style("cursor", "pointer");
+
+
+    node.append("a")
+      .attr("width", nodeWidth)
+      .attr("height", nodeHeight)
+      .attr("title", "node-href")
+      .attr("href", "google.com")
+
+    const simulation = d3.forceSimulation(data.vertices)
+      .force("link", d3.forceLink()
+        .id((v: Vertex) => v.name)
+        .links(data.edges)
+      )
+      .force("charge", d3.forceManyBody().strength(-5000))
+      .force("center", d3.forceCenter(graphWidth / 2, graphHeight / 2))
+      .on("tick", ticked)
+      .alphaDecay(0.01);
+
+
+
+    function ticked() {
+      link
+        .attr("x1", function (d: EdgeCoordinate) {
+          // console.log(d)
+          return d.source.x
+        })
+        .attr("y1", (d: EdgeCoordinate) => d.source.y)
+        .attr("x2", (d: EdgeCoordinate) => d.target.x)
+        .attr("y2", (d: EdgeCoordinate) => d.target.y);
+
+      node
+        .attr("transform", function (d: VertexCoordinate) {
+          return `translate(${d.x - nodeWidth / 2}, ${d.y - nodeHeight / 2})`
+        })
+    }
+  }, []);
 
   return (
-    <div className="container mx-auto mt-8">
-      <div className='text-center'>
-        The picture of mathematics is drawn up by the language of set theory.
-      </div>
-
-
-      <Link href="/study-notes/mathematics/terminology">
-        <div className="my-3 text-center mb-8">
-          <h2 className="text-2xl font-bold cursor-pointer">Terminology</h2>
-        </div>
-      </Link>
-
-      <div className="my-3 text-center mb-8">
-        {/* <h1 className="text-2xl font-bold cursor-pointer" onClick={toggleMathematics}>
-          Subjects
-        </h1> */}
-        <h1 className="text-2xl font-bold cursor-pointer">
-          Subjects
-        </h1>
-      </div>
-
-      {/* {isMathVisible && ( */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        <Link href="/study-notes/mathematics/topology/chapters/0">
-          <div className="box bg-white shadow-md rounded-lg p-4 cursor-pointer text-center">
-            <h2 className="text-lg font-bold">Topology</h2>
-          </div>
-        </Link>
-
-        <Link href="/study-notes/mathematics/real-analysis">
-          <div className="box bg-white shadow-md rounded-lg p-4 cursor-pointer text-center">
-            <Image src={realAnalysis} alt="Real Analysis" className="rounded-lg" />
-            <h2 className="text-lg font-bold mt-2">Real Analysis</h2>
-          </div>
-        </Link>
-
-        <Link href="/study-notes/mathematics/abstract-algebra/chapters/0">
-          <div className="box bg-white shadow-md rounded-lg p-4 cursor-pointer text-center">
-            <h2 className="text-lg font-bold">Abstract Algebra</h2>
-          </div>
-        </Link>
-
-        <Link href="/study-notes/mathematics/linear-algebra/chapters/0">
-          <div className="box bg-white shadow-md rounded-lg p-4 cursor-pointer text-center">
-            <h2 className="text-lg font-bold">Linear Algebra</h2>
-          </div>
-        </Link>
-
-        <Link href="/study-notes/mathematics/probability-theory">
-          <div className="box bg-white shadow-md rounded-lg p-4 cursor-pointer text-center">
-            <h2 className="text-lg font-bold">Probability Theory</h2>
-          </div>
-        </Link>
-
-        <Link href="/study-notes/mathematics/optimization">
-          <div className="box bg-white shadow-md rounded-lg p-4 cursor-pointer text-center">
-            <h2 className="text-lg font-bold">Optimization</h2>
-          </div>
-        </Link>
-      </div>
-      {/* )} */}
+    <div
+      className='flex justify-center'>
+      <svg ref={svgRef}></svg>
     </div>
+
   );
-}
+};

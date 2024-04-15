@@ -1,7 +1,7 @@
 "use client"
 
 import Xarrow, { Xwrapper } from 'react-xarrows';
-import topology from '@models/topology';
+import topology from '@models/mathematics/topology';
 import Latex from 'react-latex-next';
 import 'katex/dist/katex.min.css';
 import { forwardRef, RefObject } from 'react';

@@ -19,6 +19,18 @@ export default {
     {
       name: 'probability-theory'
     },
+    {
+      name: 'calculus'
+    },
+    {
+      name: 'optimization'
+    },
+    {
+      name: 'stochastic-processes'
+    },
+    {
+      name: 'markov-chain'
+    },
   ],
   edges: [
     {
@@ -42,8 +54,28 @@ export default {
       target: 'probability-theory'
     },
     {
+      source: 'real-analysis',
+      target: 'calculus'
+    },
+    {
+      source: 'real-analysis',
+      target: 'optimization'
+    },
+    {
+      source: 'calculus',
+      target: 'optimization'
+    },
+    {
       source: 'measure-theory',
       target: 'probability-theory'
+    },
+    {
+      source: 'probability-theory',
+      target: 'stochastic-processes'
+    },
+    {
+      source: 'stochastic-processes',
+      target: 'markov-chain'
     },
 
   ]

@@ -9,8 +9,9 @@ export default function NetworkGraph() {
   const svgRef = useRef(null);
 
   const margin = { top: 10, right: 30, bottom: 30, left: 40 };
-  const graphWidth = 1000 - margin.left - margin.right;
-  const graphHeight = 1000 - margin.top - margin.bottom;
+  const graphWidth = (typeof window !== 'undefined' && window.visualViewport) ? window.visualViewport.width - margin.left - margin.right : 1500 - margin.left - margin.right;
+  const graphHeight = (typeof window !== 'undefined' && window.visualViewport) ? window.visualViewport.height - margin.top - margin.bottom : 750 - margin.top - margin.bottom;
+
 
   const nodeWidth = 150
   const nodeHeight = 60
@@ -86,9 +87,12 @@ export default function NetworkGraph() {
       .force("link", d3.forceLink()
         .id((v: Vertex) => v.name)
         .links(data.edges)
+        .distance(nodeWidth) // Adjust the distance between linked nodes
+        // .strength(1) 
       )
-      .force("charge", d3.forceManyBody().strength(-5000))
+      .force("charge", d3.forceManyBody().strength(-250))
       .force("center", d3.forceCenter(graphWidth / 2, graphHeight / 2))
+      // .force("collide", d3.forceCollide(nodeWidth / 2))
       .on("tick", ticked)
       .alphaDecay(0.01);
 
@@ -106,7 +110,7 @@ export default function NetworkGraph() {
 
       node
         .attr("transform", function (d: VertexCoordinate) {
-          return `translate(${d.x - nodeWidth / 2}, ${d.y - nodeHeight / 2})`
+          return `translate(${d.x - nodeWidth / 2}, ${d.y - nodeHeight})`
         })
     }
   }, []);

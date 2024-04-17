@@ -4,19 +4,19 @@ import { useEffect } from 'react';
 import * as d3 from 'd3';
 
 export default function NetworkGraph({ data }: { data: Graph }) {
+  const margin = { top: 10, right: 30, bottom: 30, left: 40 };
+  const graphWidth = (typeof window !== 'undefined' && window.visualViewport)
+    ? window.visualViewport.width - margin.left - margin.right
+    : 1500 - margin.left - margin.right;
+  const graphHeight = (typeof window !== 'undefined' && window.visualViewport)
+    ? window.visualViewport.height - margin.top - margin.bottom
+    : 750 - margin.top - margin.bottom;
+
+
+  const nodeWidth = 150
+  const nodeHeight = 60
 
   useEffect(() => {
-    const margin = { top: 10, right: 30, bottom: 30, left: 40 };
-    const graphWidth = (typeof window !== 'undefined' && window.visualViewport)
-      ? window.visualViewport.width - margin.left - margin.right
-      : 1500 - margin.left - margin.right;
-    const graphHeight = (typeof window !== 'undefined' && window.visualViewport)
-      ? window.visualViewport.height - margin.top - margin.bottom
-      : 750 - margin.top - margin.bottom;
-
-
-    const nodeWidth = 150
-    const nodeHeight = 60
     // Select the referenced graph svg and define it as a <g> tag
     const graph = d3
       .select('svg')
@@ -121,7 +121,7 @@ export default function NetworkGraph({ data }: { data: Graph }) {
         .attr("transform", (d: Vertex) => `translate(${d.x}, ${d.y})`);
     }
 
-  }, []);
+  });
 
   return (
     <div

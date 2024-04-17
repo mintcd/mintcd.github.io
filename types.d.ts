@@ -1,4 +1,5 @@
 declare module 'd3'
+declare module 'katex'
 
 type Chapter = {
     chapterName: string,
@@ -27,6 +28,10 @@ type Graph = {
 
 type Vertex = {
     name: string
+    fx: number,
+    fy: number,
+    x: number,
+    y: number
 }
 
 type Edge = {

@@ -288,9 +288,9 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
                                   {`<b>
                                       ${implication.type.charAt(0).toUpperCase() + implication.type.slice(1)}
                                       ${chapterIndex + 1}.${statementIndex + 1}.${implicationIndex + 1} 
-                                      (${implication.statementName
+                                      ${implication.statementName
                                     &&
-                                    implication.statementName.charAt(0)?.toUpperCase() + implication.statementName.slice(1)}).
+                                    `(${implication.statementName.charAt(0)?.toUpperCase() + implication.statementName.slice(1)})`}
                                     </b>`}
                                 </MyLatex>
                                 <MyLatex>

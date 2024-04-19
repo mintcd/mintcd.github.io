@@ -4,7 +4,7 @@ import Nav from '@components/nav'
 import Footer from '@components/footer'
 
 export const metadata = {
-  title: 'My Deeds',
+  title: 'Life for Meaning',
   description: 'The meaning to my extend.',
 };
 

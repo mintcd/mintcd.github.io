@@ -3,7 +3,7 @@ declare module 'katex'
 
 type Chapter = {
     chapterName: string,
-    subtitle?: string,
+    description?: string,
     notations: Notation[],
     statements: Statement[]
 }
@@ -27,7 +27,8 @@ type Graph = {
 }
 
 type Vertex = {
-    name: string
+    name: string,
+    color: string,
     fx: number,
     fy: number,
     x: number,
@@ -55,15 +56,6 @@ type EdgeCoordinate = {
     }
 }
 
-type GraphNode = {
-    nodeId: number,
-    label: string = "",
-    content: string = "",
-    color: string = "blue",
-    opacity: string = "200",
-    type: string = "text"
-};
-
 type Term = {
     name: string,
     definition: string = "",
@@ -77,4 +69,5 @@ type Notation = {
     content: string
 }
 
-type StatementType = 'axiom' | 'theorem' | 'definition' | 'corollary' | 'lemma' | 'note' | 'thoughtBubble' | 'example';
+type StatementType = 'axiom' | 'theorem' | 'definition' | 'corollary' | 'lemma' | 'note' | 'thoughtBubble' | 'example' | 'proposition';
+type Category = 'all' | 'realAnalysis' | 'probabilityTheory';

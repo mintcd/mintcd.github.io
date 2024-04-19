@@ -1,5 +1,12 @@
 export default [
   {
+    name: "null set",
+    definition: "",
+    categories: ["measureTheory"],
+    subcategories: [],
+    dependants: []
+  },
+  {
     name: "statistic",
     definition: "",
     categories: ["statistics"],
@@ -276,14 +283,13 @@ export default [
   {
     name: "random variable",
     definition: "",
-    categories: ["analysis"],
-    subcategories: ["probability theory"],
+    categories: ["probabilityTheory"],
+    subcategories: [],
   },
   {
     name: "distribution function",
     definition: "",
-    categories: ["analysis"],
-    subcategories: ["probability theory"],
+    categories: ["probabilityTheory"],
   },
   {
     name: "expectation",

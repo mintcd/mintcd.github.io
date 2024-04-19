@@ -16,12 +16,18 @@ const MyLatex: React.FC<MyLatexProps> = ({ children }) => {
     "\\VV": "\\mathbb{V}",
 
     "\\B": "\\mathcal{B}",
+    "\\C": "\\mathcal{C}",
     "\\D": "\\mathcal{D}",
     "\\E": "\\mathcal{E}",
     "\\F": "\\mathcal{F}",
+    "\\G": "\\mathcal{G}",
     "\\I": "\\mathcal{I}",
     "\\L": "\\mathcal{L}",
     "\\P": "\\mathcal{P}",
+
+    "\\d": "\\mathrm{d}",
+
+    "\\1": "\\mathbf{1}"
   };
 
   // Ensure children is an array

@@ -8,11 +8,13 @@ import Latex from 'react-latex-next';
 import 'katex/dist/katex.min.css';
 import terms from '@models/mathematics/mathematics-terminology';
 
-export default function Terminology({ subject }: { subject: 'all' | 'real analysis' | 'probability theory' }) {
+export default function Terminology({ category }: { category: Category }) {
   const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({});
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [filteredTerms, setFilteredTerms] = useState<Term[]>(subject === 'all' ? terms : terms.filter(term => term.subcategories?.includes(subject)));
+  const [filteredTerms, setFilteredTerms] = useState<Term[]>(category === 'all'
+    ? terms
+    : terms.filter(term => term.categories.includes(category)));
 
   const groupedTerms: { [key: string]: Term[] } = {};
   filteredTerms.forEach((term: Term) => {
@@ -118,7 +120,7 @@ export default function Terminology({ subject }: { subject: 'all' | 'real analys
                     {groupedTerms[letter].map(term => (
                       <li key={term.name}>
                         <div>
-                          {term.name} ({term.categories.join(', ')})
+                          {term.name}
                         </div>
                         {term.definition !== "" && <div className="bg-green-200 p-3 rounded-xl">
                           <Latex>

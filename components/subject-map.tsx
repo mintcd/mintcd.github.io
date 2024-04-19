@@ -7,20 +7,20 @@ import TimelineSeparator from '@mui/lab/TimelineSeparator'
 import TimelineConnector from '@mui/lab/TimelineConnector'
 import TimelineContent from '@mui/lab/TimelineContent'
 import TimelineDot, {
-  TimelineDotProps
+  TimelineDotProps,
 } from '@mui/lab/TimelineDot'
 import TimelineOppositeContent, {
   timelineOppositeContentClasses,
 } from '@mui/lab/TimelineOppositeContent'
 
 import ExpandMoreOutlinedIcon from '@mui/icons-material/ExpandMoreOutlined';
-
 import TipsAndUpdatesRoundedIcon from '@mui/icons-material/TipsAndUpdatesRounded'
 import NotificationsActiveRoundedIcon from '@mui/icons-material/NotificationsActiveRounded'
 
-import MyLatex from '@components/my-latex'
+import Latex from '@components/latex'
+import Terminology from './terminology'
 
-export default function SubjectMap({ data }: { data: Chapter[] }) {
+export default function SubjectMap({ data, category }: { data: Chapter[], category: Category }) {
 
   const proofRef = useRef(null);
 
@@ -86,7 +86,7 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
   }
 
   const statementProps: { [key in StatementType]: {
-    color: TimelineDotProps["color"],
+    color: string,
     image: (chapterIndex: number, statementIndex: number) => JSX.Element,
     contentBackground: string
   } } = {
@@ -120,16 +120,25 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
       ),
       contentBackground: 'bg-[#77c7f2]'
     },
+    proposition: {
+      color: '#6da484',
+      image: (chapterIndex, statementIndex) => (
+        <TipsAndUpdatesRoundedIcon
+          className={showedItems[chapterIndex].showedChapter === true
+            && showedItems[chapterIndex].showedStatements[statementIndex] === true
+            ? 'text-white' : 'text-[#6da484]'} />
+      ),
+      contentBackground: 'bg-[#6da484]'
+    },
     theorem: {
       color: 'success',
       image: (chapterIndex, statementIndex) => (
         <NotificationsActiveRoundedIcon
           className={showedItems[chapterIndex].showedChapter === true
             && showedItems[chapterIndex].showedStatements[statementIndex] === true
-            ? 'text-white' : 'text-[#2e7d32]'} />
+            ? 'text-white' : 'text-[#7cab7f]'} />
       ),
-      contentBackground: 'bg-[#a3cca5]'
-
+      contentBackground: 'bg-[#7cab7f]'
     },
     corollary: {
       color: 'grey',
@@ -153,7 +162,7 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
       contentBackground: 'bg-[#77c7f2]'
     },
     note: {
-      color: 'primary',
+      color: 'green',
       image: (chapterIndex, statementIndex) => (
         <TipsAndUpdatesRoundedIcon
           className={showedItems[chapterIndex].showedChapter === true
@@ -180,6 +189,7 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
 
   return (
     <div className='m-5'>
+      <Terminology category='probabilityTheory' />
       {data.map((chapter, chapterIndex) => (
         <Timeline
           key={chapterIndex}
@@ -212,14 +222,8 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
                   <TimelineSeparator>
                     <TimelineDot
                       sx={{
-                        width: 40,
-                        height: 40,
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        cursor: 'pointer'
+                        color: statementProps[statement.type].color,
                       }}
-                      color={statementProps[statement.type].color}
                       variant={showedItems[chapterIndex].showedStatements[statementIndex] ? 'filled' : 'outlined'}
                       onClick={() => toggleStatement(chapterIndex, statementIndex)}>
                       {statementProps[statement.type].image(chapterIndex, statementIndex)}
@@ -234,20 +238,20 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
 
                   <TimelineContent>
                     <div className='text-lg'>
-                      <MyLatex>
+                      <Latex>
                         {statement.statementName
                           ? statement.statementName.charAt(0).toUpperCase() + statement.statementName.slice(1)
                           : ""}
-                      </MyLatex>
+                      </Latex>
 
                     </div>
                     <div className={`mt-2 transition-all duration-500 ${showedItems[chapterIndex].showedStatements[statementIndex] ? 'h-auto opacity-100' : 'h-0 opacity-0'}`}>
                       {showedItems[chapterIndex].showedStatements[statementIndex]
                         && statement.content !== ""
                         && <div className={`relative text-black ${statementProps[statement.type].contentBackground} p-3 rounded-xl`}>
-                          <MyLatex>
+                          <Latex>
                             {statement.content}
-                          </MyLatex>
+                          </Latex>
                           <div itemID='proof-and-implications-button' className='flex justify-end'>
                             {statement.type === 'theorem'
                               && <div onClick={() => changeProof(chapterIndex, statementIndex, null)}
@@ -282,9 +286,11 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
                           >
                             <TimelineItem key={`${statementIndex}-${implicationIndex}`}>
                               <TimelineOppositeContent />
-                              <TimelineDot color={statementProps[implication.type].color} />
+                              <TimelineDot sx={{
+                                backgroundColor: statementProps[implication.type].color
+                              }} />
                               <TimelineContent>
-                                <MyLatex>
+                                <Latex>
                                   {`<b>
                                       ${implication.type.charAt(0).toUpperCase() + implication.type.slice(1)}
                                       ${chapterIndex + 1}.${statementIndex + 1}.${implicationIndex + 1} 
@@ -292,10 +298,10 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
                                     &&
                                     `(${implication.statementName.charAt(0)?.toUpperCase() + implication.statementName.slice(1)})`}
                                     </b>`}
-                                </MyLatex>
-                                <MyLatex>
+                                </Latex>
+                                <Latex>
                                   {implication.content}
-                                </MyLatex>
+                                </Latex>
                                 <div itemID='implication-proof-button' className='flex justify-end'>
                                   {implication.type === 'theorem'
                                     && <div onClick={() => changeProof(chapterIndex, statementIndex, implicationIndex)}
@@ -317,14 +323,14 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
                   className={`p-5 rounded-md
                             h-auto 
                           bg-blue-300`}>
-                  <MyLatex>
+                  <Latex>
                     {`<b>
                     ${statement.statementName ?
                         statement.statementName.charAt(0).toUpperCase() + statement.statementName.slice(1) :
                         ''}.
                   </b> 
               ${statement.content}`}
-                  </MyLatex>
+                  </Latex>
                 </div>
             ))}
         </Timeline>
@@ -354,16 +360,16 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
             className="p-5 bg-white rounded-lg">
             {showedProof.implicationIndex === null
               ?
-              <MyLatex>
+              <Latex>
                 {`<b>
                 Proof of Theorem ${showedProof.chapterIndex + 1}.${showedProof.statementIndex + 1}.
               </b> 
               ${data[showedProof.chapterIndex].statements[showedProof.statementIndex].proof
                   || "Have not provided yet :(("}`}
-              </MyLatex>
+              </Latex>
               :
               (
-                <MyLatex>
+                <Latex>
                   {`<b>
                     Proof of ${data[showedProof.chapterIndex]
                       .statements[showedProof.statementIndex]
@@ -374,7 +380,7 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
                       .statements[showedProof.statementIndex]
                       .implications?.[showedProof.implicationIndex].proof
                     || "Have not provided yet :(("}`}
-                </MyLatex>)
+                </Latex>)
             }
           </div>
         </div>

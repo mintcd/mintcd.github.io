@@ -1,7 +1,8 @@
 export default {
   vertices: [
     {
-      name: 'set-theory'
+      name: 'set-theory',
+      color: '#6883ba'
     },
     {
       name: 'linear-algebra'

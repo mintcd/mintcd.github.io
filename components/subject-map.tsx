@@ -6,9 +6,7 @@ import TimelineItem from '@mui/lab/TimelineItem'
 import TimelineSeparator from '@mui/lab/TimelineSeparator'
 import TimelineConnector from '@mui/lab/TimelineConnector'
 import TimelineContent from '@mui/lab/TimelineContent'
-import TimelineDot, {
-  TimelineDotProps,
-} from '@mui/lab/TimelineDot'
+import TimelineDot from '@mui/lab/TimelineDot'
 import TimelineOppositeContent, {
   timelineOppositeContentClasses,
 } from '@mui/lab/TimelineOppositeContent'
@@ -91,7 +89,7 @@ export default function SubjectMap({ data, category }: { data: Chapter[], catego
     contentBackground: string
   } } = {
     axiom: {
-      color: 'secondary',
+      color: '#0288d1',
       image: (chapterIndex, statementIndex) => (
         <TipsAndUpdatesRoundedIcon
           className={showedItems[chapterIndex].showedChapter === true
@@ -102,7 +100,7 @@ export default function SubjectMap({ data, category }: { data: Chapter[], catego
 
     },
     definition: {
-      color: 'info',
+      color: '#0288d1',
       image: (chapterIndex, statementIndex) => (
         <TipsAndUpdatesRoundedIcon
           className={showedItems[chapterIndex].showedStatements[statementIndex]
@@ -131,12 +129,12 @@ export default function SubjectMap({ data, category }: { data: Chapter[], catego
       contentBackground: 'bg-[#6da484]'
     },
     theorem: {
-      color: 'success',
+      color: '#5bb561',
       image: (chapterIndex, statementIndex) => (
         <NotificationsActiveRoundedIcon
           className={showedItems[chapterIndex].showedChapter === true
             && showedItems[chapterIndex].showedStatements[statementIndex] === true
-            ? 'text-white' : 'text-[#7cab7f]'} />
+            ? 'text-white' : 'text-[#5bb561]'} />
       ),
       contentBackground: 'bg-[#7cab7f]'
     },

@@ -1,4 +1,4 @@
-Everything I am concerning about. Visit at mintcd.github.io.
+Everything I am concerning about. Visit at lifeformeaning.com
 
 Uncovered plan:
 1) Philosophy (history first)

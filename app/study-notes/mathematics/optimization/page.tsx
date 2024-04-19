@@ -3,6 +3,6 @@ import SubjectMap from '@components/subject-map'
 
 export default function Optimization() {
   return (
-    <SubjectMap data={timeline} />
+    <SubjectMap data={timeline} category='real-analysis' />
   )
 }

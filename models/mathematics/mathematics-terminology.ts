@@ -283,13 +283,13 @@ export default [
   {
     name: "random variable",
     definition: "",
-    categories: ["probabilityTheory"],
+    categories: ["probability-theory"],
     subcategories: [],
   },
   {
     name: "distribution function",
     definition: "",
-    categories: ["probabilityTheory"],
+    categories: ["probability-theory"],
   },
   {
     name: "expectation",

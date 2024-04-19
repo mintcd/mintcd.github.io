@@ -189,7 +189,7 @@ export default function SubjectMap({ data, category }: { data: Chapter[], catego
 
   return (
     <div className='m-5'>
-      <Terminology category='probabilityTheory' />
+      <Terminology category='probability-theory' />
       {data.map((chapter, chapterIndex) => (
         <Timeline
           key={chapterIndex}

@@ -10,31 +10,35 @@ export default function TheoremBox({ statement }: { statement: Statement }) {
       backgroundColor: 'gray-100',
       borderColor: 'border-green-400'
     },
+    corollary: {
+      backgroundColor: 'gray-100',
+      borderColor: 'gray-400'
+    },
     definition: {
       backgroundColor: 'green-50',
       borderColor: 'border-green-400'
+    },
+    example: {
+      backgroundColor: 'gray-100',
+      borderColor: 'gray-400'
     },
     lemma: {
       backgroundColor: 'green-50',
       borderColor: 'blue-400'
     },
-    theorem: {
-      backgroundColor: 'blue-50',
-      borderColor: 'blue-400'
-    },
-    corollary: {
-      backgroundColor: 'gray-100',
-      borderColor: 'gray-400'
-    },
-    thoughtBubble: {
-      backgroundColor: 'gray-100',
-      borderColor: 'gray-400'
-    },
     note: {
       backgroundColor: 'gray-100',
       borderColor: 'gray-400'
     },
-    example: {
+    proposition: {
+      backgroundColor: 'gray-100',
+      borderColor: 'gray-400'
+    },
+    theorem: {
+      backgroundColor: 'blue-50',
+      borderColor: 'blue-400'
+    },
+    thoughtBubble: {
       backgroundColor: 'gray-100',
       borderColor: 'gray-400'
     }

@@ -222,9 +222,11 @@ export default function SubjectMap({ data, category }: { data: Chapter[], catego
                   <TimelineSeparator>
                     <TimelineDot
                       sx={{
-                        color: statementProps[statement.type].color,
+                        backgroundColor: showedItems[chapterIndex].showedStatements[statementIndex]
+                          ? statementProps[statement.type].color
+                          : 'white',
+                        borderColor: statementProps[statement.type].color
                       }}
-                      variant={showedItems[chapterIndex].showedStatements[statementIndex] ? 'filled' : 'outlined'}
                       onClick={() => toggleStatement(chapterIndex, statementIndex)}>
                       {statementProps[statement.type].image(chapterIndex, statementIndex)}
                     </TimelineDot>

@@ -58,10 +58,10 @@ type EdgeCoordinate = {
 
 type Term = {
     name: string,
-    definition: string = "",
-    categories: string[] = [],
-    subcategories?: string[] = [],
-    dependants?: string[] = []
+    definition: string,
+    categories: string[],
+    subcategories?: string[],
+    dependants?: string[]
 }
 
 type Notation = {

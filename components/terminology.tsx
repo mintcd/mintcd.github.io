@@ -6,15 +6,14 @@ import { GoSearch } from 'react-icons/go';
 import Fuse from 'fuse.js';
 import Latex from 'react-latex-next';
 import 'katex/dist/katex.min.css';
-import terms from '@models/mathematics/mathematics-terminology';
 
-export default function Terminology({ category }: { category: Category }) {
+export default function Terminology({ data, category }: { data: Term[], category: Category }) {
   const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({});
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [filteredTerms, setFilteredTerms] = useState<Term[]>(category === 'all'
-    ? terms
-    : terms.filter(term => term.categories.includes(category)));
+    ? data
+    : data.filter(term => term.categories.includes(category)));
 
   const groupedTerms: { [key: string]: Term[] } = {};
   filteredTerms.forEach((term: Term) => {
@@ -54,7 +53,7 @@ export default function Terminology({ category }: { category: Category }) {
   }
 
   function filterTerms(query: string, category: string | null) {
-    let filtered = terms.filter(term => {
+    let filtered = data.filter(term => {
       if (category && !term.categories.includes(category)) return false;
       if (query.trim()) {
         const fuse = new Fuse([term], {

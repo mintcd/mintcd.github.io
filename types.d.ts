@@ -70,4 +70,4 @@ type Notation = {
 }
 
 type StatementType = 'axiom' | 'theorem' | 'definition' | 'corollary' | 'lemma' | 'note' | 'thoughtBubble' | 'example' | 'proposition';
-type Category = 'all' | 'real-analysis' | 'probability-theory' | 'measure-theory' | 'stochastic-processes';
+type Category = string | 'all' | 'real-analysis' | 'probability-theory' | 'measure-theory' | 'stochastic-processes';

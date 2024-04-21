@@ -16,7 +16,7 @@ import TipsAndUpdatesRoundedIcon from '@mui/icons-material/TipsAndUpdatesRounded
 import NotificationsActiveRoundedIcon from '@mui/icons-material/NotificationsActiveRounded'
 
 import Latex from '@components/latex'
-import Terminology from './terminology'
+import Terminology from '@components/terminology'
 
 export default function SubjectMap({ data, category }: { data: Chapter[], category: Category }) {
 
@@ -187,7 +187,6 @@ export default function SubjectMap({ data, category }: { data: Chapter[], catego
 
   return (
     <div className='m-5'>
-      <Terminology category='probability-theory' />
       {data.map((chapter, chapterIndex) => (
         <Timeline
           key={chapterIndex}

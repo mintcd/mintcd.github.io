@@ -58,10 +58,10 @@ type EdgeCoordinate = {
 
 type Term = {
     name: string,
-    definition: string = "",
-    categories: string[] = [],
-    subcategories?: string[] = [],
-    dependants?: string[] = []
+    definition: string,
+    categories: string[],
+    subcategories?: string[],
+    dependants?: string[]
 }
 
 type Notation = {
@@ -70,4 +70,4 @@ type Notation = {
 }
 
 type StatementType = 'axiom' | 'theorem' | 'definition' | 'corollary' | 'lemma' | 'note' | 'thoughtBubble' | 'example' | 'proposition';
-type Category = 'all' | 'real-analysis' | 'probability-theory' | 'measure-theory' | 'stochastic-processes';
+type Category = string | 'all' | 'real-analysis' | 'probability-theory' | 'measure-theory' | 'stochastic-processes';

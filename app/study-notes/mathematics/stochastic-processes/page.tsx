@@ -4,7 +4,7 @@ import SubjectMap from '@components/subject-map';
 export default function StochasticProcesses() {
   return (
     <div>
-      <SubjectMap data={timeline} category='stochastic-processes' />
+      <SubjectMap data={timeline} />
     </div>
   )
 }

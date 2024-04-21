@@ -4,7 +4,7 @@ declare module 'katex'
 type Chapter = {
     chapterName: string,
     description?: string,
-    notations: Notation[],
+    notations: Term[],
     statements: Statement[]
 }
 
@@ -62,12 +62,10 @@ type Term = {
     categories: string[],
     subcategories?: string[],
     dependants?: string[]
-}
-
-type Notation = {
-    name: string,
-    content: string
+    type: NotationType,
+    notation?: string
 }
 
 type StatementType = 'axiom' | 'theorem' | 'definition' | 'corollary' | 'lemma' | 'note' | 'thoughtBubble' | 'example' | 'proposition';
-type Category = string | 'all' | 'real-analysis' | 'probability-theory' | 'measure-theory' | 'stochastic-processes';
+type Category = 'all' | 'real-analysis' | 'probability-theory' | 'measure-theory' | 'stochastic-processes';
+type TermType = 'metric' | 'architecture' | "dataset" | 'problem'

@@ -14,11 +14,11 @@ import TimelineOppositeContent, {
 import ExpandMoreOutlinedIcon from '@mui/icons-material/ExpandMoreOutlined';
 import TipsAndUpdatesRoundedIcon from '@mui/icons-material/TipsAndUpdatesRounded'
 import NotificationsActiveRoundedIcon from '@mui/icons-material/NotificationsActiveRounded'
+import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 
 import Latex from '@components/latex'
-import Terminology from '@components/terminology'
 
-export default function SubjectMap({ data, category }: { data: Chapter[], category: Category }) {
+export default function SubjectMap({ data }: { data: Chapter[] }) {
 
   const proofRef = useRef(null);
 
@@ -99,6 +99,18 @@ export default function SubjectMap({ data, category }: { data: Chapter[], catego
       contentBackground: 'bg-[#a0d7f5]'
 
     },
+    corollary: {
+      color: 'grey',
+      image: (chapterIndex, statementIndex) => (
+        <TipsAndUpdatesRoundedIcon
+          className={showedItems[chapterIndex].showedChapter === true
+            && showedItems[chapterIndex].showedStatements[statementIndex] === true
+            ? 'text-[#0288d1]' : 'text-gray-700'} />
+      ),
+      contentBackground: 'bg-[#77c7f2]'
+
+    },
+
     definition: {
       color: '#0288d1',
       image: (chapterIndex, statementIndex) => (
@@ -108,6 +120,18 @@ export default function SubjectMap({ data, category }: { data: Chapter[], catego
       ),
       contentBackground: 'bg-[#aad7ef]'
     },
+
+    example: {
+      color: '#0288d1',
+      image: (chapterIndex, statementIndex) => (
+        <EditNoteRoundedIcon
+          className={showedItems[chapterIndex].showedChapter === true
+            && showedItems[chapterIndex].showedStatements[statementIndex] === true
+            ? 'text-white' : 'text-[#0288d1]'} />
+      ),
+      contentBackground: 'bg-[#77c7f2]'
+    },
+
     lemma: {
       color: 'primary',
       image: (chapterIndex, statementIndex) => (
@@ -138,27 +162,7 @@ export default function SubjectMap({ data, category }: { data: Chapter[], catego
       ),
       contentBackground: 'bg-[#7cab7f]'
     },
-    corollary: {
-      color: 'grey',
-      image: (chapterIndex, statementIndex) => (
-        <TipsAndUpdatesRoundedIcon
-          className={showedItems[chapterIndex].showedChapter === true
-            && showedItems[chapterIndex].showedStatements[statementIndex] === true
-            ? 'text-[#0288d1]' : 'text-gray-700'} />
-      ),
-      contentBackground: 'bg-[#77c7f2]'
 
-    },
-    example: {
-      color: 'warning',
-      image: (chapterIndex, statementIndex) => (
-        <TipsAndUpdatesRoundedIcon
-          className={showedItems[chapterIndex].showedChapter === true
-            && showedItems[chapterIndex].showedStatements[statementIndex] === true
-            ? 'text-[#0288d1]' : 'text-gray-700'} />
-      ),
-      contentBackground: 'bg-[#77c7f2]'
-    },
     note: {
       color: 'green',
       image: (chapterIndex, statementIndex) => (

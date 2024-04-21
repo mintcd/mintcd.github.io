@@ -4,7 +4,7 @@ import SubjectMap from '@components/subject-map';
 export default function RealAnalysis() {
   return (
     <div className='py-5'>
-      <SubjectMap data={timeline} category='real-analysis' />
+      <SubjectMap data={timeline} />
     </div>
   )
 }

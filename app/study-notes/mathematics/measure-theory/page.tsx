@@ -5,7 +5,7 @@ export default function MeasureTheory() {
   return (
 
     <div className="col-span-4">
-      <SubjectMap data={timeline} category='measure-theory' />
+      <SubjectMap data={timeline} />
     </div>
 
 

@@ -92,7 +92,7 @@ export default function Terminology({ data, category }: { data: Term[], category
           onChange={handleSearchInputChange}
           className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500 mr-2"
         />
-        <select
+        {/* <select
           value={selectedCategory || 'all'}
           onChange={handleCategoryChange}
           className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500"
@@ -103,7 +103,7 @@ export default function Terminology({ data, category }: { data: Term[], category
               {category}
             </option>
           ))}
-        </select>
+        </select> */}
       </div>
       <div className="grid grid-cols-3">
         {[0, 1, 2].map(columnIndex => (

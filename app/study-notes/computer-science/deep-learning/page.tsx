@@ -6,9 +6,6 @@ import terms from '@models/computer-science/terminology'
 
 export default function DeepLearning() {
   return (
-    <div className="col-span-4">
-      <Terminology data={terms} category='all' />
-      <SubjectMap data={timeline} category="deep-learning" />
-    </div>
+    <SubjectMap data={timeline} />
   )
 }

@@ -4,7 +4,7 @@ import SubjectMap from '@components/subject-map';
 export default function ProbabilityTheory() {
   return (
     <div>
-      <SubjectMap data={timeline} category='probability-theory' />
+      <SubjectMap data={timeline} />
     </div>
   )
 }

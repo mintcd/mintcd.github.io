@@ -1,5 +1,12 @@
 export default [
   {
+    name: "chi-square test",
+    definition: "",
+    categories: ["statistics"],
+    subcategories: [],
+    dependants: []
+  },
+  {
     name: "null set",
     definition: "",
     categories: ["measureTheory"],

@@ -35,7 +35,7 @@ export default [
     statements: [
       {
         statementName: "the incompleteness of $\\QQ$",
-        type: "thoughtBubble",
+        type: 'thought-bubble',
         content: `We can prove the followings 
         </br>
         1) There exists no $x\\in \\QQ$ such that $x^2=2$ (by contradiction). 

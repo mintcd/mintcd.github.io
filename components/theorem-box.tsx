@@ -38,7 +38,7 @@ export default function TheoremBox({ statement }: { statement: Statement }) {
       backgroundColor: 'blue-50',
       borderColor: 'blue-400'
     },
-    thoughtBubble: {
+    'thought-bubble': {
       backgroundColor: 'gray-100',
       borderColor: 'gray-400'
     }

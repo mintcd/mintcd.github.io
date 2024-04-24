@@ -122,7 +122,9 @@ export default function Terminology({ data, category }: { data: Term[], category
                           {term.name}
                         </div>
                         {term.definition !== "" && <div className="bg-green-200 p-3 rounded-xl">
-                          <Latex children={term.definition} />
+                          <Latex>
+                            term.definition
+                          </Latex>
                         </div>}
                       </li>
                     ))}

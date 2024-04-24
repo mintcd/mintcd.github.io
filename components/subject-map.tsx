@@ -173,7 +173,7 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
       ),
       contentBackground: 'bg-[#77c7f2]'
     },
-    thoughtBubble: {
+    'thought-bubble': {
       color: 'primary',
       image: (chapterIndex, statementIndex) => (
         <TipsAndUpdatesRoundedIcon
@@ -186,7 +186,7 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
   }
 
   const numberOfThoughtBubbles = data.map((chapter) => (
-    chapter.statements.filter((statement) => (statement.type === 'thoughtBubble')).length
+    chapter.statements.filter((statement) => (statement.type === 'thought-bubble')).length
   ))
 
   return (
@@ -208,7 +208,7 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
 
           {showedItems[chapterIndex].showedChapter &&
             chapter.statements.map((statement, statementIndex) => (
-              statement.type !== 'thoughtBubble' ?
+              statement.type !== 'thought-bubble' ?
                 <TimelineItem
                   key={`${chapterIndex}-${statementIndex}`}>
 
@@ -232,7 +232,9 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
                       {statementProps[statement.type].image(chapterIndex, statementIndex)}
                     </TimelineDot>
 
-                    {statementIndex !== chapter.statements.length - 1 && chapter.statements[statementIndex + 1].type !== 'thoughtBubble' &&
+                    {statementIndex !== chapter.statements.length - 1
+                      && chapter.statements[statementIndex + 1].type !== 'thought-bubble'
+                      &&
                       <TimelineConnector sx={showedItems[chapterIndex].showedStatements[statementIndex]
                         && statement.content !== ""
                         ? { height: 80 }

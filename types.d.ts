@@ -21,23 +21,41 @@ type Statement = {
 }
 
 
-type Graph = {
-    vertices: Vertex[]
-    edges: Edge[]
-}
+type Graph = Term[]
 
-type Vertex = {
+type Term = {
+    // Basic Properties
     name: string,
-    color: string,
-    fx: number,
-    fy: number,
-    x: number,
-    y: number
+    abbreviation?: string,
+    type: TermType,
+    niches: string[],
+
+    // Graph properties
+    children?: string[],
+    depth?: number
+
+    // Knowledge properties
+    definition?: string,
+    otherNames?: string[],
+    href?: string
+    notation?: string[]
+
+    // Taxonomy properties
+    subjects?: SubjectType[],
+    categories?: string[],
+
+    // Style properties
+    color?: string,
+    fx?: number,
+    fy?: number,
+    x?: number,
+    y?: number
 }
 
-type Edge = {
+type Relation = {
     source: string
     target: string
+    type?: RelationType
 }
 
 type VertexCoordinate = {
@@ -56,16 +74,23 @@ type EdgeCoordinate = {
     }
 }
 
-type Term = {
-    name: string,
-    definition: string,
-    categories: string[],
-    subcategories?: string[],
-    dependants?: string[]
-    type: NotationType,
-    notation?: string
-}
+type StatementType =
+    'axiom'
+    | 'corollary'
+    | 'definition'
+    | 'example'
+    | 'lemma'
+    | 'note'
+    | 'proposition'
+    | 'thought-bubble'
+    | 'theorem'
 
-type StatementType = 'axiom' | 'theorem' | 'definition' | 'corollary' | 'lemma' | 'note' | 'thoughtBubble' | 'example' | 'proposition';
-type Category = 'all' | 'real-analysis' | 'probability-theory' | 'measure-theory' | 'stochastic-processes';
-type TermType = 'metric' | 'architecture' | "dataset" | 'problem'
+type Category = 'all' | 'real-analysis' | 'probability-theory' | 'measure-theory' | 'stochastic-processes'
+type TermType = 'metric' | 'architecture' | "dataset" | 'problem' | 'mechanism'
+type SubjectType = 'mathematics' | 'computer-science' | 'philosophy'
+
+type RelationType =     // A -[RelationType]-> B
+    'composited-in'
+    | 'included-in'
+    | 'derives'
+    | 'specializes'

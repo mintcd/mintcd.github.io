@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import { GoSearch } from 'react-icons/go';
 import Fuse from 'fuse.js';
-import Latex from 'react-latex-next';
+import Latex from '@components/latex';
 import 'katex/dist/katex.min.css';
 
 export default function Terminology({ data, category }: { data: Term[], category: Category }) {
@@ -13,7 +13,7 @@ export default function Terminology({ data, category }: { data: Term[], category
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [filteredTerms, setFilteredTerms] = useState<Term[]>(category === 'all'
     ? data
-    : data.filter(term => term.categories.includes(category)));
+    : data.filter(term => term.niches.includes(category)));
 
   const groupedTerms: { [key: string]: Term[] } = {};
   filteredTerms.forEach((term: Term) => {
@@ -54,7 +54,7 @@ export default function Terminology({ data, category }: { data: Term[], category
 
   function filterTerms(query: string, category: string | null) {
     let filtered = data.filter(term => {
-      if (category && !term.categories.includes(category)) return false;
+      if (category && !term.niches.includes(category)) return false;
       if (query.trim()) {
         const fuse = new Fuse([term], {
           keys: ['name'],
@@ -122,9 +122,7 @@ export default function Terminology({ data, category }: { data: Term[], category
                           {term.name}
                         </div>
                         {term.definition !== "" && <div className="bg-green-200 p-3 rounded-xl">
-                          <Latex>
-                            {term.definition}
-                          </Latex>
+                          <Latex children={term.definition} />
                         </div>}
                       </li>
                     ))}

@@ -35,7 +35,7 @@ type Term = {
     depth?: number
 
     // Knowledge properties
-    definition?: string,
+    definition: string = "",
     otherNames?: string[],
     href?: string
     notation?: string[]

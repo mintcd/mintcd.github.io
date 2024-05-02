@@ -1,13 +1,16 @@
 'use client'
 
 import { useState } from 'react';
+
+import Link from 'next/link';
+
 import { BsList } from 'react-icons/bs';
 import Image from 'next/image';
 
 export default function Nav() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const navItems: string[] = ['Blogs', 'Study Notes', 'About']
+  const navItems: string[] = ['Trailblazers', 'Blogs', 'Study Notes', 'About']
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
@@ -16,7 +19,7 @@ export default function Nav() {
   return (
     <nav className={`w-full bg-slate-100
                     flex flex-wrap items-center justify-between`}>
-      <a href="/" className={`flex items-center`}>
+      <Link href="/" className={`flex items-center`}>
         <Image src="/favicon.ico" alt="bagel" width={75} height={75} className='mr-3' />
         <span className={``}>
           <div itemID='slogan-container'
@@ -31,7 +34,7 @@ export default function Nav() {
             What&apos;s worth it? How to find?
           </div>
         </span>
-      </a>
+      </Link>
 
       {/* <button
         onClick={toggleDropdown}
@@ -46,11 +49,11 @@ export default function Nav() {
         className={`flex justify-end items-center
                   text-gray-900`}>
         {navItems.map((item, index) => (
-          <a key={`nav-item-${index}`}
+          <Link key={`nav-item-${index}`}
             href={`/${item.toLowerCase().replace(" ", "-")}`}
             className='mr-4 hover:text-blue-500'>
             {item}
-          </a>))}
+          </Link>))}
       </div>
     </nav>
   );

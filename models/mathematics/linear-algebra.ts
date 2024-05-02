@@ -4,7 +4,7 @@ export default [
     notations: [],
     statements: [
       {
-        statementName: "Cauchy-Schwartz inequality",
+        name: "Cauchy-Schwartz inequality",
         type: "theorem",
         content: "",
         dependants: [],

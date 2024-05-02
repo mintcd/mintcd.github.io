@@ -4,6 +4,7 @@ import timeline from '@models/computer-science/deep-learning';
 import SubjectMap from '@components/subject-map';
 import Terminology from '@components/terminology';
 
+import Link from 'next/link'
 import { usePathname } from 'next/navigation';
 
 export default function DeepLearning() {
@@ -11,14 +12,15 @@ export default function DeepLearning() {
 
   return (
     <div>
-      <a
-        href={`${path}/graph`}// Call the function on click
+      <Link
+        href={`${path}/graph`}
+        replace
         className={`ml-5 mb-3 
                         cursor-pointer hover:bg-slate-200
                         text-lg font-bold `}
       >
         Summary
-      </a>
+      </Link>
       <SubjectMap data={timeline} />
     </div>
   );

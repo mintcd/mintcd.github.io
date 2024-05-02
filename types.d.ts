@@ -12,7 +12,7 @@ type Chapter = {
 type Statement = {
     id?: string,
     type: StatementType,
-    statementName?: string,
+    name?: string,
     content: string,
     short?: string,
     proof?: string,
@@ -80,6 +80,7 @@ type StatementType =
     | 'definition'
     | 'example'
     | 'lemma'
+    | 'notation'
     | 'note'
     | 'proposition'
     | 'thought-bubble'

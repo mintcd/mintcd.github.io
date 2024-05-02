@@ -4,18 +4,38 @@ import { useEffect } from 'react';
 import * as d3 from 'd3';
 import { computeNodeDepths, extractEdges } from '@functions/graph-analysis'
 
-export default function NetworkGraph({ data }: { data: Graph }) {
-  const margin = { top: 10, right: 30, bottom: 30, left: 40 };
+/**
+ * Renders a network graph based on the provided data.
+ * 
+ * @param data
+ * @param shape :'cir' (circle), 'rec' (rectangle), or undefined (default).
+ * @param width. The node width, in case of rectangles.
+ * @param height. The node height, in case of rectangles.
+ * @param rx. The x-radius of rounded corner,  in case of rectangles.
+ * @param ry. The y-radius of rounded corner,  in case of rectangles.
+ * @param radius. The radius of nodes in case of circles.
+ */
+
+export default function NetworkGraph(
+  { data, shape, width, height, rx, ry, radius }: {
+    data: Graph
+    shape?: 'cir' | 'rec' | undefined
+    width?: number | undefined
+    height?: number | undefined
+    rx?: number | undefined
+    ry?: number | undefined
+    radius?: number | undefined
+  }) {
 
   const graphWidth = (typeof window !== 'undefined' && window.visualViewport)
-    ? window.visualViewport.width - margin.left - margin.right
-    : 1500 - margin.left - margin.right;
+    ? window.visualViewport.width
+    : 1500;
   const graphHeight = (typeof window !== 'undefined' && window.visualViewport)
-    ? window.visualViewport.height - margin.top - margin.bottom
-    : 750 - margin.top - margin.bottom;
+    ? window.visualViewport.height
+    : 750;
 
-  const nodeWidth = 150
-  const nodeHeight = 60
+  const nodeWidth = width !== undefined ? width : 150
+  const nodeHeight = height !== undefined ? height : 60
 
   useEffect(() => {
     const vertices = computeNodeDepths(data)
@@ -23,10 +43,9 @@ export default function NetworkGraph({ data }: { data: Graph }) {
 
     // Define a graph as an SVG
     const graph = d3
-      .select('svg')
-      .attr("transform", `translate(${margin.left}, ${margin.top})`)
-      .attr("width", graphWidth + margin.left + margin.right)
-      .attr("height", graphHeight + margin.top + margin.bottom)
+      .select('.graph')
+      .attr("width", graphWidth)
+      .attr("height", graphHeight)
 
     // Append links before nodes
     const links = graph
@@ -59,7 +78,7 @@ export default function NetworkGraph({ data }: { data: Graph }) {
       .attr("class", "node")
       .attr("href",
         function (d: Term) {
-          return d.href ? d.href : `${window.location.href}/${d.name}`
+          return d.href ? d.href : `${window.location.href}/${d.name.toLowerCase().replace(" ", "-")}`
         })
 
     // Add a rectangle inside each node
@@ -74,7 +93,9 @@ export default function NetworkGraph({ data }: { data: Graph }) {
     // Add a text inside each node
     nodes
       .append("text")
-      .text((d: Term) => d.name)
+      .text(function (d: Term) {
+        return d.name
+      })
       .style("text-anchor", "middle")
       .style("dominant-baseline", "middle")
       .style("fill", "white")
@@ -123,17 +144,11 @@ export default function NetworkGraph({ data }: { data: Graph }) {
         .attr("x2", (d: EdgeCoordinate) => d.target.x + nodeWidth / 2)
         .attr("y2", (d: EdgeCoordinate) => d.target.y);
     }
-
-    console.log("Depths", vertices)
-
   });
 
   return (
-    <div
-      className='flex justify-center'>
-
-      <svg />
+    <div>
+      <svg className='graph' />
     </div>
-
   );
 };

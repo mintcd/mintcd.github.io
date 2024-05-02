@@ -4,23 +4,23 @@ export default [
     notations: [],
     statements: [
       {
-        statementName: "set cardinality",
+        name: "set cardinality",
         type: "definition",
         content: "Two sets $A$ and $B$ have the same cardinality if there is a bijection $f:A\\to B$.",
         dependants: [],
       },
       {
-        statementName: "Cantor-Schröder-Bernstein theorem",
+        name: "Cantor-Schröder-Bernstein theorem",
         type: "theorem",
         content: "If $|A| \\le |B|$ and $|B| \\le |A|$ then $|A| = |B|$."
       },
       {
-        statementName: "Cantor's theorem of the power set",
+        name: "Cantor's theorem of the power set",
         type: "theorem",
         content: "If $A$ is a set, then $|A| < \\mathcal{P}(A)$.",
         implications: [
           {
-            statementName: "",
+            name: "",
             type: "corollary",
             content: "For any $n\\in\\mathbb{N}\\cup\\{0\\}$, we have $n<2^n$."
           },
@@ -34,7 +34,7 @@ export default [
     notations: [],
     statements: [
       {
-        statementName: "the incompleteness of $\\QQ$",
+        name: "the incompleteness of $\\QQ$",
         type: 'thought-bubble',
         content: `We can prove the followings 
         </br>
@@ -43,26 +43,26 @@ export default [
         2) Moreover, given $S=\\{x\\in \\QQ \\,|\\, x^2<2\\}$. There exists no $x^*\\in\\QQ$ such that $x\\le x^*,\\forall x\\in \\QQ$.`,
         implications: [
           {
-            statementName: "",
+            name: "",
             type: "corollary",
             content: "For any $n\\in\\mathbb{N}\\cup\\{0\\}$, we have $n<2^n$."
           },
         ]
       },
       {
-        statementName: "A construction of $\\mathbb{R}$ by Dedekind's cuts",
+        name: "A construction of $\\mathbb{R}$ by Dedekind's cuts",
         type: "definition",
         content: "",
         implications: [
           {
-            statementName: "",
+            name: "",
             type: "theorem",
             content: ""
           },
         ]
       },
       {
-        statementName: "supremum and infimum",
+        name: "supremum and infimum",
         type: "definition",
         content: `An element $b_0\\in A$ is called a least lower bound, or a supremum of $A$ if 
         </br>
@@ -77,44 +77,44 @@ export default [
         (ii) for any lower bound $c$ of $A$, we have $c_0\\le c$.`,
       },
       {
-        statementName: "Least upper bound property",
+        name: "Least upper bound property",
         type: "theorem",
         content: "The set $\\RR$ constructed as above has the Least upper bound property: every nonempty and bounded subset $S$ of $\\RR$ has a supremum in $\\RR$.",
         dependants: [],
         implications: [
           {
-            statementName: "",
+            name: "",
             type: "note",
             content: "From now on, when we write comparative statements like $a>b$ without further explanation, it means $a,b\\in\\RR$.",
           },
         ]
       },
       {
-        statementName: "The $\\epsilon$-principle",
+        name: "The $\\epsilon$-principle",
         type: "theorem",
         content: "If $x,y\\in\\RR$ and for any $\\epsilon>0$, $|x-y|<\\epsilon$, then $x=y$.",
         dependants: []
       },
       {
-        statementName: "Archimedian Property",
+        name: "Archimedian Property",
         type: "theorem",
         content: "If $x, y\\in\\mathbb{R}$ and $x > 0$, then $\\exist n \\in \\mathbb{N}$ such that $nx > y$.",
         dependants: []
       },
       {
-        statementName: "Density of $\\mathbb{Q}$",
+        name: "Density of $\\mathbb{Q}$",
         type: "theorem",
         content: "If $x, y\\in \\mathbb{R}$ and $x < y$ then $\\exist r\\in\\mathbb{Q}$ such that $x < r < y$.",
         dependants: []
       },
       {
-        statementName: "Absolute value",
+        name: "Absolute value",
         type: "definition",
         content: "",
         dependants: []
       },
       {
-        statementName: "Triangle inequality",
+        name: "Triangle inequality",
         type: "theorem",
         content: "$\\forall x,y\\in\\mathbb{R}, |x+y|\\le |x|+|y|$.",
         dependants: []

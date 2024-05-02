@@ -4,7 +4,7 @@ export default [
     notations: [],
     statements: [
       {
-        statementName: "Optimization taxonomy",
+        name: "Optimization taxonomy",
         type: "definition",
         content: `1) Linear and nonlinear,
                 <br/>
@@ -35,7 +35,7 @@ export default [
     ],
     statements: [
       {
-        statementName: "General Form of a Smooth Problem",
+        name: "General Form of a Smooth Problem",
         type: "definition",
         content: `Consider the problem 
         $$\\begin{aligned}
@@ -48,7 +48,7 @@ export default [
       domain of $\\RR^n$.`,
         implications: [
           {
-            statementName: "terminology",
+            name: "terminology",
             type: "definition",
             content: `1) The feasible set is defined by 
                       $$\\F=\\{x\\in\\RR^n : g(x)=0 \\text{ and } h(x) \\le 0\\}.$$
@@ -59,7 +59,7 @@ export default [
         ]
       },
       {
-        statementName: "Fritz John Conditions",
+        name: "Fritz John Conditions",
         type: "theorem",
         content: `If $x^*$ is a local minimum of $(\\P)$, and $f,g$ and $h$ are are continuously differentiable in a neighborhood of
         $x^*$, then there exists $(\\lambda^*, y^*, z^*)\\in\\RR_+\\times\\RR^m\\times\\RR^p_+\\setminus\\{0\\}$, such that
@@ -71,19 +71,19 @@ export default [
         dependants: [],
       },
       {
-        statementName: "Lagrangian function",
+        name: "Lagrangian function",
         type: "definition",
         content: `The function $\\L(x,y,z) = f(x) + y^\\top g(x) + z^\\top h(x)$.`,
         dependants: [],
         implications: [
           {
-            statementName: "",
+            name: "",
             type: "definition",
             content: `The vectors $y$ and $z$ are called Lagrange multiplier vectors. Each component of $y$ and $z$ is called a Lagrange multiplier. There is one multiplier per constraint.`,
             dependants: [],
           },
           {
-            statementName: "",
+            name: "",
             type: "theorem",
             content: `We have $$\\inf\\limits_{x\\in K}\\sup\\limits_{(\\lambda,\\mu)\\in\\R^{\ell+m}}\\L(x,\\lambda,\\mu) = f(x),\\forall x\\in\\RR^n,\\lambda\\in\\RR^\\ell_+,\\mu\\in\\RR^m.$$`,
             dependants: [],
@@ -91,7 +91,7 @@ export default [
         ]
       },
       {
-        statementName: "Mangasarian-Fromovitz Constraint Qualification",
+        name: "Mangasarian-Fromovitz Constraint Qualification",
         type: "definition",
         content: `Define the set of active inequalities for each $x\\in \\F$ as
         $$\\I(x) = \\{i\\in\\{1,\\cdots,p\\} : h_i(x)=0\\}.$$
@@ -100,7 +100,7 @@ export default [
         dependants: [],
         implications: [
           {
-            statementName: "",
+            name: "",
             type: "theorem",
             content: `The qualification condition is equivalent to
                       </br>
@@ -111,7 +111,7 @@ export default [
             dependants: [],
           },
           {
-            statementName: "Linear Independence Constraint Qualification",
+            name: "Linear Independence Constraint Qualification",
             type: "definition",
             content: `The linear constraint qualification holds at $x\\in\\F$ if columns of  $\\nabla g(x)$ and $\\nabla h_{\\I(x)}(x)$ are independent.`,
             dependants: [],
@@ -119,7 +119,7 @@ export default [
         ]
       },
       {
-        statementName: "Karush-Kuhn-Tucker conditions",
+        name: "Karush-Kuhn-Tucker conditions",
         type: "theorem",
         content: `If $x^*$ is a qualified local minimum of $(\\P)$, and $f,g$ and $h$ are are continuously differentiable in a neighborhood of
         $x^*$, there exists $(y^*, z^*)\\in\\times\\RR^m\\times\\RR^p_+\\setminus\\{0\\}$, such that
@@ -131,7 +131,7 @@ export default [
         dependants: [],
         implications: [
           {
-            statementName: "",
+            name: "",
             type: "note",
             content: `This theorem permits $p$ in the first theorem to be taken as $1$ at qualified minimum point.`,
             dependants: [],
@@ -140,7 +140,7 @@ export default [
       },
 
       {
-        statementName: "Qualification criteria",
+        name: "Qualification criteria",
         type: "theorem",
         content: `If $x\\in K$ satisfying two following conditions
       </br>
@@ -153,7 +153,7 @@ export default [
         dependants: [],
         implications: [
           {
-            statementName: "",
+            name: "",
             type: "note",
             content: `This theorem permits $p$ in the first theorem to be taken as $1$ at qualified minimum point.`,
             dependants: [],
@@ -161,13 +161,13 @@ export default [
         ]
       },
       {
-        statementName: "Week duality",
+        name: "Week duality",
         type: "definition",
         content: `We have $$\\sup\\limits_{(\\lambda,\\mu)\\in\\R^{\ell+m}}\\inf\\limits_{x\\in K}\\L(x,\\lambda,\\mu) \\le \\inf\\limits_{x\\in K}\\sup\\limits_{(\\lambda,\\mu)\\in\\R^{\ell+m}}\\L(x,\\lambda,\\mu),\\forall x\\in\\RR^n,\\lambda\\in\\RR^\\ell_+,\\mu\\in\\RR^m.$$`,
         dependants: [],
         implications: [
           {
-            statementName: "",
+            name: "",
             type: "definition",
             content: `The problem 
                         $$\\begin{aligned}
@@ -187,20 +187,20 @@ export default [
     notations: [],
     statements: [
       {
-        statementName: "linear program",
+        name: "linear program",
         type: "definition",
         content: `An optimization problem whose objective is a linear function and constraints are linear equalities or inequalities`,
         dependants: [],
         implications: [
           {
-            statementName: "taxonomy",
+            name: "taxonomy",
             type: "definition",
             content: `Integer linear program, binary linear program, or mixed integer linear program`,
           },
         ]
       },
       {
-        statementName: "standard form of a linear program",
+        name: "standard form of a linear program",
         type: "definition",
         content: `$$\\begin{aligned}
                     (\\P) : \\text{min } & c^\\top x \\\\
@@ -211,19 +211,19 @@ export default [
         dependants: [],
         implications: [
           {
-            statementName: "",
+            name: "",
             type: "note",
             content: `We can assume that $\\rank(A) = m$. Otherwise, we can process row elimination to get fewer equality constraints.`,
           },
           {
-            statementName: "convert to standard form",
+            name: "convert to standard form",
             type: "note",
             content: ``,
           },
         ]
       },
       {
-        statementName: "introductory terminology",
+        name: "introductory terminology",
         type: "definition",
         content: `1) The set of feasible solutions: $X=\\{x\\in\\RR^n\\,|\\, Ax=b, x\\ge 0\\}$. If $X$ is empty, the problem is called infeasible.
                   </br>
@@ -235,7 +235,7 @@ export default [
         dependants: [],
       },
       {
-        statementName: "solution-relevant terminology",
+        name: "solution-relevant terminology",
         type: "definition",
         content: `1) A basis $B$ is a non-singular submatrix of $A$.
                   </br>
@@ -250,7 +250,7 @@ export default [
         dependants: [],
       },
       {
-        statementName: "dual problem",
+        name: "dual problem",
         type: "theorem",
         content: `The dual problem of the given standard primal problem is
                     $$\\begin{aligned}
@@ -261,26 +261,26 @@ export default [
         dependants: [],
         implications: [
           {
-            statementName: "",
+            name: "",
             type: "theorem",
             content: `The double-dual problem coincides with the primal problem i.e. linear programs are self-dual.`,
           },
         ]
       },
       {
-        statementName: "weak duality",
+        name: "weak duality",
         type: "theorem",
         content: `If $x$ is feasible for $(\\P)$, $y$ is feasible for $(\\D)$ and $c^\\top x = b^\\top y$, then $x$ is optimal for $(\\P)$ and $y$ is optimal for $(\\D)$.`,
       },
       {
-        statementName: "strong duality",
+        name: "strong duality",
         type: "theorem",
         content: `1) $(\\P)$ has a finite optimal solution if and only if $(\\D)$ has a finite optimal solution. In this case, the duality gap is   zero.
         </br>
         2) If $(\\P)$ (resp. $(\\D)$) is unbounded, then $(\\D)$ (resp. $(\\P)$) is infeasible.`,
       },
       {
-        statementName: "KKT optimality conditions",
+        name: "KKT optimality conditions",
         type: "theorem",
         content: `The tuple $(x,y,s)\\in\\R^{n+m+n}$ is a primal-dual optimal solution if and only if
                   $$

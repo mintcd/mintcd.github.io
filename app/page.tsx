@@ -1,5 +1,7 @@
 'use client'
 
+import Link from 'next/link'
+
 import FacebookOutlinedIcon from '@mui/icons-material/FacebookOutlined';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import InstagramIcon from '@mui/icons-material/Instagram';
@@ -12,23 +14,21 @@ export default function Home() {
       <div className="text-center">
         <div className={`lg:w-[50%] inline-block justify-between lg:space-x-4`}>
 
-          <a href='https://github.com/mintcd' target="_blank">
+          <Link href='https://github.com/mintcd' target="_blank">
             <GitHubIcon className='text-[50px]' />
-          </a>
-          <a href='https://www.facebook.com/profile.php?id=61557162368297' target="_blank">
+          </Link>
+          <Link href='https://www.facebook.com/profile.php?id=61557162368297' target="_blank">
             <FavoriteIcon className='text-[50px]' />
-          </a>
-          <a href='mailto:dangminh2208@gmail.com'>
+          </Link>
+          <Link href='mailto:dangminh2208@gmail.com'>
             <EmailRoundedIcon className='text-[50px]' />
-          </a>
-
-          <a href='https://www.fb.com/minh.chaudangg' target="_blank">
+          </Link>
+          <Link href='https://www.fb.com/minh.chaudangg' target="_blank">
             <FacebookOutlinedIcon className='text-[50px]' />
-          </a>
-          <a href='https://www.instagram.com/chaudangg' target="_blank">
+          </Link>
+          <Link href='https://www.instagram.com/chaudangg' target="_blank">
             <InstagramIcon className='text-[50px]' />
-          </a>
-
+          </Link>
         </div>
       </div>
       <h1 className="font-bold text-lg"> Welcome visitor! </h1>

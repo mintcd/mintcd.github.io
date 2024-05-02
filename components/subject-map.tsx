@@ -142,6 +142,16 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
       ),
       contentBackground: 'bg-[#77c7f2]'
     },
+    notation: {
+      color: 'primary',
+      image: (chapterIndex, statementIndex) => (
+        <TipsAndUpdatesRoundedIcon
+          className={showedItems[chapterIndex].showedChapter === true
+            && showedItems[chapterIndex].showedStatements[statementIndex] === true
+            ? 'text-[#0288d1]' : 'text-gray-700'} />
+      ),
+      contentBackground: 'bg-[#77c7f2]'
+    },
     proposition: {
       color: '#6da484',
       image: (chapterIndex, statementIndex) => (
@@ -244,8 +254,8 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
                   <TimelineContent>
                     <div className='text-lg'>
                       <Latex>
-                        {statement.statementName
-                          ? statement.statementName.charAt(0).toUpperCase() + statement.statementName.slice(1)
+                        {statement.name
+                          ? statement.name.charAt(0).toUpperCase() + statement.name.slice(1)
                           : ""}
                       </Latex>
 
@@ -299,9 +309,10 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
                                   {`<b>
                                       ${implication.type.charAt(0).toUpperCase() + implication.type.slice(1)}
                                       ${chapterIndex + 1}.${statementIndex + 1}.${implicationIndex + 1} 
-                                      ${implication.statementName
-                                    &&
-                                    `(${implication.statementName.charAt(0)?.toUpperCase() + implication.statementName.slice(1)})`}
+                                      ${implication.name !== undefined
+                                      ? `(${implication.name.charAt(0)?.toUpperCase() + implication.name.slice(1)})`
+                                      : ""}
+
                                     </b>`}
                                 </Latex>
                                 <Latex>
@@ -330,8 +341,8 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
                           bg-blue-300`}>
                   <Latex>
                     {`<b>
-                    ${statement.statementName ?
-                        statement.statementName.charAt(0).toUpperCase() + statement.statementName.slice(1) :
+                    ${statement.name ?
+                        statement.name.charAt(0).toUpperCase() + statement.name.slice(1) :
                         ''}.
                   </b> 
               ${statement.content}`}

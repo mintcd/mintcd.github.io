@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react';
+import Link from "next/link";
 
 export default function Footer() {
 
@@ -17,13 +17,13 @@ export default function Footer() {
         <div itemID='motor-container'
           className={`md:text-[16px] 
                           sm:text-lg`}>
-          <a href="mailto:dangminh2208@gmail.com">
+          <Link href="mailto:dangminh2208@gmail.com">
             Email: dangminh2208@gmail.com
-          </a>
+          </Link>
           <br />
-          <a href="https://www.fb.com/minh.chaudangg">
+          <Link href="https://www.fb.com/minh.chaudangg">
             Facebook: facebook.com/minh.chaudangg
-          </a>
+          </Link>
         </div>
       </span>
     </div>

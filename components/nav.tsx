@@ -17,14 +17,15 @@ export default function Nav() {
 
   return (
     <nav className="">
-      <div className={`w-full m-5
+      <a href="/"
+        className={`w-full m-5
                     flex justify-center items-center`}>
         <Image src={Favicon} alt="bagel" width={100} height={100} className='mr-3' />
         <br />
         <div itemID='slogan-container' className={`font-semibold md:text-lg sm:text-2xl`}>
           Chocomint's Study Space
         </div>
-      </div>
+      </a>
 
       {/* <button onClick={toggleDropdown} className={`focus:outline-none sm:mr-10 md:hidden md:mr-20`}>
         <BsList size={24} />

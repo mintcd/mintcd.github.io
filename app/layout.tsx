@@ -4,8 +4,8 @@ import Nav from '@components/nav'
 import Footer from '@components/footer'
 
 export const metadata = {
-  title: 'Life for Meaning',
-  description: 'The meaning to my extend.',
+  title: 'Study Space',
+  description: 'Notes in Philosophy, Mathematics and Computer Science',
 };
 
 interface RootLayoutProps {

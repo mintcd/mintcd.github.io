@@ -1,13 +1,7 @@
-'use client'
-
-import FacebookOutlinedIcon from '@mui/icons-material/FacebookOutlined';
-import GitHubIcon from '@mui/icons-material/GitHub';
-import InstagramIcon from '@mui/icons-material/Instagram';
-
-export default function About() {
+export default function AboutPage() {
   return (
-    <div className="text-center">
-      Coming soon...
+    <div className="flex items-center justify-center">
+      <embed src="/cv.pdf" type="application/pdf" width="80%" height="1000px" />
     </div>
-  )
-}
+  );
+};

@@ -1,5 +1,5 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+const configs = {
   /**
    * Enable static exports for the App Router.
    *
@@ -23,6 +23,22 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  webpack: (config, { isServer }) => {
+    config.module.rules.push({
+      test: /\.pdf$/,
+      use: [
+        {
+          loader: 'file-loader',
+          options: {
+            publicPath: '/_next',
+            name: 'static/media/[name].[hash].[ext]',
+          },
+        },
+      ],
+    });
+
+    return config;
+  },
 };
 
-export default nextConfig
+export default configs

@@ -9,7 +9,7 @@ import Favicon from '@app/favicon.ico';
 export default function Nav() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const navItems: string[] = ['Trailblazers', 'Blogs', 'Study Notes'];
+  const navItems: string[] = ['Trailblazers', 'Philosophy', 'Mathematics', 'Computer Science'];
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);

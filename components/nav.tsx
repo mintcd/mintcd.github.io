@@ -23,7 +23,7 @@ export default function Nav() {
         <Image src={Favicon} alt="bagel" width={100} height={100} className='mr-3' />
         <br />
         <div itemID='slogan-container' className={`font-semibold md:text-lg sm:text-2xl`}>
-          Chocomint's Study Space
+          Chocomint&apos;s Study Space
         </div>
       </a>
 

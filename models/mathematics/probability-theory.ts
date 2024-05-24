@@ -1,23 +1,23 @@
 export default
   [
     {
-      chapterName: "Introduction",
+      chapterName: `Introduction`,
       notations: [
         {
-          name: 'probability space',
+          name: `probability space`,
           content: `$(\\Omega,\\F, \\PP)$`
         }
       ],
       statements: [
         {
-          name: "probability space",
-          type: "definition",
-          content: "A probability measure $\\mathbb{P}$ on a mesurable space $(\\Omega, \\mathcal{F})$ is a measure satisfying $\\mathbb{P}(\\Omega)=1$. The triplet $(\\Omega,\\mathcal{F},\\mathbb{P})$ is called a probability space.",
+          name: `probability space`,
+          type: `definition`,
+          content: `A probability measure $\\mathbb{P}$ on a mesurable space $(\\Omega, \\mathcal{F})$ is a measure satisfying $\\mathbb{P}(\\Omega)=1$. The triplet $(\\Omega,\\mathcal{F},\\mathbb{P})$ is called a probability space.`,
           dependants: [],
           implications: [
             {
-              name: "terminology",
-              type: "note",
+              name: `terminology`,
+              type: `note`,
               content: `1) The set $\\Omega$ is called the sample space.
               </br>
               2) Each element $\\omega\\in\\Omega$ is called an outcome.
@@ -30,16 +30,16 @@ export default
               dependants: [],
             },
             {
-              name: "discrete uniform",
-              type: "example",
+              name: `discrete uniform`,
+              type: `example`,
               content: `Let $\\Omega = \\{\\omega_1,\\ldots,\\omega_N\\}$ and $p_{i}, i = 1,\\ldots,N$ such that $\\sum\\limits_{i=1}^N p_i = 1$. For an event $A=\\{\\omega_{i_1},\\ldots,\\omega_{i_m}\\}$. Define $\\PP(A)=p_{i_1}+\\ldots+p_{i_m}$.`,
               dependants: [],
             },
           ]
         },
         {
-          name: "Borel-Cantelli lemma",
-          type: "definition",
+          name: `Borel-Cantelli lemma`,
+          type: `definition`,
           content: `Given a sequence of events $(A_n)_{n\\in\\NN}$
                   </br>
                   1) If $\\sum_{n\\in\\NN}\\PP(A_n) < \\infty$, then 
@@ -51,73 +51,73 @@ export default
                   Equivalently, $\\{n\\in N : \\omega\\in A_n\\}$ is a.s. infinite.`,
         },
         {
-          type: "lemma",
-          content: "Let $A$ be an event such that $\\mathbb{P}(A) > 0$. Then the function $\\mathbb{P}(\\cdot|A):\\mathcal{F}\\to\\mathbb{R}$ defined by $\\mathbb{P}(X|A)=\\dfrac{\\mathbb{P}(X\\cap A)}{\\mathbb{A}}$ is another probability measure, called the <i>probability conditioned on event $A$ </i>.",
+          type: `lemma`,
+          content: `Let $A$ be an event such that $\\mathbb{P}(A) > 0$. Then the function $\\mathbb{P}(\\cdot|A):\\mathcal{F}\\to\\mathbb{R}$ defined by $\\mathbb{P}(X|A)=\\dfrac{\\mathbb{P}(X\\cap A)}{\\mathbb{A}}$ is another probability measure, called the <i>probability conditioned on event $A$ </i>.`,
           dependants: [],
         },
         {
-          name: "independent events",
-          type: "definition",
-          content: "A family of events $\\{A_i\\}_{i\\in I}$ is independent if for any indices $i_1,\\cdots,i_k$ in $I$ ($k\\in\\mathbb{N}^*$), we have $$\\mathbb{P}(A_{i_1}\\cdots A_{i_k}) = \\mathbb{P}(A_{i_1})\\cdots \\mathbb{P}(A_{i_k})$$.",
+          name: `independent events`,
+          type: `definition`,
+          content: `A family of events $\\{A_i\\}_{i\\in I}$ is independent if for any indices $i_1,\\cdots,i_k$ in $I$ ($k\\in\\mathbb{N}^*$), we have $$\\mathbb{P}(A_{i_1}\\cdots A_{i_k}) = \\mathbb{P}(A_{i_1})\\cdots \\mathbb{P}(A_{i_k})$$.`,
         },
       ]
     },
     {
-      chapterName: "Random Variables",
+      chapterName: `Random Variables`,
       notations: [],
       statements: [
         {
-          name: "Random variable",
-          type: "definition",
-          content: "A Borel measurable function $X:\\Omega\\to\\mathbb{R}$ is called a random variable. A tuple $(X_1,\\cdots,X_n)$ of random variables is called a random vector.",
+          name: `Random variable`,
+          type: `definition`,
+          content: `A Borel measurable function $X:\\Omega\\to\\mathbb{R}$ is called a random variable. A tuple $(X_1,\\cdots,X_n)$ of random variables is called a random vector.`,
           dependants: [],
           implications: [
             {
-              name: "",
-              type: "notation",
-              content: "For an element $B\\in\\B(\\R)$, we usually write $P(X^{-1}(B))$ as $P(X\\in B)$ or an equivalent notation of $P(X\\in B)$.",
+              name: ``,
+              type: `notation`,
+              content: `For an element $B\\in\\B(\\R)$, we usually write $P(X^{-1}(B))$ as $P(X\\in B)$ or an equivalent notation of $P(X\\in B)$.`,
               dependants: [],
             },
             {
-              name: "",
-              type: "definition",
-              content: "If $X(\\Omega)$ is countable, $X$ is said to be discrete. We also concern about absolutely continuous random variables, to be defined later.",
+              name: ``,
+              type: `definition`,
+              content: `If $X(\\Omega)$ is countable, $X$ is said to be discrete. We also concern about absolutely continuous random variables, to be defined later.`,
               dependants: [],
             },
           ]
         },
         {
-          name: "$\\sigma$-algebra generated by a random variable",
-          type: "lemma",
+          name: `$\\sigma$-algebra generated by a random variable`,
+          type: `lemma`,
           content: `Let $X$ be a random variable. Then 
           $$\\sigma(X) = \\{X^{-1}(B) : B\\in\\B(\\RR)\\}$$
           is a $\\sigma$-algebra, called the $\\sigma$-algebra generated by $X$. Moreover, $\\sigma(X)$ is the smallest sub-$\\sigma$-algebra of $\\F$ with respect to which $X$ is measurable.`,
           implications: [
             {
-              name: "",
-              type: "note",
+              name: ``,
+              type: `note`,
               content: `The generated $\\sigma(X)$ is interpreted as the containing all relevant information about $X$.`,
             },
           ],
         },
         {
-          name: "Norms of a random variable",
-          type: "definition",
+          name: `Norms of a random variable`,
+          type: `definition`,
           content: `Let $X$ be a random variable. The $\\L^p$-norm of $X$ is defined as
           $$\\|X\\|_{\\L^p} = \\left(\\int_\\Omega \\|X(\\omega)\\|_p^p\\,\\d \\PP\\right)^{\\frac{1}{p}}.$$`,
           implications: [
           ],
         },
         {
-          name: "Distribution function",
-          type: "definition",
+          name: `Distribution function`,
+          type: `definition`,
           content: `The distribution function of a random variable $X$ is expressed as $F_X: \\mathbb{R}\\to [0,1]$, such that 
         $$F_X(x) = \\mathbb{P}(X\\le x).$$`,
           dependants: [],
           implications: [
             {
-              name: "Absolutely continuous random variable",
-              type: "definition",
+              name: `Absolutely continuous random variable`,
+              type: `definition`,
               content: `If there exists a Borel measurable function $f_X:\\mathbb{R}\\to\\mathbb{R}$ such that
             <br/>
             1) $f(x)\\ge0, \\forall x\\in\\mathbb{R}$;
@@ -126,17 +126,17 @@ export default
             Then $X$ is absolutely continuous.`,
             },
             {
-              name: "",
-              type: "definition",
+              name: ``,
+              type: `definition`,
               content: `If $X=(X_1,\\ldots,X_d)$ be a random vector, then we define the distribution function $F_X: \\RR^d\\to[0,1]$ for each $x=(x_1,\\ldots, x_d)$ as
               $$F_X(x) = P(X_1\\le x_1,\\ldots,X_d\\le x_d).$$`,
             },
           ]
         },
         {
-          name: "Convergence of random variables",
-          type: "definition",
-          content: "",
+          name: `Convergence of random variables`,
+          type: `definition`,
+          content: ``,
           dependants: [],
           implications: [
             {
@@ -147,13 +147,13 @@ export default
     },
 
     {
-      chapterName: "Conditioning",
+      chapterName: `Conditioning`,
       description: `This chapter discusses conditional expectations coming along with random variables.`,
       notations: [],
       statements: [
         {
-          name: "expectation conditioned on an event",
-          type: "definition",
+          name: `expectation conditioned on an event`,
+          type: `definition`,
           content: `The conditional expectation of a random variable $X$ given an event $B$ such that $\\PP(B)>0$ is
         $$\\EE[X|B] = \\int_{\\Omega} X\\,\\d\\PP(X|B) = \\dfrac{\\EE[X\\1_B]}{\\PP(B)}.$$
         If $\\PP(B)=0$, we may assign $\\EE[X|B] = 0$, because $\\PP(X=x|B) = 0,\\forall x\\in X(\\Omega)$.`,
@@ -161,14 +161,14 @@ export default
           ]
         },
         {
-          name: "expectation conditioned on a random variable",
-          type: "definition",
+          name: `expectation conditioned on a random variable`,
+          type: `definition`,
           content: `Let $X,Y$ be random variables. The conditional expectation of $X$ given $Y$ is a random variable, denoted by $\\EE[X|Y]$, such that
                   $$\\EE[X|Y](\\omega) = \\EE[X|Y=Y(\\omega)], a.s.$$`,
           implications: [
             {
-              name: "",
-              type: "note",
+              name: ``,
+              type: `note`,
               content: `Consider the set $E=\\{y\\in Y(\\Omega) : \\PP(Y=y) > 0\\}$. We write
             $$\\EE[X|Y](\\omega) = \\begin{cases}
                                         \\EE[X|Y=Y(\\omega)], & \\text{ if } Y(\\omega)\\in E,\\\\\\\\

@@ -1,13 +1,15 @@
+import { getTextWidth } from "./text-analysis";
+
 export function extractEdges(vertices: Term[]) {
   const edges: Relation[] = [];
 
   // Iterate over each vertex
   vertices.forEach(vertex => {
     // If the vertex has children
-    if (vertex.children) {
+    if (vertex.parents) {
       // Iterate over each child and create an edge
-      vertex.children.forEach(child => {
-        edges.push({ source: vertex.name, target: child });
+      vertex.parents.forEach(parent => {
+        edges.push({ source: parent, target: vertex.name });
       });
     }
   });
@@ -16,43 +18,80 @@ export function extractEdges(vertices: Term[]) {
 }
 
 export function computeNodeDepths(terms: Term[]): Term[] {
-  // Clone the array of terms to avoid modifying the original array
-  var newTerms = JSON.parse(JSON.stringify(terms));
+  // Create a map of node names to their corresponding nodes
+  const termMap = new Map<string, Term>();
+  terms.forEach(term => termMap.set(term.name, term));
 
-  // Function to compute the depth of a single node
-  function computeNodeDepth(nodeName: string, depth: number) {
-    // Find the node by name
-    var node = newTerms.find((term: Term) => term.name === nodeName);
+  // Iterate over each node to compute its depth iteratively
+  terms.forEach(term => {
+    const stack = [{ node: term.name, depth: term.depth ?? 0 }];
 
-    // If the node is not found, return -1
-    if (!node) {
-      return -1;
+    while (stack.length > 0) {
+      const { node, depth } = stack.pop()!;
+      const currentNode = termMap.get(node)!;
+
+      // Update the depth of the current node
+      if (currentNode.depth === undefined || depth < currentNode.depth) {
+        currentNode.depth = depth;
+      }
+
+      // Add parents of the current node to the stack with increased depth
+      if (currentNode.parents) {
+        currentNode.parents.forEach(parentName => {
+          stack.push({ node: parentName, depth: depth - 1 });
+        });
+      }
     }
+  });
 
-    // Assign the depth to the current node
-    node.depth = depth;
+  const depths = terms.map(term => term.depth).filter(depth => depth !== undefined) as number[];
+  const minDepth = Math.min(...depths);
 
-    // If the node doesn't have children, return the current depth
-    if (!node.children || node.children.length === 0) {
-      return depth;
+  terms.forEach(term => {
+    term.depth = term.depth !== undefined ? term.depth - minDepth : term.depth
+  })
+
+  // Last adjust to ensure minimum depth is 0 and correct depth based on parents
+  terms.forEach(term => {
+    if (term.parents) {
+      const parentDepths = term.parents
+        .map(parent => terms.find(t => t.name === parent)?.depth)
+        .filter((depth): depth is number => depth !== undefined);
+
+      if (parentDepths.length > 0) {
+        term.depth = Math.min(...parentDepths) + 1;
+      }
     }
+  });
 
-    // Otherwise, compute the depth recursively for each child and return the maximum depth
-    var childDepths = node
-      .children
-      .map((child: string) => computeNodeDepth(child, depth + 1));
-    return Math.max(...childDepths);
-  }
 
-  // Find the name of the root node
-  const rootNodeName = newTerms
-    .find((term: Term) =>
-      !newTerms
-        .some((otherTerm: Term) => otherTerm.children && otherTerm.children.includes(term.name))
-    ).name;
-  // Start depth computation from the root node
-  computeNodeDepth(rootNodeName, 0);
 
-  // Return the new array with updated depth values
-  return newTerms;
+  return terms;
+}
+
+
+export function breakLines(terms: Term[], maxWidth: number, fontSize: number, fontFamily: string): Term[] {
+  return terms.map(term => {
+    // Split the text into lines based on the maximum width
+    const lines: string[] = [];
+    let currentLine = term.name.split(` `)[0];
+
+    for (let i = 1; i < term.name.split(` `).length; i++) {
+      const word = term.name.split(` `)[i];
+      const testLine = currentLine + ` ` + word;
+      const testWidth = getTextWidth(testLine, fontSize, fontFamily);
+
+      if (testWidth <= maxWidth) {
+        currentLine = testLine;
+      } else {
+        lines.push(currentLine);
+        currentLine = word;
+      }
+    }
+    lines.push(currentLine);
+    return {
+      ...term,
+      lines: lines
+    };
+  });
 }

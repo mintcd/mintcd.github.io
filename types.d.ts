@@ -25,13 +25,15 @@ type Graph = Term[]
 
 type Term = {
     // Basic Properties
+    key: string,
     name: string,
     abbreviation?: string,
-    type: TermType,
-    niches: string[],
+    type?: StatementType,
+    relevant: string[],
 
     // Graph properties
     children?: string[],
+    parents: string[] = [],
     depth?: number
 
     // Knowledge properties
@@ -43,13 +45,17 @@ type Term = {
     // Taxonomy properties
     subjects?: SubjectType[],
     categories?: string[],
+    narrowestField?: string,
 
     // Style properties
     color?: string,
+    lines: string[]
     fx?: number,
     fy?: number,
-    x?: number,
-    y?: number
+    x: number,
+    y: number,
+    height: number,
+    width: number,
 }
 
 type Relation = {
@@ -63,15 +69,9 @@ type VertexCoordinate = {
     y: number
 }
 
-type EdgeCoordinate = {
-    source: {
-        x: number
-        y: number
-    },
-    target: {
-        x: number
-        y: number
-    }
+type Edge = {
+    source: Term
+    target: Term
 }
 
 type StatementType =
@@ -87,7 +87,7 @@ type StatementType =
     | 'theorem'
 
 type Category = 'all' | 'real-analysis' | 'probability-theory' | 'measure-theory' | 'stochastic-processes'
-type TermType = 'metric' | 'architecture' | "dataset" | 'problem' | 'mechanism'
+type TermType = 'metric' | 'architecture' | "dataset" | 'problem' | 'mechanism' | StatementType
 type SubjectType = 'mathematics' | 'computer-science' | 'philosophy'
 
 type RelationType =     // A -[RelationType]-> B

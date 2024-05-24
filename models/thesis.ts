@@ -1,11 +1,11 @@
 export default [
   {
-    name: "Stochastic differential equations"
+    name: `Stochastic differential equations`
   },
   {
-    name: "Diffusion equations"
+    name: `Diffusion equations`
   },
   {
-    name: "Reverse-time diffusion equation"
+    name: `Reverse-time diffusion equation`
   }
 ] as Term[]

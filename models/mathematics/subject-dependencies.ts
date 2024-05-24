@@ -1,42 +1,51 @@
 export default [
   {
-    name: 'Set Theory',
-    color: '#6883ba',
-    children: ['Topology', 'Linear Algebra']
+    name: `Set Theory`,
+    color: `#6883ba`,
+    parents: []
   },
   {
-    name: 'Linear Algebra'
+    name: `Linear Algebra`,
+    parents: [`Set Theory`]
   },
   {
-    name: 'Topology',
-    children: ['Real Analysis']
+    name: `Topology`,
+    parents: [`Set Theory`]
   },
   {
-    name: 'Real Analysis',
-    children: ['Calculus', 'Probability Theory', 'Measure Theory']
+    name: `Real Analysis`,
+    parents: [`Topology`]
   },
   {
-    name: 'Measure Theory',
-    children: ['Probability Theory']
+    name: `Measure Theory`,
+    parents: [`Real Analysis`]
   },
   {
-    name: 'Probability Theory',
-    children: ['Stochastic Process']
+    name: `Probability Theory`,
+    parents: [`Measure Theory`, `Real Analysis`]
+
+  },
+
+  {
+    name: `Calculus`,
+    parents: [`Real Analysis`]
 
   },
   {
-    name: 'Calculus',
-    children: ['Optimization']
+    name: `Optimization`,
+    parents: [`Real Analysis`]
+  },
+  {
+    name: `Statistics`,
+    parents: [`Probability Theory`]
+  },
+  {
+    name: `Stochastic Process`,
+    parents: [`Probability Theory`]
+  },
+  {
+    name: `Markov Chain`,
+    parents: [`Stochastic Process`]
 
-  },
-  {
-    name: 'Optimization'
-  },
-  {
-    name: 'Stochastic Process',
-    children: ['Markov Chain']
-  },
-  {
-    name: 'Markov Chain'
   },
 ] as Term[]

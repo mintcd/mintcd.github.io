@@ -1,23 +1,23 @@
 export default [
   {
-    name: 'Recurrent',
-    abbreviation: 'RNN',
-    children: ['Long Short-term Memory']
+    name: `Recurrent`,
+    abbreviation: `RNN`,
+    children: [`Long Short-term Memory`]
   },
   {
-    name: 'Long Short-term Memory',
-    abbreviation: 'LSTM',
+    name: `Long Short-term Memory`,
+    abbreviation: `LSTM`,
   },
   {
-    name: 'SegFormer',
+    name: `SegFormer`,
   },
   {
-    name: 'PVT',
+    name: `PVT`,
   },
   {
-    name: 'Transformer',
+    name: `Transformer`,
   },
   {
-    name: 'Multi-head Attention',
+    name: `Multi-head Attention`,
   },
 ] as Graph

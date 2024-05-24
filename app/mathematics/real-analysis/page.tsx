@@ -3,7 +3,7 @@ import SubjectMap from '@components/subject-map';
 
 export default function RealAnalysis() {
   return (
-    <div className='py-5'>
+    <div className={`py-5`}>
       <SubjectMap data={timeline} />
     </div>
   )

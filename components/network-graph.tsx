@@ -1,8 +1,12 @@
 'use client'
 
 import { useEffect } from 'react';
+import { createRoot } from 'react-dom/client';
+
 import * as d3 from 'd3';
-import { computeNodeDepths, extractEdges } from '@functions/graph-analysis'
+import { computeNodeDepths, extractEdges, breakLines } from '@functions/graph-analysis'
+
+import Latex from '@components/latex';
 
 /**
  * Renders a network graph based on the provided data.
@@ -27,6 +31,51 @@ export default function NetworkGraph(
     radius?: number | undefined
   }) {
 
+  const statementProps: { [key in StatementType]: { color: string, contentBackground: string } } = {
+    axiom: {
+      color: '#0288d1',
+      contentBackground: 'bg-[#a0d7f5]'
+    },
+    corollary: {
+      color: 'grey',
+      contentBackground: 'bg-[#77c7f2]'
+    },
+    definition: {
+      color: '#0288d1',
+      contentBackground: 'bg-[#aad7ef]'
+    },
+
+    example: {
+      color: '#0288d1',
+      contentBackground: 'bg-[#77c7f2]'
+    },
+    lemma: {
+      color: 'primary',
+      contentBackground: 'bg-[#77c7f2]'
+    },
+    notation: {
+      color: 'primary',
+      contentBackground: 'bg-[#77c7f2]'
+    },
+    proposition: {
+      color: '#6da484',
+      contentBackground: 'bg-[#6da484]'
+    },
+    theorem: {
+      color: '#5bb561',
+      contentBackground: 'bg-[#7cab7f]'
+    },
+
+    note: {
+      color: 'green',
+      contentBackground: 'bg-[#77c7f2]'
+    },
+    'thought-bubble': {
+      color: 'primary',
+      contentBackground: 'bg-[#77c7f2]'
+    },
+  }
+
   const graphWidth = (typeof window !== 'undefined' && window.visualViewport)
     ? window.visualViewport.width
     : 1500;
@@ -34,20 +83,38 @@ export default function NetworkGraph(
     ? window.visualViewport.height
     : 750;
 
+  const fontSize = 16;
+  const lineHeightRatio = 1;
+
   const nodeWidth = width !== undefined ? width : 150
   const nodeHeight = height !== undefined ? height : 60
 
   useEffect(() => {
-    const vertices = computeNodeDepths(data)
+    const lineHeight = fontSize * lineHeightRatio;
+    const addedLengthNodes = computeNodeDepths(data)
+    console.log(addedLengthNodes)
+
+
+    const vertices = breakLines(addedLengthNodes, 0.95 * nodeWidth, fontSize, "Arial")
+      .map(vertex => {
+        const length = vertex.lines.length
+        vertex.height = (length + 1) * lineHeight * 1.2;
+        vertex.width = nodeWidth;
+        return vertex;
+      });
+
+    const maxDepth = Math.max(...vertices.map((vertex: Term) => vertex.depth === undefined ? 0 : vertex.depth));
+    console.log(maxDepth)
+
     const edges = extractEdges(data)
 
     // Define a graph as an SVG
     const graph = d3
       .select('.graph')
       .attr("width", graphWidth)
-      .attr("height", graphHeight)
+      .attr("height", maxDepth * ((length + 1) * lineHeight * 1.2) * 10)
 
-    // Append links before nodes
+    // Append links
     const links = graph
       .selectAll("line")
       .data(edges)
@@ -76,58 +143,83 @@ export default function NetworkGraph(
       .enter()
       .append("a")
       .attr("class", "node")
-      .attr("href",
-        function (d: Term) {
-          return d.href ? d.href : `${window.location.href}/${d.name.toLowerCase().replace(" ", "-")}`
-        })
+
+    nodes.filter((d: Term) => d.href)
+      .attr("href", (d: Term) => `${window.location.href}/${d.href}`);
 
     // Add a rectangle inside each node
     nodes
       .append("rect")
       .attr("width", nodeWidth)
-      .attr("height", nodeHeight)
+      .attr("height", (d: Term) => {
+        return d.height;
+      })
       .attr("rx", 10)
       .attr("ry", 10)
-      .style("fill", (d: Term) => d.color ? d.color : "#69b3a2");
+      .style("fill", (d: Term) => {
+        return d.color
+          || d.type && statementProps[d.type] && statementProps[d.type].color
+          || '#0288d1'
+      });
 
-    // Add a text inside each node
-    nodes
-      .append("text")
-      .text(function (d: Term) {
-        return d.name
-      })
-      .style("text-anchor", "middle")
-      .style("dominant-baseline", "middle")
-      .style("fill", "white")
-      .attr("x", nodeWidth / 2)
-      .attr("y", nodeHeight / 2);
+    const textNodes = nodes.append("foreignObject")
+      .attr("width", nodeWidth)
+      .attr("height", (d: Term) => d.height)
+      .attr("x", 0)
+      .attr("y", 0)
+      .append("xhtml:div")
+      .style("display", "flex")
+      .style("align-items", "center")
+      .style("justify-content", "center")
+      .style("height", "100%")
+      .style("width", "100%")
+      .style("color", "white")
+      .style("font-size", fontSize)
+      .append("xhtml:div")
+      .style("display", "flex")
+      .style("flex-direction", "column")
+      .style("align-items", "center")
+      .style("justify-content", "center")
+      .style("width", "100%")
+      .style("height", "100%");
+
+    textNodes.each(function (this: Element, d: Term) {
+      const container = this;
+      const lines = d.lines.map((line, index) => (
+        <div className={`text-center w-full text-[${fontSize}px]`} key={index}>
+          <Latex>{line}</Latex>
+        </div>
+      ));
+
+      createRoot(container).render(lines);
+    });
+
 
     // Set initial positions for specific nodes
     for (const vertex of vertices) {
       vertex.fy = vertex.depth !== undefined ? nodeHeight * (0.5 + 2 * vertex.depth) : 500;
-      if (vertex.depth === 0) vertex.fx = graphWidth / 2
+      const equalDepthVertices = vertices.filter(v => v.depth == vertex.depth)
+      vertex.fx = graphWidth * (equalDepthVertices.indexOf(vertex) + 1) / (equalDepthVertices.length + 1)
+
+      // vertex.fy = vertex.parents?.length === 0 ? nodeHeight * 0.5 : undefined;
     }
 
     // Force simulation and tick function remain unchanged
     const simulation = d3.forceSimulation(vertices)
-      // Force the nodes to the center
       .force("center",
         d3.forceCenter(graphWidth / 2, graphHeight / 2)
       )
-      // Force the links to be equally nodeWidth
       .force("link",
         d3.forceLink()
           .id((vertex: Term) => vertex.name)
           .links(edges)
-        // .distance(nodeHeight)
+          .distance(nodeHeight)
         // .iterations(300)
       )
 
-      // Force the nodes to be at least nodeHeight far from others
       .force("collide",
-        d3.forceCollide((nodeHeight + nodeWidth) / 2)
+        d3.forceCollide(nodeWidth / 2)
       )
-
       .on("tick", ticked);
 
     function ticked() {
@@ -139,10 +231,10 @@ export default function NetworkGraph(
           });
 
       // Update links
-      links.attr("x1", (d: EdgeCoordinate) => d.source.x + nodeWidth / 2)
-        .attr("y1", (d: EdgeCoordinate) => d.source.y + nodeHeight)
-        .attr("x2", (d: EdgeCoordinate) => d.target.x + nodeWidth / 2)
-        .attr("y2", (d: EdgeCoordinate) => d.target.y);
+      links.attr("x1", (d: Edge) => d.source.x + d.source.width / 2)
+        .attr("y1", (d: Edge) => d.source.y + d.source.height)
+        .attr("x2", (d: Edge) => d.target.x + d.target.width / 2)
+        .attr("y2", (d: Edge) => d.target.y);
     }
   });
 

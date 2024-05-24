@@ -50,49 +50,48 @@ export default [
             {
                 id: `1.3`,
                 name: `Compare two topologies`,
-                content: `Let topologies $\\mathcal{T}$ and $\\mathcal{T`
-            }$ having bases $\\mathcal{ B }$ and $\\mathcal{ B }`$, respectively. Then $\\mathcal{T}\\subseteq\\mathcal{T}`$ if and only if $\\forall x\\in B\\in\\mathcal{ B }, \\exists B`\\in\\mathcal{B}` : x\\in B`\\subseteq B$.`,
-    type: `theorem`,
-    short: `$\\\\\\mathcal{T}_{\\mathcal{B}_1}\\subseteq\\mathcal{T}_{\\mathcal{B}_2} \\Leftrightarrow \\forall x\\in B_1\\in\\mathcal{B}_1,\\exists B_2\\in\\mathcal{B}_2 : x\\in B_2\\subseteq B_1$.`,
-    dependants: []
+                content: `Let topologies $\\mathcal{T}$ and $\\mathcal{T}'$ having bases $\\mathcal{B}$ and $\\mathcal{B}'$, respectively. Then $\\mathcal{T}\\subseteq\\mathcal{T}'$ if and only if $\\forall x\\in B\\in\\mathcal{ B }, \\exists B'\\in\\mathcal{B}' : x\\in B'\\subseteq B$.`,
+                type: `theorem`,
+                short: `$\\\\\\mathcal{T}_{\\mathcal{B}_1}\\subseteq\\mathcal{T}_{\\mathcal{B}_2} \\Leftrightarrow \\forall x\\in B_1\\in\\mathcal{B}_1,\\exists B_2\\in\\mathcal{B}_2 : x\\in B_2\\subseteq B_1$.`,
+                dependants: []
             },
+            {
+                id: `3`,
+                name: ``,
+                type: `definition`,
+                content: `An $\\textbf{order topology}$ is whose basis contains elements of the form $(a,b), [a_0,b), (a,b_0]$, where $a,b\\in X$, $a_0$ is the smallest element if any, $b_0$ is the largest element if any.`,
+                dependants: []
+            },
+        ]
+    },
     {
-        id: `3`,
-        name: ``,
-        type: `definition`,
-        content: `An $\\textbf{order topology}$ is whose basis contains elements of the form $(a,b), [a_0,b), (a,b_0]$, where $a,b\\in X$, $a_0$ is the smallest element if any, $b_0$ is the largest element if any.`,
-        dependants: []
-    },
-]
-    },
-{
-    chapterName: `Connectedness and Compactness`,
+        chapterName: `Connectedness and Compactness`,
         notations: [],
-            statements: [
-                {
-                    type: `definition`,
-                    content: `Let $X$ be a topological space. A separation of $X$ is a pair $U$, $V$ of disjoint nonempty open subsets of $X$ whose union is $X$.`,
-                    short: ``,
-                    dependants: []
-                },
-                {
-                    type: `definition`,
-                    content: `A topological space $X$ is said to be connected if there exists no seperation of $X$.`,
-                    short: ``,
-                    dependants: []
-                },
-                {
-                    type: `lemma`,
-                    content: `Let $X$ be a topological space and $Y$ is a subspace of $X$. Then $Y$ is connected if there exists no seperation $A$, $B$ of $Y$ such that neither $A$ nor $B$ contains a limit point of the other.`,
-                    short: ``,
-                    dependants: []
-                },
-                {
-                    type: `lemma`,
-                    content: `Let $X$ be a topological space and $Y$ is a subspace of $X$. If $U$ and $V$ form a separation of $X$, and $Y$ is connected, then $Y$ lies entirely in $U$ or $V$.`,
-                    short: ``,
-                    dependants: []
-                },
-            ]
-}
+        statements: [
+            {
+                type: `definition`,
+                content: `Let $X$ be a topological space. A separation of $X$ is a pair $U$, $V$ of disjoint nonempty open subsets of $X$ whose union is $X$.`,
+                short: ``,
+                dependants: []
+            },
+            {
+                type: `definition`,
+                content: `A topological space $X$ is said to be connected if there exists no seperation of $X$.`,
+                short: ``,
+                dependants: []
+            },
+            {
+                type: `lemma`,
+                content: `Let $X$ be a topological space and $Y$ is a subspace of $X$. Then $Y$ is connected if there exists no seperation $A$, $B$ of $Y$ such that neither $A$ nor $B$ contains a limit point of the other.`,
+                short: ``,
+                dependants: []
+            },
+            {
+                type: `lemma`,
+                content: `Let $X$ be a topological space and $Y$ is a subspace of $X$. If $U$ and $V$ form a separation of $X$, and $Y$ is connected, then $Y$ lies entirely in $U$ or $V$.`,
+                short: ``,
+                dependants: []
+            },
+        ]
+    }
 ] as Chapter[]

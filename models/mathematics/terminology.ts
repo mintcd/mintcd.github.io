@@ -212,7 +212,7 @@ export default [
     categories: [`set theory`]
   },
   {
-    name: `De Morgan`s Laws`,
+    name: `De Morgan's Laws`,
     definition: ``,
     categories: [`set theory`]
   },

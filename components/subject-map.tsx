@@ -273,20 +273,20 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
                                 className='cursor-pointer mr-3 italic'>
                                 Proof
                               </div>}
-                            {statement.implications
+                            {/* {statement.implications
                               && statement.implications.length !== 0
                               &&
                               <ExpandMoreOutlinedIcon
                                 onClick={() => toggleImplication(chapterIndex, statementIndex)}
                                 className={`w-6 h-6 cursor-pointer
                                           text-${statementProps[statement.type].color}`} />
-                            }
+                            } */}
                           </div>
 
                         </div>
                       }
 
-                      {showedItems[chapterIndex].showedStatements[statementIndex]
+                      {/* {showedItems[chapterIndex].showedStatements[statementIndex]
                         && showedItems[chapterIndex].showedImplications[statementIndex]
                         && statement.implications
                         && statement.implications.length !== 0
@@ -329,7 +329,7 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
                               </TimelineContent>
                             </TimelineItem>
                           </Timeline>
-                        ))}
+                        ))} */}
                     </div>
                   </TimelineContent>
                 </TimelineItem>
@@ -374,7 +374,7 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
                       flex items-center justify-center `}>
           <div ref={proofRef}
             className="p-5 bg-white rounded-lg">
-            {showedProof.implicationIndex === null
+            {/* {showedProof.implicationIndex === null
               ?
               <Latex>
                 {`<b>
@@ -397,7 +397,7 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
                       .implications?.[showedProof.implicationIndex].proof
                     || "Have not provided yet :(("}`}
                 </Latex>)
-            }
+            } */}
           </div>
         </div>
       )}

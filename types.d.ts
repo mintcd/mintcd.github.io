@@ -7,7 +7,7 @@ type Chapter = {
     description?: string,
     sections: Section[]
     notations?: string[]
-    statements?: Term[] = []
+    statements: Term[] = []
 }
 
 type Section = {
@@ -23,7 +23,7 @@ type Term = {
     key?: string,
     name: string,
     abbreviation?: string,
-    type?: StatementType,
+    type: StatementType = "definition"
 
     // Graph properties
     children?: string[],
@@ -37,7 +37,7 @@ type Term = {
     otherNames?: string[],
     href?: string
     notation?: string[],
-    content?: string = ""
+    content: string = ""
 
     // Taxonomy properties
     field?: string,

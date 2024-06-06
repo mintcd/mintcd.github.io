@@ -2,22 +2,17 @@ declare module 'd3'
 declare module 'katex'
 
 type Chapter = {
-    chapterName: string,
+    name: string,
+    content: string = "",
     description?: string,
-    notations: Term[],
-    statements: Statement[]
+    sections: Section[]
+    notations?: string[]
+    statements?: Term[] = []
 }
 
-
-type Statement = {
-    id?: string,
-    type: StatementType,
-    name?: string,
-    content: string,
-    short?: string,
-    proof?: string,
-    dependants?: string[],
-    implications?: Statement[]
+type Section = {
+    name: string,
+    content: string = ""
 }
 
 
@@ -25,37 +20,38 @@ type Graph = Term[]
 
 type Term = {
     // Basic Properties
-    key: string,
+    key?: string,
     name: string,
     abbreviation?: string,
     type?: StatementType,
-    relevant: string[],
 
     // Graph properties
     children?: string[],
-    parents: string[] = [],
+    parents?: string[] = [],
     depth?: number
+    short?: string,
+    proof?: string,
+    implication?: Term[]
 
     // Knowledge properties
-    definition: string = "",
     otherNames?: string[],
     href?: string
-    notation?: string[]
+    notation?: string[],
+    content?: string = ""
 
     // Taxonomy properties
-    subjects?: SubjectType[],
-    categories?: string[],
-    narrowestField?: string,
+    field?: string,
+    chapter?: string
 
     // Style properties
     color?: string,
-    lines: string[]
+    lines?: string[]
     fx?: number,
     fy?: number,
-    x: number,
-    y: number,
-    height: number,
-    width: number,
+    x?: number,
+    y?: number,
+    height?: number,
+    width?: number,
 }
 
 type Relation = {
@@ -67,11 +63,6 @@ type Relation = {
 type VertexCoordinate = {
     x: number
     y: number
-}
-
-type Edge = {
-    source: Term
-    target: Term
 }
 
 type StatementType =

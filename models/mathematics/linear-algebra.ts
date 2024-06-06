@@ -1,6 +1,6 @@
 export default [
   {
-    chapterName: `Euclidean Space`,
+    name: `Euclidean Space`,
     notations: [],
     statements: [
       {

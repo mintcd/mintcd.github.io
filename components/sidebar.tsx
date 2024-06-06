@@ -49,7 +49,7 @@ export default function Sidebar({ topic, current }: { topic: string, current: nu
         {data.map((chapter, index) => (
           <a key={`${index}`} href={`/${topicModuleMap[topic].link}/chapters/${index}`} className="hover:opacity-75 cursor-pointer my-10">
             <div className={`p-2 ${current === index ? 'bg-slate-200' : ''}`}>
-              Chapter {index} - {chapter.chapterName}
+              Chapter {index} - {chapter.name}
             </div>
           </a>
         ))}

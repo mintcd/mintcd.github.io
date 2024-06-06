@@ -1,6 +1,6 @@
 export default [
   {
-    chapterName: `Introduction`,
+    name: `Introduction`,
     statements: [
       {
         name: `limits of sets`,
@@ -45,7 +45,7 @@ export default [
     ]
   },
   {
-    chapterName: `Measure Space`,
+    name: `Measure Space`,
     notations: [
       {
         name: `\\sigma-algebra`,
@@ -154,7 +154,7 @@ export default [
     ]
   },
   {
-    chapterName: `Measurable Functions`,
+    name: `Measurable Functions`,
     notations: [],
     statements: [
       {
@@ -176,7 +176,7 @@ export default [
     ],
   },
   {
-    chapterName: `Integration`,
+    name: `Integration`,
     notations: [],
     statements: [
       {

@@ -1,6 +1,6 @@
 export default [
     {
-        chapterName: ``,
+        name: ``,
         notations: [],
         statements: [
             {

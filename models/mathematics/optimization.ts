@@ -1,6 +1,6 @@
 export default [
   {
-    chapterName: `Introduction to Optimization`,
+    name: `Introduction to Optimization`,
     notations: [],
     statements: [
       {
@@ -22,7 +22,7 @@ export default [
     ]
   },
   {
-    chapterName: `Smooth and Constrained Problems`,
+    name: `Smooth and Constrained Problems`,
     notations: [
       {
         name: `Optimization problem`,
@@ -183,7 +183,7 @@ export default [
     ]
   },
   {
-    chapterName: `Linear Programming`,
+    name: `Linear Programming`,
     notations: [],
     statements: [
       {

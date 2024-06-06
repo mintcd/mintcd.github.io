@@ -1,7 +1,7 @@
 export default
   [
     {
-      chapterName: `Introduction`,
+      name: `Introduction`,
       notations: [
         {
           name: `probability space`,
@@ -63,7 +63,7 @@ export default
       ]
     },
     {
-      chapterName: `Random Variables`,
+      name: `Random Variables`,
       notations: [],
       statements: [
         {
@@ -147,7 +147,7 @@ export default
     },
 
     {
-      chapterName: `Conditioning`,
+      name: `Conditioning`,
       description: `This chapter discusses conditional expectations coming along with random variables.`,
       notations: [],
       statements: [

@@ -1,6 +1,7 @@
 export default [
   {
     name: `$\\sigma$-algebra`,
+    key: 'sigma-algebra',
     type: `definition`,
     parents: []
   },

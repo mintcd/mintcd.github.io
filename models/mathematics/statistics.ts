@@ -1,6 +1,6 @@
 export default [
   {
-    chapterName: `Set Estimation`,
+    name: `Set Estimation`,
     notations: [],
     statements: [
       {

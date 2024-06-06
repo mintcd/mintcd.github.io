@@ -213,7 +213,7 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
             className={`mb-3 
                         cursor-pointer hover:bg-slate-200
                         text-lg font-bold `}>
-            {chapter.chapterName}
+            {chapter.name}
           </div>
 
           {showedItems[chapterIndex].showedChapter &&

@@ -1,6 +1,6 @@
 export default [
   {
-    chapterName: `Markov Chain`,
+    name: `Markov Chain`,
     notations: [],
     statements: [
       {

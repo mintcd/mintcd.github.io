@@ -1,6 +1,6 @@
 export default [
     {
-        chapterName: `Topological Spaces and Continuous Functions`,
+        name: `Topological Spaces and Continuous Functions`,
         notations: [],
         statements: [
             {
@@ -65,7 +65,7 @@ export default [
         ]
     },
     {
-        chapterName: `Connectedness and Compactness`,
+        name: `Connectedness and Compactness`,
         notations: [],
         statements: [
             {

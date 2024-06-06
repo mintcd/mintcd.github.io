@@ -1,6 +1,6 @@
 export default [
   {
-    chapterName: `Introduction`,
+    name: `Introduction`,
     notations: [],
     statements: [
       {
@@ -11,7 +11,7 @@ export default [
     ]
   },
   {
-    chapterName: `Transformer`,
+    name: `Transformer`,
     notations: [],
     statements: [
       {

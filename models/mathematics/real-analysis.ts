@@ -1,6 +1,6 @@
 export default [
   {
-    chapterName: 'Sets and Maps',
+    name: 'Sets and Maps',
     notations: [],
     statements: [
       {
@@ -30,7 +30,7 @@ export default [
     ]
   },
   {
-    chapterName: `The Real Numbers`,
+    name: `The Real Numbers`,
     notations: [],
     statements: [
       {

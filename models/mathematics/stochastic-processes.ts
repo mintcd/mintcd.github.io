@@ -1,13 +1,13 @@
 export default [
   {
-    chapterName: `Introduction`,
+    name: `Introduction`,
     notations: [],
     statements: [
       {
         name: `stochastic process`,
         type: `definition`,
         content: `A stochastic process is a collection of random variable $\\{X(t)\\}_{t\\in T}$, where $T$ is an index set.`,
-        dependants: [],
+        parents: [],
         implications: [
           {
             name: ``,
@@ -56,7 +56,7 @@ export default [
     ]
   },
   {
-    chapterName: `Stochastic Differential Equations`,
+    name: `Stochastic Differential Equations`,
     notations: [],
     statements: [
       {

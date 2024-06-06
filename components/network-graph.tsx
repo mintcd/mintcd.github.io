@@ -231,10 +231,10 @@ export default function NetworkGraph(
           });
 
       // Update links
-      links.attr("x1", (d: Edge) => d.source.x + d.source.width / 2)
-        .attr("y1", (d: Edge) => d.source.y + d.source.height)
-        .attr("x2", (d: Edge) => d.target.x + d.target.width / 2)
-        .attr("y2", (d: Edge) => d.target.y);
+      links.attr("x1", (d: Relation) => d.source.x + d.source.width / 2)
+        .attr("y1", (d: Relation) => d.source.y + d.source.height)
+        .attr("x2", (d: Relation) => d.target.x + d.target.width / 2)
+        .attr("y2", (d: Relation) => d.target.y);
     }
   });
 

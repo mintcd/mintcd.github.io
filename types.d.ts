@@ -45,7 +45,7 @@ type Term = {
 
     // Style properties
     color?: string,
-    lines?: string[]
+    lines: string[] = []
     fx?: number,
     fy?: number,
     x?: number,

@@ -8,4 +8,4 @@ export default [
   {
     name: `Reverse-time diffusion equation`
   }
-] as Term[]
+] as Vertex[]

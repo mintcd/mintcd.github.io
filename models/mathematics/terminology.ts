@@ -489,4 +489,4 @@ export default [
     categories: [`analysis`],
     subcategories: [`real analysis`],
   },
-]
+] as unknown as Vertex[]

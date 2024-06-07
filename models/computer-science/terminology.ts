@@ -46,4 +46,4 @@ export default [
     categories: [`deep-learning`],
     type: `problem`
   },
-] as Term[]
+] as Vertex[]

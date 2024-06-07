@@ -13,28 +13,38 @@ export default [
     parents: [`Set Theory`]
   },
   {
+    name: `Abstract Algebra`,
+    parents: [`Set Theory`]
+  },
+  {
     name: `Real Analysis`,
+    href: `real-analysis`,
     parents: [`Topology`]
   },
   {
-    name: `Measure Theory`,
-    parents: [`Real Analysis`]
+    name: `Functional Analysis`,
+    parents: [`Linear Algebra`, 'Real Analysis']
   },
-  {
-    name: `Probability Theory`,
-    parents: [`Measure Theory`, `Real Analysis`]
-
-  },
-
   {
     name: `Calculus`,
     parents: [`Real Analysis`]
 
   },
   {
+    name: `Measure Theory`,
+    href: `measure-theory`,
+    parents: [`Real Analysis`]
+  },
+  {
+    name: `Probability Theory`,
+    parents: [`Measure Theory`]
+
+  },
+  {
     name: `Optimization`,
     parents: [`Real Analysis`]
   },
+
   {
     name: `Statistics`,
     parents: [`Probability Theory`]
@@ -48,4 +58,4 @@ export default [
     parents: [`Stochastic Process`]
 
   },
-] as Term[]
+] as Vertex[]

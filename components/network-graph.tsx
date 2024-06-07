@@ -103,7 +103,7 @@ export default function NetworkGraph(
         return vertex;
       });
 
-    const maxDepth = Math.max(...vertices.map((vertex: Term) => vertex.depth === undefined ? 0 : vertex.depth));
+    const maxDepth = Math.max(...vertices.map((vertex: Vertex) => vertex.depth === undefined ? 0 : vertex.depth));
     console.log(maxDepth)
 
     const edges = extractEdges(data)
@@ -144,19 +144,19 @@ export default function NetworkGraph(
       .append("a")
       .attr("class", "node")
 
-    nodes.filter((d: Term) => d.href)
-      .attr("href", (d: Term) => `${window.location.href}/${d.href}`);
+    nodes.filter((d: Vertex) => d.href)
+      .attr("href", (d: Vertex) => `${window.location.href}/${d.href}`);
 
     // Add a rectangle inside each node
     nodes
       .append("rect")
       .attr("width", nodeWidth)
-      .attr("height", (d: Term) => {
+      .attr("height", (d: Vertex) => {
         return d.height;
       })
       .attr("rx", 10)
       .attr("ry", 10)
-      .style("fill", (d: Term) => {
+      .style("fill", (d: Vertex) => {
         return d.color
           || d.type && statementProps[d.type] && statementProps[d.type].color
           || '#0288d1'
@@ -164,7 +164,7 @@ export default function NetworkGraph(
 
     const textNodes = nodes.append("foreignObject")
       .attr("width", nodeWidth)
-      .attr("height", (d: Term) => d.height)
+      .attr("height", (d: Vertex) => d.height)
       .attr("x", 0)
       .attr("y", 0)
       .append("xhtml:div")
@@ -183,7 +183,7 @@ export default function NetworkGraph(
       .style("width", "100%")
       .style("height", "100%");
 
-    textNodes.each(function (this: Element, d: Term) {
+    textNodes.each(function (this: Element, d: Vertex) {
       const container = this;
       const lines = d.lines.map((line, index) => (
         <div className={`text-center w-full text-[${fontSize}px]`} key={index}>
@@ -211,7 +211,7 @@ export default function NetworkGraph(
       )
       .force("link",
         d3.forceLink()
-          .id((vertex: Term) => vertex.name)
+          .id((vertex: Vertex) => vertex.name)
           .links(edges)
           .distance(nodeHeight)
         // .iterations(300)
@@ -226,15 +226,15 @@ export default function NetworkGraph(
       // Update nodes
       nodes
         .attr("transform",
-          function (d: Term) {
+          function (d: Vertex) {
             return `translate(${d.x}, ${d.y})`
           });
 
       // Update links
-      links.attr("x1", (d: Relation) => d.source.x + d.source.width / 2)
-        .attr("y1", (d: Relation) => d.source.y + d.source.height)
-        .attr("x2", (d: Relation) => d.target.x + d.target.width / 2)
-        .attr("y2", (d: Relation) => d.target.y);
+      links.attr("x1", (d: Edge) => d.source.x + d.source.width / 2)
+        .attr("y1", (d: Edge) => d.source.y + d.source.height)
+        .attr("x2", (d: Edge) => d.target.x + d.target.width / 2)
+        .attr("y2", (d: Edge) => d.target.y);
     }
   });
 

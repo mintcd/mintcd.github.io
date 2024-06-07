@@ -169,4 +169,4 @@ export default [
   //   name: `Reverse-time SDE`,
   //   parents: [`Kolmogorov Forward Equation`, `Kolmogorov Backward Equation`]
   // },
-] as Term[]
+] as Vertex[]

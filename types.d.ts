@@ -7,7 +7,7 @@ type Chapter = {
     description?: string,
     sections: Section[]
     notations?: string[]
-    statements: Term[] = []
+    statements: Vertex[] = []
 }
 
 type Section = {
@@ -16,22 +16,23 @@ type Section = {
 }
 
 
-type Graph = Term[]
+type Graph = Vertex[]
 
-type Term = {
+type Vertex = {
     // Basic Properties
     key?: string,
     name: string,
     abbreviation?: string,
     type: StatementType = "definition"
+    implications: Vertex[] = []
 
     // Graph properties
     children?: string[],
     parents?: string[] = [],
-    depth?: number
+    depth: number = 0,
     short?: string,
     proof?: string,
-    implication?: Term[]
+    implication?: Vertex[]
 
     // Knowledge properties
     otherNames?: string[],
@@ -40,7 +41,7 @@ type Term = {
     content: string = ""
 
     // Taxonomy properties
-    field?: string,
+    field: string = 'undefined',
     chapter?: string
 
     // Style properties
@@ -48,17 +49,18 @@ type Term = {
     lines: string[] = []
     fx?: number,
     fy?: number,
-    x?: number,
-    y?: number,
-    height?: number,
-    width?: number,
+    x: number = 0,
+    y: number = 0,
+    height: number = 75,
+    width: number = 150,
 }
 
-type Relation = {
-    source: string
-    target: string
+type Edge = {
+    source: Vertex,
+    target: Vertex
     type?: RelationType
 }
+
 
 type VertexCoordinate = {
     x: number

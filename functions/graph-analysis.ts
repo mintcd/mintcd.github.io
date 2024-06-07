@@ -1,7 +1,7 @@
 import { getTextWidth } from "./text-analysis";
 
-export function extractEdges(vertices: Term[]) {
-  const edges: Relation[] = [];
+export function extractEdges(vertices: Vertex[]) {
+  const edges: Edge[] = [];
 
   // Iterate over each vertex
   vertices.forEach(vertex => {
@@ -17,9 +17,9 @@ export function extractEdges(vertices: Term[]) {
   return edges;
 }
 
-export function computeNodeDepths(terms: Term[]): Term[] {
+export function computeNodeDepths(terms: Vertex[]): Vertex[] {
   // Create a map of node names to their corresponding nodes
-  const termMap = new Map<string, Term>();
+  const termMap = new Map<string, Vertex>();
   terms.forEach(term => termMap.set(term.name, term));
 
   // Iterate over each node to compute its depth iteratively
@@ -63,14 +63,11 @@ export function computeNodeDepths(terms: Term[]): Term[] {
       }
     }
   });
-
-
-
   return terms;
 }
 
 
-export function breakLines(terms: Term[], maxWidth: number, fontSize: number, fontFamily: string): Term[] {
+export function breakLines(terms: Vertex[], maxWidth: number, fontSize: number, fontFamily: string): Vertex[] {
   return terms.map(term => {
     // Split the text into lines based on the maximum width
     const lines: string[] = [];

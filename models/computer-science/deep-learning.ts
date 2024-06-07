@@ -24,7 +24,6 @@ export default [
         type: `example`,
         content: ``,
       },
-
     ]
   },
 ] as Chapter[]

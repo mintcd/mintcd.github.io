@@ -3,9 +3,9 @@ declare module 'katex'
 
 type Chapter = {
     name: string,
-    content: string = "",
+    content?: string,
     description?: string,
-    sections: Section[]
+    sections?: Section[]
     notations?: string[]
     statements: Vertex[] = []
 }
@@ -23,13 +23,13 @@ type Vertex = {
     key?: string,
     name: string,
     abbreviation?: string,
-    type: StatementType = "definition"
-    implications: Vertex[] = []
+    type: Type,
+    implications?: Vertex[] = []
 
     // Graph properties
     children?: string[],
     parents?: string[] = [],
-    depth: number = 0,
+    depth?: number = 0,
     short?: string,
     proof?: string,
     implication?: Vertex[]
@@ -41,18 +41,18 @@ type Vertex = {
     content: string = ""
 
     // Taxonomy properties
-    field: string = 'undefined',
+    field?: string | string[],
     chapter?: string
 
     // Style properties
     color?: string,
-    lines: string[] = []
+    lines?: string[] = []
     fx?: number,
     fy?: number,
-    x: number = 0,
-    y: number = 0,
-    height: number = 75,
-    width: number = 150,
+    x?: number = 0,
+    y?: number = 0,
+    height?: number = 75,
+    width?: number = 150,
 }
 
 type Edge = {
@@ -80,7 +80,7 @@ type StatementType =
     | 'theorem'
 
 type Category = 'all' | 'real-analysis' | 'probability-theory' | 'measure-theory' | 'stochastic-processes'
-type TermType = 'metric' | 'architecture' | "dataset" | 'problem' | 'mechanism' | StatementType
+type Type = 'metric' | 'architecture' | "dataset" | 'problem' | 'mechanism' | StatementType
 type SubjectType = 'mathematics' | 'computer-science' | 'philosophy'
 
 type RelationType =     // A -[RelationType]-> B

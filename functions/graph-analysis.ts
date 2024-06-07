@@ -1,7 +1,7 @@
 import { getTextWidth } from "./text-analysis";
 
 export function extractEdges(vertices: Vertex[]) {
-  const edges: Edge[] = [];
+  const edges: { source: string, target: string }[] = [];
 
   // Iterate over each vertex
   vertices.forEach(vertex => {

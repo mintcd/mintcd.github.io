@@ -4,13 +4,7 @@ import NotificationsActiveRoundedIcon from '@mui/icons-material/NotificationsAct
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 
 
-const statementProps: { [key in StatementType]: {
-  color: string,
-  image: JSX.Element,
-  clicked: string,
-  unclicked: string,
-  contentBackground: string
-} } = {
+export default {
   axiom: {
     color: '#0288d1',
     image: <TipsAndUpdatesRoundedIcon />,
@@ -51,6 +45,14 @@ const statementProps: { [key in StatementType]: {
     unclicked: 'text-gray-700',
     contentBackground: 'bg-[#77c7f2]'
   },
+  metric: {
+    color: '#0288d1',
+    image: <TipsAndUpdatesRoundedIcon />,
+    clicked: 'text-[#0288d1]',
+    unclicked: 'text-gray-700',
+    contentBackground: 'bg-[#a0d7f5]'
+
+  },
   notation: {
     color: 'primary',
     image: <TipsAndUpdatesRoundedIcon />,
@@ -87,4 +89,10 @@ const statementProps: { [key in StatementType]: {
     unclicked: 'text-gray-700',
     contentBackground: 'bg-[#77c7f2]'
   },
-}
+} as { [key in Type]: {
+  color: string,
+  image: JSX.Element,
+  clicked: string,
+  unclicked: string,
+  contentBackground: string
+} } 

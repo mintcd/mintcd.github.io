@@ -5,6 +5,7 @@ import { createRoot } from 'react-dom/client';
 
 import * as d3 from 'd3';
 import { computeNodeDepths, extractEdges, breakLines } from '@functions/graph-analysis'
+import statementProps from '@styles/statement-props'
 
 import Latex from '@components/latex';
 
@@ -31,50 +32,6 @@ export default function NetworkGraph(
     radius?: number | undefined
   }) {
 
-  const statementProps: { [key in StatementType]: { color: string, contentBackground: string } } = {
-    axiom: {
-      color: '#0288d1',
-      contentBackground: 'bg-[#a0d7f5]'
-    },
-    corollary: {
-      color: 'grey',
-      contentBackground: 'bg-[#77c7f2]'
-    },
-    definition: {
-      color: '#0288d1',
-      contentBackground: 'bg-[#aad7ef]'
-    },
-
-    example: {
-      color: '#0288d1',
-      contentBackground: 'bg-[#77c7f2]'
-    },
-    lemma: {
-      color: 'primary',
-      contentBackground: 'bg-[#77c7f2]'
-    },
-    notation: {
-      color: 'primary',
-      contentBackground: 'bg-[#77c7f2]'
-    },
-    proposition: {
-      color: '#6da484',
-      contentBackground: 'bg-[#6da484]'
-    },
-    theorem: {
-      color: '#5bb561',
-      contentBackground: 'bg-[#7cab7f]'
-    },
-
-    note: {
-      color: 'green',
-      contentBackground: 'bg-[#77c7f2]'
-    },
-    'thought-bubble': {
-      color: 'primary',
-      contentBackground: 'bg-[#77c7f2]'
-    },
-  }
 
   const graphWidth = (typeof window !== 'undefined' && window.visualViewport)
     ? window.visualViewport.width
@@ -97,7 +54,7 @@ export default function NetworkGraph(
 
     const vertices = breakLines(addedLengthNodes, 0.95 * nodeWidth, fontSize, "Arial")
       .map(vertex => {
-        const length = vertex.lines.length
+        const length = vertex.lines ? vertex.lines.length : 0;
         vertex.height = (length + 1) * lineHeight * 1.2;
         vertex.width = nodeWidth;
         return vertex;
@@ -185,7 +142,7 @@ export default function NetworkGraph(
 
     textNodes.each(function (this: Element, d: Vertex) {
       const container = this;
-      const lines = d.lines.map((line, index) => (
+      const lines = d.lines?.map((line, index) => (
         <div className={`text-center w-full text-[${fontSize}px]`} key={index}>
           <Latex>{line}</Latex>
         </div>
@@ -231,10 +188,12 @@ export default function NetworkGraph(
           });
 
       // Update links
-      links.attr("x1", (d: Edge) => d.source.x + d.source.width / 2)
-        .attr("y1", (d: Edge) => d.source.y + d.source.height)
-        .attr("x2", (d: Edge) => d.target.x + d.target.width / 2)
-        .attr("y2", (d: Edge) => d.target.y);
+      // Update links
+      links.attr("x1", (d: Edge) => (d.source.x ?? 0) + ((d.source.width ?? 0) / 2))
+        .attr("y1", (d: Edge) => (d.source.y ?? 0) + (d.source.height ?? 0))
+        .attr("x2", (d: Edge) => (d.target.x ?? 0) + ((d.target.width ?? 0) / 2))
+        .attr("y2", (d: Edge) => d.target.y ?? 0);
+
     }
   });
 

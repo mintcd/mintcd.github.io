@@ -202,7 +202,7 @@ const KnowledgeGraph = ({ graph, radius }: { graph: Graph, radius: number }) => 
       svg.selectAll('*').remove();
       simulation.stop();
     };
-  }, [vertices, edges]);
+  });
 
   return <svg ref={svgRef}></svg>;
 };

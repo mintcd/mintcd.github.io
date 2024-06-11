@@ -1,5 +1,5 @@
-import timeline from '@models/mathematics/stochastic-processes';
-import SubjectMap from '@components/subject-map';
+import timeline from '@models/mathematics/timelines/stochastic-processes';
+import SubjectMap from '@components/subject-timeline';
 
 export default function StochasticProcesses() {
   return (

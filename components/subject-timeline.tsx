@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Timeline from '@mui/lab/Timeline'
 import TimelineItem from '@mui/lab/TimelineItem'
 import TimelineSeparator from '@mui/lab/TimelineSeparator'
@@ -17,6 +17,7 @@ import NotificationsActiveRoundedIcon from '@mui/icons-material/NotificationsAct
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 
 import Latex from '@components/latex'
+import statementProps from '@styles/statement-props'
 
 export default function SubjectMap({ data }: { data: Chapter[] }) {
 
@@ -83,117 +84,117 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
     }
   }
 
-  const statementProps: { [key in StatementType]: {
-    color: string,
-    image: (chapterIndex: number, statementIndex: number) => JSX.Element,
-    contentBackground: string
-  } } = {
-    axiom: {
-      color: '#0288d1',
-      image: (chapterIndex, statementIndex) => (
-        <TipsAndUpdatesRoundedIcon
-          className={showedItems[chapterIndex].showedChapter === true
-            && showedItems[chapterIndex].showedStatements[statementIndex] === true
-            ? 'text-[#0288d1]' : 'text-gray-700'} />
-      ),
-      contentBackground: 'bg-[#a0d7f5]'
+  // const statementProps: { [key in StatementType]: {
+  //   color: string,
+  //   image: (chapterIndex: number, statementIndex: number) => JSX.Element,
+  //   contentBackground: string
+  // } } = {
+  //   axiom: {
+  //     color: '#0288d1',
+  //     image: (chapterIndex, statementIndex) => (
+  //       <TipsAndUpdatesRoundedIcon
+  //         className={showedItems[chapterIndex].showedChapter === true
+  //           && showedItems[chapterIndex].showedStatements[statementIndex] === true
+  //           ? 'text-[#0288d1]' : 'text-gray-700'} />
+  //     ),
+  //     contentBackground: 'bg-[#a0d7f5]'
 
-    },
-    corollary: {
-      color: 'grey',
-      image: (chapterIndex, statementIndex) => (
-        <TipsAndUpdatesRoundedIcon
-          className={showedItems[chapterIndex].showedChapter === true
-            && showedItems[chapterIndex].showedStatements[statementIndex] === true
-            ? 'text-[#0288d1]' : 'text-gray-700'} />
-      ),
-      contentBackground: 'bg-[#77c7f2]'
+  //   },
+  //   corollary: {
+  //     color: 'grey',
+  //     image: (chapterIndex, statementIndex) => (
+  //       <TipsAndUpdatesRoundedIcon
+  //         className={showedItems[chapterIndex].showedChapter === true
+  //           && showedItems[chapterIndex].showedStatements[statementIndex] === true
+  //           ? 'text-[#0288d1]' : 'text-gray-700'} />
+  //     ),
+  //     contentBackground: 'bg-[#77c7f2]'
 
-    },
+  //   },
 
-    definition: {
-      color: '#0288d1',
-      image: (chapterIndex, statementIndex) => (
-        <TipsAndUpdatesRoundedIcon
-          className={showedItems[chapterIndex].showedStatements[statementIndex]
-            ? 'text-white' : 'text-[#0288d1]'} />
-      ),
-      contentBackground: 'bg-[#aad7ef]'
-    },
+  //   definition: {
+  //     color: '#0288d1',
+  //     image: (chapterIndex, statementIndex) => (
+  //       <TipsAndUpdatesRoundedIcon
+  //         className={showedItems[chapterIndex].showedStatements[statementIndex]
+  //           ? 'text-white' : 'text-[#0288d1]'} />
+  //     ),
+  //     contentBackground: 'bg-[#aad7ef]'
+  //   },
 
-    example: {
-      color: '#0288d1',
-      image: (chapterIndex, statementIndex) => (
-        <EditNoteRoundedIcon
-          className={showedItems[chapterIndex].showedChapter === true
-            && showedItems[chapterIndex].showedStatements[statementIndex] === true
-            ? 'text-white' : 'text-[#0288d1]'} />
-      ),
-      contentBackground: 'bg-[#77c7f2]'
-    },
+  //   example: {
+  //     color: '#0288d1',
+  //     image: (chapterIndex, statementIndex) => (
+  //       <EditNoteRoundedIcon
+  //         className={showedItems[chapterIndex].showedChapter === true
+  //           && showedItems[chapterIndex].showedStatements[statementIndex] === true
+  //           ? 'text-white' : 'text-[#0288d1]'} />
+  //     ),
+  //     contentBackground: 'bg-[#77c7f2]'
+  //   },
 
-    lemma: {
-      color: 'primary',
-      image: (chapterIndex, statementIndex) => (
-        <TipsAndUpdatesRoundedIcon
-          className={showedItems[chapterIndex].showedChapter === true
-            && showedItems[chapterIndex].showedStatements[statementIndex] === true
-            ? 'text-[#0288d1]' : 'text-gray-700'} />
-      ),
-      contentBackground: 'bg-[#77c7f2]'
-    },
-    notation: {
-      color: 'primary',
-      image: (chapterIndex, statementIndex) => (
-        <TipsAndUpdatesRoundedIcon
-          className={showedItems[chapterIndex].showedChapter === true
-            && showedItems[chapterIndex].showedStatements[statementIndex] === true
-            ? 'text-[#0288d1]' : 'text-gray-700'} />
-      ),
-      contentBackground: 'bg-[#77c7f2]'
-    },
-    proposition: {
-      color: '#6da484',
-      image: (chapterIndex, statementIndex) => (
-        <TipsAndUpdatesRoundedIcon
-          className={showedItems[chapterIndex].showedChapter === true
-            && showedItems[chapterIndex].showedStatements[statementIndex] === true
-            ? 'text-white' : 'text-[#6da484]'} />
-      ),
-      contentBackground: 'bg-[#6da484]'
-    },
-    theorem: {
-      color: '#5bb561',
-      image: (chapterIndex, statementIndex) => (
-        <NotificationsActiveRoundedIcon
-          className={showedItems[chapterIndex].showedChapter === true
-            && showedItems[chapterIndex].showedStatements[statementIndex] === true
-            ? 'text-white' : 'text-[#5bb561]'} />
-      ),
-      contentBackground: 'bg-[#7cab7f]'
-    },
+  //   lemma: {
+  //     color: 'primary',
+  //     image: (chapterIndex, statementIndex) => (
+  //       <TipsAndUpdatesRoundedIcon
+  //         className={showedItems[chapterIndex].showedChapter === true
+  //           && showedItems[chapterIndex].showedStatements[statementIndex] === true
+  //           ? 'text-[#0288d1]' : 'text-gray-700'} />
+  //     ),
+  //     contentBackground: 'bg-[#77c7f2]'
+  //   },
+  //   notation: {
+  //     color: 'primary',
+  //     image: (chapterIndex, statementIndex) => (
+  //       <TipsAndUpdatesRoundedIcon
+  //         className={showedItems[chapterIndex].showedChapter === true
+  //           && showedItems[chapterIndex].showedStatements[statementIndex] === true
+  //           ? 'text-[#0288d1]' : 'text-gray-700'} />
+  //     ),
+  //     contentBackground: 'bg-[#77c7f2]'
+  //   },
+  //   proposition: {
+  //     color: '#6da484',
+  //     image: (chapterIndex, statementIndex) => (
+  //       <TipsAndUpdatesRoundedIcon
+  //         className={showedItems[chapterIndex].showedChapter === true
+  //           && showedItems[chapterIndex].showedStatements[statementIndex] === true
+  //           ? 'text-white' : 'text-[#6da484]'} />
+  //     ),
+  //     contentBackground: 'bg-[#6da484]'
+  //   },
+  //   theorem: {
+  //     color: '#5bb561',
+  //     image: (chapterIndex, statementIndex) => (
+  //       <NotificationsActiveRoundedIcon
+  //         className={showedItems[chapterIndex].showedChapter === true
+  //           && showedItems[chapterIndex].showedStatements[statementIndex] === true
+  //           ? 'text-white' : 'text-[#5bb561]'} />
+  //     ),
+  //     contentBackground: 'bg-[#7cab7f]'
+  //   },
 
-    note: {
-      color: 'green',
-      image: (chapterIndex, statementIndex) => (
-        <TipsAndUpdatesRoundedIcon
-          className={showedItems[chapterIndex].showedChapter === true
-            && showedItems[chapterIndex].showedStatements[statementIndex] === true
-            ? 'text-[#0288d1]' : 'text-gray-700'} />
-      ),
-      contentBackground: 'bg-[#77c7f2]'
-    },
-    'thought-bubble': {
-      color: 'primary',
-      image: (chapterIndex, statementIndex) => (
-        <TipsAndUpdatesRoundedIcon
-          className={showedItems[chapterIndex].showedChapter === true
-            && showedItems[chapterIndex].showedStatements[statementIndex] === true
-            ? 'text-[#0288d1]' : 'text-gray-700'} />
-      ),
-      contentBackground: 'bg-[#77c7f2]'
-    },
-  }
+  //   note: {
+  //     color: 'green',
+  //     image: (chapterIndex, statementIndex) => (
+  //       <TipsAndUpdatesRoundedIcon
+  //         className={showedItems[chapterIndex].showedChapter === true
+  //           && showedItems[chapterIndex].showedStatements[statementIndex] === true
+  //           ? 'text-[#0288d1]' : 'text-gray-700'} />
+  //     ),
+  //     contentBackground: 'bg-[#77c7f2]'
+  //   },
+  //   'thought-bubble': {
+  //     color: 'primary',
+  //     image: (chapterIndex, statementIndex) => (
+  //       <TipsAndUpdatesRoundedIcon
+  //         className={showedItems[chapterIndex].showedChapter === true
+  //           && showedItems[chapterIndex].showedStatements[statementIndex] === true
+  //           ? 'text-[#0288d1]' : 'text-gray-700'} />
+  //     ),
+  //     contentBackground: 'bg-[#77c7f2]'
+  //   },
+  // }
 
   const numberOfThoughtBubbles = data.map((chapter) => (
     chapter.statements.filter((statement) => (statement.type === 'thought-bubble')).length
@@ -239,7 +240,12 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
                         borderColor: statementProps[statement.type].color
                       }}
                       onClick={() => toggleStatement(chapterIndex, statementIndex)}>
-                      {statementProps[statement.type].image(chapterIndex, statementIndex)}
+                      {React.cloneElement(statementProps[statement.type].icon,
+                        {
+                          className: showedItems[chapterIndex].showedChapter === true
+                            && showedItems[chapterIndex].showedStatements[statementIndex] === true
+                            ? statementProps[statement.type].clicked : statementProps[statement.type].unclicked
+                        })}
                     </TimelineDot>
 
                     {statementIndex !== chapter.statements.length - 1
@@ -265,7 +271,7 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
                         && statement.content !== ""
                         && <div className={`relative text-black ${statementProps[statement.type].contentBackground} p-3 rounded-xl`}>
                           <Latex>
-                            {statement.content}
+                            {statement.content ? statement.content : ''}
                           </Latex>
                           <div itemID='proof-and-implications-button' className='flex justify-end'>
                             {statement.type === 'theorem'
@@ -316,7 +322,7 @@ export default function SubjectMap({ data }: { data: Chapter[] }) {
                                     </b>`}
                                 </Latex>
                                 <Latex>
-                                  {implication.content}
+                                  {implication.content ? implication.content : ''}
                                 </Latex>
                                 <div itemID='implication-proof-button' className='flex justify-end'>
                                   {implication.type === 'theorem'

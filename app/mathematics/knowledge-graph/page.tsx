@@ -1,12 +1,10 @@
-import NetworkGraph from '@components/network-graph'
+import KnowledgeGraph from '@components/knowledge-graph';
+import graph from '@models/knowledge-graph'
 
-import data from '@models/knowledge-graph'
-// import data from '@models/mathematics/subject-dependencies'
-
-export default function Mathematics() {
+const App = () => {
   return (
-    <div className=''>
-      <NetworkGraph data={data} width={125} />
-    </div>
-  )
+    <KnowledgeGraph graph={graph} radius={50} />
+  );
 };
+
+export default App;

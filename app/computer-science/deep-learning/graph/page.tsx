@@ -1,11 +1,11 @@
-import NetworkGraph from '@components/network-graph'
+import KnowledgeGraph from '@components/knowledge-graph'
 
 import data from '@models/computer-science/architecture-dependencies'
 
 export default function Mathematics() {
   return (
     <div>
-      <NetworkGraph data={data} />
+      <KnowledgeGraph graph={data} />
     </div>
   )
 };

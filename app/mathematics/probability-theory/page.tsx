@@ -1,5 +1,5 @@
-import timeline from '@models/mathematics/probability-theory';
-import SubjectMap from '@components/subject-map';
+import timeline from '@models/mathematics/timelines/probability-theory';
+import SubjectMap from '@components/subject-timeline';
 
 export default function ProbabilityTheory() {
   return (

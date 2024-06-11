@@ -1,5 +1,5 @@
-import timeline from '@models/mathematics/real-analysis';
-import SubjectMap from '@components/subject-map';
+import timeline from '@models/mathematics/timelines/real-analysis';
+import SubjectMap from '@components/subject-timeline';
 
 export default function RealAnalysis() {
   return (

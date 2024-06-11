@@ -1,7 +1,7 @@
 'use client'
 
 import timeline from '@models/computer-science/deep-learning';
-import SubjectMap from '@components/subject-map';
+import SubjectMap from '@components/subject-timeline';
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation';

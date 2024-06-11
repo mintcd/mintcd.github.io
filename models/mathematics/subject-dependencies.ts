@@ -1,61 +1,71 @@
-export default [
-  {
-    name: `Set Theory`,
-    color: `#6883ba`,
-    parents: []
-  },
-  {
-    name: `Linear Algebra`,
-    parents: [`Set Theory`]
-  },
-  {
-    name: `Topology`,
-    parents: [`Set Theory`]
-  },
-  {
-    name: `Abstract Algebra`,
-    parents: [`Set Theory`]
-  },
-  {
-    name: `Real Analysis`,
-    href: `real-analysis`,
-    parents: [`Topology`]
-  },
-  {
-    name: `Functional Analysis`,
-    parents: [`Linear Algebra`, 'Real Analysis']
-  },
-  {
-    name: `Calculus`,
-    parents: [`Real Analysis`]
+export default {
+  vertices: [
+    {
+      name: `Set Theory`,
+      color: `#6883ba`,
+      href: 'set-theory'
+    },
+    {
+      name: `Linear Algebra`,
+      color: `#6883ba`,
+    },
+    {
+      name: `Topology`,
+      color: `#6883ba`,
+    },
+    {
+      name: `Abstract Algebra`,
+      color: `#6883ba`,
+    },
+    {
+      name: `Real Analysis`,
+      href: `mathematics/real-analysis`,
+      color: `#6883ba`,
+    },
+    {
+      name: `Functional Analysis`,
+      color: `#6883ba`,
+    },
+    {
+      name: `Calculus`,
+      color: `#6883ba`,
 
-  },
-  {
-    name: `Measure Theory`,
-    href: `measure-theory`,
-    parents: [`Real Analysis`]
-  },
-  {
-    name: `Probability Theory`,
-    parents: [`Measure Theory`]
-
-  },
-  {
-    name: `Optimization`,
-    parents: [`Real Analysis`]
-  },
-
-  {
-    name: `Statistics`,
-    parents: [`Probability Theory`]
-  },
-  {
-    name: `Stochastic Process`,
-    parents: [`Probability Theory`]
-  },
-  {
-    name: `Markov Chain`,
-    parents: [`Stochastic Process`]
-
-  },
-] as Vertex[]
+    },
+    {
+      name: `Measure Theory`,
+      href: `measure-theory`,
+      color: `#6883ba`,
+    },
+    {
+      name: `Probability Theory`,
+      color: `#6883ba`,
+    },
+    {
+      name: `Optimization`,
+      color: `#6883ba`,
+    },
+    {
+      name: `Statistics`,
+      color: `#6883ba`,
+    },
+    {
+      name: `Stochastic Processes`,
+      color: `#6883ba`,
+    },
+  ],
+  edges: [
+    { source: 'Set Theory', target: 'Linear Algebra' },
+    { source: 'Set Theory', target: 'Abstract Algebra' },
+    { source: 'Set Theory', target: 'Topology' },
+    { source: 'Set Theory', target: 'Topology' },
+    { source: 'Topology', target: 'Real Analysis' },
+    { source: 'Linear Algebra', target: 'Functional Analysis' },
+    { source: 'Real Analysis', target: 'Functional Analysis' },
+    { source: 'Real Analysis', target: 'Calculus' },
+    { source: 'Real Analysis', target: 'Measure Theory' },
+    { source: 'Real Analysis', target: 'Optimization' },
+    { source: 'Measure Theory', target: 'Probability Theory' },
+    { source: 'Probability Theory', target: 'Statistics' },
+    { source: 'Probability Theory', target: 'Stochastic Processes' },
+  ]
+} as Graph

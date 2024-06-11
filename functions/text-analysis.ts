@@ -1,10 +1,11 @@
+import { createCanvas } from 'canvas';
+
 export function getTextWidth(text: string, fontSize: number, fontFamily: string) {
-  const canvas = document.createElement('canvas');
+  const canvas = createCanvas(200, 200); // Adjust dimensions as needed
   const context = canvas.getContext('2d');
   if (context) {
     context.font = `${fontSize}px ${fontFamily}`;
-    const width = context.measureText(text).width;
-    return width
+    return context.measureText(text).width;
   }
-  return 200;
+  return 0;
 }

@@ -1,5 +1,8 @@
 declare module 'd3'
 declare module 'katex'
+declare module 'dagre'
+declare module 'cytoscape'
+
 
 type Chapter = {
     name: string,
@@ -16,19 +19,20 @@ type Section = {
 }
 
 
-type Graph = Vertex[]
+type Graph = {
+    vertices: Vertex[],
+    edges: Relation[]
+}
 
 type Vertex = {
     // Basic Properties
     key?: string,
     name: string,
     abbreviation?: string,
-    type: Type,
+    type: StatementType,
     implications?: Vertex[] = []
 
     // Graph properties
-    children?: string[],
-    parents?: string[] = [],
     depth?: number = 0,
     short?: string,
     proof?: string,
@@ -38,7 +42,7 @@ type Vertex = {
     otherNames?: string[],
     href?: string
     notation?: string[],
-    content: string = ""
+    content?: string = ""
 
     // Taxonomy properties
     field?: string | string[],
@@ -58,13 +62,20 @@ type Vertex = {
 type Edge = {
     source: Vertex,
     target: Vertex
-    type?: RelationType
+    relation: RelationType
+}
+
+type EdgeCoordinate = {
+    source: VertexCoordinate,
+    target: VertexCoordinate
 }
 
 
 type VertexCoordinate = {
     x: number
     y: number
+    fx: number
+    fy: number
 }
 
 type StatementType =

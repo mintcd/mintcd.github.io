@@ -1,5 +1,5 @@
-import timeline from '@models/mathematics/statistics';
-import SubjectMap from '@components/subject-map';
+import timeline from '@models/mathematics/timelines/statistics';
+import SubjectMap from '@components/subject-timeline';
 
 export default function Statistics() {
   return (

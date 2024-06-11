@@ -1,4 +1,4 @@
-import NetworkGraph from '@components/network-graph'
+import KnowledgeGraph from '@components/knowledge-graph'
 
 import data from '@models/mathematics/subject-dependencies'
 import Terminology from '@components/terminology'
@@ -13,7 +13,7 @@ export default function Mathematics() {
         </a>
       </div>
       <Terminology data={objects} category='all' />
-      <NetworkGraph data={data} />
+      <KnowledgeGraph graph={data} radius={50} />
     </div>
   )
 };

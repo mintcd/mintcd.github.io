@@ -8,7 +8,7 @@ type Chapter = {
     name: string,
     content?: string,
     description?: string,
-    sections?: Section[]
+    sections?: Section[],
     notations?: string[]
     statements: Vertex[] = []
 }

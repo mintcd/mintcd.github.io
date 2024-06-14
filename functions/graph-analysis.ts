@@ -96,6 +96,7 @@ function getAvailableWidthAtHeight(radius: number, height: number) {
   // Use the Pythagorean theorem to calculate the half-width at a given height
   return 2 * Math.sqrt(radius * radius - height * height);
 }
+
 export function breakLinesForCircle(terms: Vertex[], radius: number, fontSize: number, fontFamily: string): Vertex[] {
   return terms.map(term => {
     // Split the text into lines based on the maximum width at each height
@@ -109,7 +110,7 @@ export function breakLinesForCircle(terms: Vertex[], radius: number, fontSize: n
       const word = words[i];
       const testLine = currentLine + ' ' + word;
       const testWidth = getTextWidth(testLine, fontSize, fontFamily);
-      const maxWidth = getAvailableWidthAtHeight(radius, currentHeight + lineIndex * fontSize);
+      const maxWidth = 2 * Math.sqrt(radius * radius - (currentHeight + lineIndex * fontSize) * currentHeight + lineIndex * fontSize);
 
       if (testWidth <= maxWidth) {
         currentLine = testLine;

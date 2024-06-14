@@ -45,7 +45,7 @@ type Vertex = {
     content?: string = ""
 
     // Taxonomy properties
-    field?: string | string[],
+    fields?: string[],
     chapter?: string
 
     // Style properties

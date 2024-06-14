@@ -13,7 +13,7 @@ export default function Terminology({ data, category }: { data: Vertex[], catego
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [filteredTerms, setFilteredTerms] = useState<Vertex[]>(category === 'all'
     ? data
-    : data.filter(term => term.field ? term.field.includes(category) : false));
+    : data.filter(term => term.fields ? term.fields.includes(category) : false));
 
   const groupedTerms: { [key: string]: Vertex[] } = {};
   filteredTerms.forEach((term: Vertex) => {
@@ -54,7 +54,7 @@ export default function Terminology({ data, category }: { data: Vertex[], catego
 
   function filterTerms(query: string, category: string | null) {
     let filtered = data.filter(term => {
-      if (category && term.field && !term.field.includes(category)) return false;
+      if (category && term.fields && !term.fields.includes(category)) return false;
       if (query.trim()) {
         const fuse = new Fuse([term], {
           keys: ['name'],

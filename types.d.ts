@@ -15,7 +15,8 @@ type Chapter = {
 
 type Section = {
     name: string,
-    content: string = ""
+    content?: string = ""
+    statements: Vertex[] = []
 }
 
 

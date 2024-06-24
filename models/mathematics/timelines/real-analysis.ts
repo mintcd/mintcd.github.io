@@ -31,7 +31,6 @@ export default [
   },
   {
     name: `The Real Numbers`,
-    notations: [],
     statements: [
       {
         name: `the incompleteness of $\\QQ$`,
@@ -93,13 +92,13 @@ export default [
         name: `The $\\epsilon$-principle`,
         type: `theorem`,
         content: `If $x,y\\in\\RR$ and for any $\\epsilon>0$, $|x-y|<\\epsilon$, then $x=y$.`,
-        dependants: []
+        key: '',
       },
       {
         name: `Archimedian Property`,
         type: `theorem`,
         content: `If $x, y\\in\\mathbb{R}$ and $x > 0$, then $\\exist n \\in \\mathbb{N}$ such that $nx > y$.`,
-        dependants: []
+        key: '',
       },
       {
         name: `Density of $\\mathbb{Q}$`,

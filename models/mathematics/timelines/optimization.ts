@@ -1,7 +1,6 @@
 export default [
   {
     name: `Introduction to Optimization`,
-    notations: [],
     statements: [
       {
         name: `Optimization taxonomy`,
@@ -23,16 +22,6 @@ export default [
   },
   {
     name: `Smooth and Constrained Problems`,
-    notations: [
-      {
-        name: `Optimization problem`,
-        content: ``
-      },
-      {
-        name: `The set of constraints`,
-        content: `$K$`
-      }
-    ],
     statements: [
       {
         name: `General Form of a Smooth Problem`,

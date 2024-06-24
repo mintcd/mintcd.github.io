@@ -1,11 +1,11 @@
 export default [
     {
         name: `Topological Spaces and Continuous Functions`,
-        notations: [],
         statements: [
             {
                 name: `1`,
                 type: `definition`,
+                key: '',
                 content: `Let $X$ be a set. A collection $\\mathcal{T}\\subseteq\\mathcal{P}(X)$ is called a topology on $X$ if $\\mathcal{T}$ satisfies the following properties $\\\\ \\text{1. }$ $\\varnothing\\in\\mathcal{T}$ and $X\\in\\mathcal{T}.$ $\\\\ \\text{2. }$ $\\mathcal{T}$ is closed under finite intersections. That is, given an. $X$ is also called a $\\textbf{topological space}$. A subset $U$ of $X$ that it in $\\mathcal{T}$ is called an $\\textbf{open set}$. A subset $V$ of $V$ is $\\textbf{closed}$ if $X\\setminus V$ is open.`,
                 short: `A collection $\\mathcal{T}\\subseteq\\mathcal{P}(X)$ is called a topology on $X$ if it contains $\\varnothing$ and $X$, and is closed under unions and finite intersections. $X$ is also called a $\\textbf{topological space}$. Any $U\\in\\mathcal{T}$ is called an $\\textbf{open set}$. Any $V$ is closed $\\textbf{closed}$ if $X\\setminus V$ is open.`,
 

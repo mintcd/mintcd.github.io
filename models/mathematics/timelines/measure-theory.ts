@@ -115,7 +115,7 @@ export default [
                   </br>
                   1) $\\mu(\\varnothing) = 0$
                   </br>
-                  2) ($\\sigma$-addictivity) For every family $\\{A_i\\}_{i\\in\\N}$ of disjoint measurable subsets, we have
+                  2) ($\\sigma$-additivity) For every family $\\{A_i\\}_{i\\in\\N}$ of disjoint measurable subsets, we have
                   $$\\mu\\left(\\bigcup\\limits_{i=1}^\\infty A_i\\right) = \\sum\\limits_{i=1}^\\infty \\mu(A_i).$$`,
         dependants: [],
         implications: [
@@ -151,7 +151,7 @@ export default [
       {
         name: `measurable function`,
         type: `definition`,
-        content: `Let $(\\Omega, \\F)$ and $(\\Gamma, \\G)$ be mesurable spaces. A function $f:\\Omega\\to\\Gamma$ is measurable $\\F\\to\\G$ if 
+        content: `Let $(\\Omega, \\F)$ and $(\\Gamma, \\G)$ be measurable spaces. A function $f:\\Omega\\to\\Gamma$ is measurable $\\F\\to\\G$ if 
         $$\\forall G\\in\\G, f^{-1}(G)\\in\\F.$$
         If $\\B$ has been explicated, we say that $f$ is $\\F$-measurable.`,
         dependants: [],

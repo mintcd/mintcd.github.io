@@ -23,7 +23,7 @@ type Graph = {
 
 type Vertex = {
     // Basic Properties
-    key: string,
+    key?: string,
     name: string,
     abbreviation?: string,
     type: string,

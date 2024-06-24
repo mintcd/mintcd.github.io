@@ -290,7 +290,7 @@ export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9 }: { g
       .distance(radius * 2)  // Increased from radius
       .id(function (node) {
         const vertex = node as Vertex
-        return vertex.key
+        return vertex.key ? vertex.key : ''
       }))
 
     simulation.force('manyBody', forceManyBody().strength(-500))  // Changed from -100

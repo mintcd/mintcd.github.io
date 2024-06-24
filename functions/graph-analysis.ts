@@ -8,7 +8,7 @@ export function getEdges(vertices: Vertex[]): Edge[] {
       vertex.parents.forEach(parent => {
         edges.push({
           source: parent.key,
-          target: vertex.key,
+          target: vertex.key ? vertex.key : '',
           relation: parent.relation
         });
       });

@@ -1,98 +1,133 @@
 'use client'
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState, KeyboardEvent } from 'react';
 import { createRoot } from 'react-dom/client';
-import * as d3 from 'd3';
-import dagre from 'dagre'
 
-import statementProps from '@styles/statement-props';
+import { D3DragEvent, extent } from 'd3';
+import { Selection, select } from 'd3-selection'
+import { drag } from 'd3-drag'
+import { zoom, zoomIdentity, zoomTransform } from 'd3-zoom'
+import { forceSimulation, forceLink, forceCenter, forceCollide, forceRadial, forceManyBody } from 'd3-force';
+
+import dagre from 'dagre';
+
+import { statementProps } from '@styles/statement-props';
 import Latex from '@components/latex';
+import { breakLinesForCircle, getEdges } from '@functions/graph-analysis';
 
+export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9 }: { graph: Vertex[], radius?: number, fontSize?: number }) {
 
-import { breakLinesForCircle } from '@functions/graph-analysis'
+  const contentRef = useRef(null);
+  const graphRef = useRef<SVGSVGElement>(null);
 
-const KnowledgeGraph = ({ graph, radius }: { graph: Graph, radius: number }) => {
-  const svgRef = useRef<SVGSVGElement>(null);
+  const [graphRendered, setGraphRendered] = useState(false)
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [shownContent, setShownContent] = useState<Vertex | null>(null)
+  const graphSize = {
+    width: typeof window !== 'undefined' && window.visualViewport ? window.visualViewport.width * 0.9 : 500,
+    height: typeof window !== 'undefined' && window.visualViewport ? window.visualViewport.height : 500,
+  }
 
-  const graphWidth = (typeof window !== 'undefined' && window.visualViewport)
-    ? window.visualViewport.width
-    : 1500;
-  const graphHeight = (typeof window !== 'undefined' && window.visualViewport)
-    ? window.visualViewport.height
-    : 750;
+  const padding = 4;
 
-  const fontSize = 14;
-  const padding = 4; // Add some padding to the foreignObject
+  let vertices: Vertex[] = breakLinesForCircle(graph, radius, fontSize, "Arial") as Vertex[];
+  let edges = getEdges(graph);
 
-  let vertices = graph.vertices;
-  const edges = graph.edges;
-
-  vertices = breakLinesForCircle(vertices, radius, fontSize, "Arial");
   const dagreGraph = new dagre.graphlib.Graph();
-
-  // Set an object for the graph label
   dagreGraph.setGraph({
-    rankdir: 'TB', // Top to bottom
-    nodesep: 50, // Separation between nodes
-    edgesep: 10, // Separation between edges
-    ranksep: 50, // Separation between ranks
+    rankdir: 'TB', // Top to bottom direction
+    nodesep: 1,
+    edgesep: 1,   // Example value less than default
+    ranksep: 1,     // Example value less than default
   });
 
-  // Default to assigning a new object as a label for each edge.
-  dagreGraph.setDefaultEdgeLabel(() => ({}));
-
-  // Add nodes to the graph
-  vertices.forEach((vertex) => {
-    dagreGraph.setNode(vertex.name, {
+  vertices.forEach((vertex: Vertex) => {
+    dagreGraph.setNode(vertex.key, {
       width: radius,
       height: radius,
       ...vertex,
     });
   });
 
-  // Add edges to the graph
-  edges.forEach((edge) => {
+  edges.forEach((edge: Edge) => {
     dagreGraph.setEdge(edge.source, edge.target, {
-      label: edge.relation,
+      // label: edge.relation,
       ...edge,
     });
   });
 
-  // Compute the layout
-  dagre.layout(dagreGraph);
+  dagre.layout(dagreGraph)
 
-  // Update vertices with dagre computed layout
-  vertices = vertices.map((vertex) => ({
+  vertices = vertices.map((vertex: Vertex) => ({
     ...vertex,
-    x: dagreGraph.node(vertex.name).x,
-    y: dagreGraph.node(vertex.name).y,
+    x: dagreGraph.node(vertex.key).x,
+    y: dagreGraph.node(vertex.key).y,
   }));
 
+
   useEffect(() => {
-    const svg = d3.select(svgRef.current)
-      .attr("width", graphWidth)
-      .attr("height", graphHeight);
+    // Select the current svg element and use it as the graph
 
-    const simulation = d3.forceSimulation(vertices)
-      .force("link", d3.forceLink(edges).id((d: Vertex) => d.name).distance(3 * radius))
-      .force("center", d3.forceCenter(graphWidth / 2, graphHeight / 2))
-      .force("charge", d3.forceManyBody())
-      .force("collide", d3.forceCollide(radius + 10));
+    const svg = select(graphRef.current as SVGSVGElement)
+      .attr('width', graphSize.width)
+      .attr('height', graphSize.height)
 
-    const links = svg
-      .selectAll("line")
-      .data(edges)
-      .join("line")
-      .style("stroke", "#aaa")
-      .attr("marker-end", "url(#arrow)");
+    const graph = svg.append("g")
 
-    // Arrow styling for links
-    svg
-      .append("svg:defs")
-      .append("svg:marker")
+    const zoomBehavior = zoom<SVGSVGElement, unknown>()
+      .scaleExtent([0.1, 1.3])
+      .filter((event) => {
+        // Allow zooming on wheel events and not on other events like drag
+        return event.type === 'wheel' || event.type === 'dblclick';
+      })
+      .on('zoom', (event) => {
+        graph.attr('transform', event.transform);
+      });
+
+    const handleZoom = (event: WheelEvent) => {
+      event.preventDefault();
+
+      const svg = select(graphRef.current as SVGSVGElement);
+      const currentTransform = zoomTransform(graphRef.current as SVGSVGElement);
+      const sensitivity = 0.001;
+
+      const svgBounds = (graphRef.current as SVGSVGElement).getBoundingClientRect();
+      const mouseX = event.clientX - svgBounds.left;
+      const mouseY = event.clientY - svgBounds.top;
+
+      const scaleFactor = 1 - event.deltaY * sensitivity;
+      const newScale = currentTransform.k * scaleFactor;
+      const constrainedScale = Math.max(0.1, Math.min(newScale, 1.3));
+
+      const x = currentTransform.x;
+      const y = currentTransform.y;
+      const k = currentTransform.k;
+
+      const newX = mouseX - (mouseX - x) * (constrainedScale / k);
+      const newY = mouseY - (mouseY - y) * (constrainedScale / k);
+
+      const newTransform = zoomIdentity
+        .translate(newX, newY)
+        .scale(constrainedScale);
+
+
+      svg
+        .transition()
+        .duration(50)
+        .call(zoomBehavior.transform as any, newTransform);
+    };
+
+    svg.call(zoomBehavior as any)
+      .on("wheel.zoom", handleZoom)
+      .on('dblclick.zoom', null);
+
+    // Style markers
+    const markerStyles = graph.append("svg:defs")
+
+    const defaultMarker = markerStyles.append("svg:marker")
       .attr("id", "arrow")
       .attr("viewBox", "0 -5 10 10")
-      .attr("refX", 8)
+      .attr("refX", 10)
       .attr("markerWidth", 10)
       .attr("markerHeight", 10)
       .attr("orient", "auto")
@@ -100,39 +135,103 @@ const KnowledgeGraph = ({ graph, radius }: { graph: Graph, radius: number }) => 
       .attr("d", "M0,-5L10,0L0,5")
       .style("fill", "#aaa");
 
-    const linkText = svg.append("g")
+    const specializesMarker = markerStyles.append("svg:marker")
+      .attr("id", "arrow-specializes")
+      .attr("viewBox", "0 -5 10 10")
+      .attr("refX", 13)
+      .attr("markerWidth", 10)
+      .attr("markerHeight", 10)
+      .attr("orient", "auto")
+      .append("svg:path")
+      .attr("d", "M0,0 L6,-6 L12,0 L6,6 Z")
+      .style("fill", "#aaa");
+
+    const links = graph.selectAll("line")
+      .data(edges)
+      .enter()
+      .append("line")
+      .style("stroke", function (d) {
+        const edge = d as Edge;
+        return edge.relation && edge.relation === 'specializes' ? "#aaa" : "#aaa";
+      })
+      .attr("marker-end", function (d) {
+        const edge = d as Edge;
+        return edge.relation && edge.relation === 'specializes' ? "url(#arrow-specializes)" : "url(#arrow)";
+      });
+
+
+    const linkText = graph.append("g")
       .attr("class", "link-texts")
       .selectAll("text")
       .data(edges)
-      .enter().append("text")
+      .enter()
+      .append("text")
       .attr("class", "link-text")
       .attr("dy", -5)
       .attr("text-anchor", "middle")
-      .text((d: Edge) => d.relation ? d.relation : '');
+      .text(function (d) {
+        const edge = d as Edge;
+        // return edge.relation !== undefined ? edge.relation : '';
+        return ''
+      });
 
-    const nodes = svg.append("g")
-      .attr("class", "vertex")
+    const nodes = graph
       .selectAll(".node")
-      .data(vertices) // Use nodeLayoutInfo instead of vertices
+      .data(vertices)
       .enter()
       .append("g")
       .attr("class", "node")
-      .attr("transform", (d: Vertex) => `translate(${d.x},${d.y})`)
+
+    const gradients = graph.append('defs')
+      .append('linearGradient')
+      .attr('id', 'definition-theorem')
+      .attr('x1', '0%')
+      .attr('y1', '0%')
+      .attr('x2', '100%')
+      .attr('y2', '0%');
+
+    gradients.append('stop')
+      .attr('offset', '0%')
+      .style('stop-color', '#0288d1');
+
+    gradients.append('stop')
+      .attr('offset', '100%')
+      .style('stop-color', '#5bb561');
 
     const shapes = nodes.append("circle")
       .attr("class", "shape")
       .attr("r", radius)
-      .attr("fill", (d: Vertex) => d.color ? d.color : statementProps[d.type].color)
-      .call(d3.drag()
-        .on("start", dragStarted)
-        .on("drag", dragged)
-        .on("end", dragEnded));
+      .attr("fill", function (d) {
+        const vertex = d as Vertex
+        return vertex.color ? vertex.color : statementProps[vertex.type].color
+      })
 
     const foreignObjects = nodes.append("foreignObject")
-      .attr("width", 2 * radius)
-      .attr("height", 2 * radius)
+      .style('width', 2 * radius)
+      .style('height', 2 * radius)
       .attr("x", -radius)
-      .attr("y", -radius); // Center the foreignObject
+      .attr("y", -radius);
+
+    // const nodeDrag = drag()
+    //   .on("start", function dragStartedHandler(event, d) {
+    //     const vertex = d as Vertex;
+    //     vertex.fx = vertex.x;
+    //     vertex.fy = vertex.y;
+    //   })
+    //   .on("drag", function draggingHandler(event, d) {
+    //     const vertex = d as Vertex;
+    //     vertex.fx = event.x;
+    //     vertex.fy = event.y;
+    //     simulation.alphaTarget(0).restart()
+    //   })
+    //   .on("end", function dragEndedHandler(event, d) {
+    //     const vertex = d as Vertex;
+    //     if (!event.active) simulation.alphaTarget(0);
+    //     vertex.fx = undefined;
+    //     vertex.fy = undefined;
+    //   });
+
+    // nodes.call(nodeDrag as any)
 
     foreignObjects.append("xhtml:div")
       .style("display", "flex")
@@ -141,70 +240,162 @@ const KnowledgeGraph = ({ graph, radius }: { graph: Graph, radius: number }) => 
       .style("justify-content", "center")
       .style("width", "100%")
       .style("height", "100%")
-      .style("padding", `${padding}px 0`) // Add padding to top and bottom
+      .style("padding", `${padding}px 0`)
       .style("color", "white")
       .style("font-size", `${fontSize}px`)
-      .each(function (this: HTMLElement, d: Vertex) {
-        createRoot(this).render(
-          <div className="text-center w-full">
-            {d.lines && d.lines.map((line, i) => (
-              <a key={i} href={d.href}>
-                <Latex>{line}</Latex>
-              </a>
-            ))}
+      .each(function (this, d) {
+        const vertex = d as Vertex
+        const container = this as HTMLElement
+        createRoot(container).render(
+          <div className={`text-center w-full hover:font-bold hover:cursor-pointer
+                            ${shownContent && shownContent.name === vertex.name ? 'font-bold' : ''}`}
+            onClick={function handleClick(event) {
+              setShownContent(vertex);
+              setMousePosition({
+                x: event.clientX,
+                y: event.clientY,
+              });
+              console.log(mousePosition)
+            }}>
+            {vertex.lines
+              && vertex.lines.map((line, i) => (
+                <Latex key={i}>
+                  {line}
+                </Latex>
+              ))
+            }
           </div>
         );
-      });
+      })
+
+    const simulation = forceSimulation(vertices)
+    simulation.alphaDecay(0.5)
+
+    simulation.force('fixed-root', forceRadial(0, graphSize.width / 2, radius)
+      .strength(function (d) {
+        const vertex = d as Vertex
+        return vertex === vertices[0] ? 2 : 0
+      }))
+    simulation.force('center', forceCenter(graphSize.width / 2, graphSize.height / 2))
+
+    simulation.force('link', forceLink(edges)
+      .distance(radius * 1.5)  // Increased from radius
+      .id(function (node) {
+        const vertex = node as Vertex
+        return vertex.key
+      }))
+
+    // simulation.force('manyBody', forceManyBody().strength(-500))  // Changed from -100
+
+    simulation.force('collide', forceCollide(1.25 * radius))
 
     simulation.on("tick", () => {
       links
-        .attr("x1", (d: EdgeCoordinate) => {
-          const angle = Math.atan2(d.target.y - d.source.y, d.target.x - d.source.x);
-          return d.source.x + radius * Math.cos(angle);
+        .attr("x1", (d) => {
+          const edge = d as any
+          const angle = Math.atan2(edge.target.y - edge.source.y, edge.target.x - edge.source.x);
+          return edge.source.x + radius * Math.cos(angle);
         })
-        .attr("y1", (d: EdgeCoordinate) => {
-          const angle = Math.atan2(d.target.y - d.source.y, d.target.x - d.source.x);
-          return d.source.y + radius * Math.sin(angle);
+        .attr("y1", (d) => {
+          const edge = d as any
+          const angle = Math.atan2(edge.target.y - edge.source.y, edge.target.x - edge.source.x);
+          return edge.source.y + radius * Math.sin(angle);
         })
-        .attr("x2", (d: EdgeCoordinate) => {
-          const angle = Math.atan2(d.source.y - d.target.y, d.source.x - d.target.x);
-          return d.target.x + radius * Math.cos(angle);
+        .attr("x2", (d) => {
+          const edge = d as any
+          const angle = Math.atan2(edge.source.y - edge.target.y, edge.source.x - edge.target.x);
+          return edge.target.x + radius * Math.cos(angle);
         })
-        .attr("y2", (d: EdgeCoordinate) => {
-          const angle = Math.atan2(d.source.y - d.target.y, d.source.x - d.target.x);
-          return d.target.y + radius * Math.sin(angle);
+        .attr("y2", (d) => {
+          const edge = d as any
+          const angle = Math.atan2(edge.source.y - edge.target.y, edge.source.x - edge.target.x);
+          return edge.target.y + radius * Math.sin(angle);
         });
 
       linkText
-        .attr("x", (d: EdgeCoordinate) => (d.source.x + d.target.x) / 2)
-        .attr("y", (d: EdgeCoordinate) => (d.source.y + d.target.y) / 2);
+        .attr("x", function (d) {
+          const edge = d as any
+          return (edge.source.x + edge.target.x) / 2
+        })
+        .attr("y", function (d) {
+          const edge = d as any
+          return (edge.source.y + edge.target.y) / 2
+        });
+      nodes.attr("transform", function (d) {
+        const vertex = d as VertexCoordinate;
+        vertex.x = Math.max(radius, Math.min(graphSize.width - radius, vertex.x));
+        vertex.y = Math.max(radius, Math.min(graphSize.height - radius, vertex.y));
+        return `translate(${vertex.x},${vertex.y})`;
+      });
+    })
 
-      nodes
-        .attr("transform", (d: VertexCoordinate) => `translate(${d.x},${d.y})`);
-    });
-
-    function dragStarted(event: any, d: VertexCoordinate) {
-      if (!event.active) simulation.alphaTarget(0.3).restart();
-      d.fx = d.x;
-      d.fy = d.y;
-    }
-
-    function dragged(event: any, d: VertexCoordinate) {
-      d.fx = event.x;
-      d.fy = event.y;
-    }
-
-    function dragEnded(event: any, d: VertexCoordinate) {
-      if (!event.active) simulation.alphaTarget(0);
-    }
+    setGraphRendered(true)
 
     return () => {
-      svg.selectAll('*').remove();
+      graph.selectAll('*').remove();
       simulation.stop();
     };
+  }, [graphRendered]);
+
+  // useEffect(() => {
+  //   if (graphRendered === true && sizeAdjusted === false) {
+  //     setSizeAdjusted(true)
+  //     const xRange = extent(vertices, (v: Vertex) => v.x) as [number, number];
+  //     const yRange = extent(vertices, (v: Vertex) => v.y) as [number, number];
+
+  //     setGraphSize({
+  //       width: (xRange[1] - xRange[0] + 2 * radius) * 5,
+  //       height: (yRange[1] - yRange[0] + 2 * radius) * 5,
+  //     });
+
+  //   } else {
+  //     setGraphRendered(true)
+  //   }
+  // })
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (contentRef.current && !(contentRef.current as HTMLElement).contains(event.target as Node)) {
+        setShownContent(null);
+      }
+    }
+
+    function escHandler(event: globalThis.KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setShownContent(null);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', escHandler);
+
+    // Clean up
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', escHandler);
+    };
+
   });
 
-  return <svg ref={svgRef}></svg>;
-};
+  return (
+    <div className='flex flex-col items-center justify-center h-screen'>
+      <div className='w-[90vw] flex flex-col items-center justify-center bg-slate-200 overflow-hidden'>
+        <svg ref={graphRef} className='graph-container' />
+      </div>
 
-export default KnowledgeGraph;
+
+      {shownContent !== null && shownContent.content && (
+        <div
+          className={`fixed bg-orange-200 z-50 rounded-md animate-fadeIn p-5
+            max-w-[600px]`}
+          style={{ top: `${mousePosition.y}px`, left: `${mousePosition.x}px` }}
+          ref={contentRef}
+        >
+          <Latex>
+            {shownContent.content ? shownContent.content : ''}
+          </Latex>
+        </div>
+      )}
+    </div>
+  );
+};

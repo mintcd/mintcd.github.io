@@ -3,7 +3,7 @@ import graph from '@models/knowledge-graph'
 
 const App = () => {
   return (
-    <KnowledgeGraph graph={graph} radius={50} />
+    <KnowledgeGraph graph={graph} />
   );
 };
 

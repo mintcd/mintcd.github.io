@@ -21,8 +21,16 @@ module.exports = {
         'silver': '#C0C0C0', // silver
         'button': '#3399FF', //vibrant blue
         'teal': '#008080',
-        'middlegreen': '#4cb8b4'
-      }
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+      },
+      animation: {
+        fadeIn: 'fadeIn 0.3s ease-out',
+      },
     },
   },
   darkMode: 'class',

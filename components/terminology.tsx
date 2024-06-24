@@ -5,7 +5,6 @@ import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import { GoSearch } from 'react-icons/go';
 import Fuse from 'fuse.js';
 import Latex from '@components/latex';
-import 'katex/dist/katex.min.css';
 
 export default function Terminology({ data, category }: { data: Vertex[], category: Category }) {
   const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({});
@@ -73,9 +72,9 @@ export default function Terminology({ data, category }: { data: Vertex[], catego
   return (
     <div className='m-5'>
       <div className="my-1 text-center mb-8 flex justify-center items-center">
-        <h2 className="text-2xl font-bold cursor-pointer mr-2">
+        {/* <h2 className="text-2xl font-bold cursor-pointer mr-2">
           Terminology
-        </h2>
+        </h2> */}
 
         <div className="cursor-pointer">
           <GoSearch size={20} onClick={() => setSearchQuery('')} />

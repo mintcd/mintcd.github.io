@@ -1,69 +1,66 @@
-declare module 'd3'
-declare module 'katex'
+// declare module 'katex'
 declare module 'dagre'
-declare module 'cytoscape'
-
 
 type Chapter = {
     name: string,
     content?: string,
     description?: string,
     sections?: Section[],
-    notations?: string[]
-    statements: Vertex[] = []
+    notations?: string[],
+    statements: Vertex[]
 }
 
 type Section = {
     name: string,
-    content?: string = ""
-    statements: Vertex[] = []
+    content?: string,
+    statements: Vertex[]
 }
-
 
 type Graph = {
     vertices: Vertex[],
-    edges: Relation[]
+    edges: Edge[]
 }
 
 type Vertex = {
     // Basic Properties
-    key?: string,
+    key: string,
     name: string,
     abbreviation?: string,
-    type: StatementType,
-    implications?: Vertex[] = []
+    type: string,
+    implications?: Vertex[],
 
     // Graph properties
-    depth?: number = 0,
+    parents?: { key: string, relation?: RelationType }[],
+    depth?: number,
     short?: string,
-    proof?: string,
-    implication?: Vertex[]
+    implication?: Vertex[],
 
     // Knowledge properties
+    proof?: string,
     otherNames?: string[],
-    href?: string
+    href?: string,
     notation?: string[],
-    content?: string = ""
+    content?: string,
 
     // Taxonomy properties
     fields?: string[],
-    chapter?: string
+    chapter?: string,
 
     // Style properties
     color?: string,
-    lines?: string[] = []
+    lines?: string[],
     fx?: number,
     fy?: number,
-    x?: number = 0,
-    y?: number = 0,
-    height?: number = 75,
-    width?: number = 150,
+    x?: number,
+    y?: number,
+    height?: number,
+    width?: number
 }
 
 type Edge = {
-    source: Vertex,
-    target: Vertex
-    relation: RelationType
+    source: string,
+    target: string,
+    relation?: RelationType
 }
 
 type EdgeCoordinate = {
@@ -71,11 +68,10 @@ type EdgeCoordinate = {
     target: VertexCoordinate
 }
 
-
 type VertexCoordinate = {
-    x: number
-    y: number
-    fx: number
+    x: number,
+    y: number,
+    fx: number,
     fy: number
 }
 
@@ -92,10 +88,10 @@ type StatementType =
     | 'theorem'
 
 type Category = 'all' | 'real-analysis' | 'probability-theory' | 'measure-theory' | 'stochastic-processes'
-type Type = 'metric' | 'architecture' | "dataset" | 'problem' | 'mechanism' | StatementType
+type Type = 'metric' | 'architecture' | 'dataset' | 'problem' | 'mechanism' | StatementType
 type SubjectType = 'mathematics' | 'computer-science' | 'philosophy'
 
-type RelationType =     // A -[RelationType]-> B
+type RelationType =
     'composited-in'
     | 'included-in'
     | 'derives'

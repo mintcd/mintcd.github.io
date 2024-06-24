@@ -1,21 +1,47 @@
 import { getTextWidth } from "./text-analysis";
 
-// export function extractEdges(vertices: Vertex[]) {
-//   const edges: { source: string, target: string }[] = [];
+export function getEdges(vertices: Vertex[]): Edge[] {
+  const edges: Edge[] = [];
 
-//   // Iterate over each vertex
-//   vertices.forEach(vertex => {
-//     // If the vertex has children
-//     if (vertex.parents) {
-//       // Iterate over each child and create an edge
-//       vertex.parents.forEach(parent => {
-//         edges.push({ source: parent, target: vertex.name });
-//       });
-//     }
-//   });
+  vertices.forEach(vertex => {
+    if (vertex.parents && vertex.parents.length > 0) {
+      vertex.parents.forEach(parent => {
+        edges.push({
+          source: parent.key,
+          target: vertex.key,
+          relation: parent.relation
+        });
+      });
+    }
+  });
 
-//   return edges;
-// }
+  return edges;
+}
+
+export function computeGraphDepth(graph: Graph, vertexName?: string): number {
+  if (vertexName === undefined) {
+    const targetVertices = graph.edges.map(edge => edge.target);
+    vertexName = graph.vertices.filter(vertex => !targetVertices.includes(vertex.name))[0].name;
+  }
+  // console.log(vertexName)
+  // Find all edges where the current vertex is the source
+  const outgoingEdges = graph.edges.filter(edge => edge.source === vertexName);
+  // console.log(graph.edges)
+  // If no outgoing edges, the depth is 0
+  if (outgoingEdges.length === 0) {
+    return 0;
+  }
+
+  // Compute depth of each target vertex and find the maximum depth
+  let maxDepth = 0;
+  for (const edge of outgoingEdges) {
+    const depth = 1 + computeGraphDepth(graph, edge.target);
+    if (depth > maxDepth) {
+      maxDepth = depth;
+    }
+  }
+  return maxDepth;
+}
 
 // export function computeNodeDepths(terms: Vertex[]): Vertex[] {
 //   // Create a map of node names to their corresponding nodes
@@ -92,10 +118,6 @@ export function breakLines(terms: Vertex[], maxWidth: number, fontSize: number, 
   });
 }
 
-function getAvailableWidthAtHeight(radius: number, height: number) {
-  // Use the Pythagorean theorem to calculate the half-width at a given height
-  return 2 * Math.sqrt(radius * radius - height * height);
-}
 
 export function breakLinesForCircle(terms: Vertex[], radius: number, fontSize: number, fontFamily: string): Vertex[] {
   return terms.map(term => {

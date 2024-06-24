@@ -5,8 +5,21 @@ import TextSnippetRoundedIcon from '@mui/icons-material/TextSnippetRounded';
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 import GradeRoundedIcon from '@mui/icons-material/GradeRounded';
 
+export const gradients = (
+  <defs>
+    <linearGradient id="definitionTheorem" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style={{ stopColor: '#0288d1', stopOpacity: 1 }} />
+      <stop offset="100%" style={{ stopColor: '#5bb561', stopOpacity: 1 }} />
+    </linearGradient>
+    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style={{ stopColor: '#77c7f2', stopOpacity: 1 }} />
+      <stop offset="100%" style={{ stopColor: 'grey', stopOpacity: 1 }} />
+    </linearGradient>
+    {/* Add more gradients as needed */}
+  </defs>
+);
 
-export default {
+export const statementProps = {
   axiom: {
     color: '#0288d1',
     icon: <GradeRoundedIcon />,
@@ -26,6 +39,14 @@ export default {
 
   definition: {
     color: '#0288d1',
+    icon: <TipsAndUpdatesRoundedIcon />,
+    clicked: 'text-white',
+    unclicked: 'text-[#0288d1]',
+    contentBackground: 'bg-[#aad7ef]'
+  },
+
+  "definition-theorem": {
+    color: 'url(#definition-theorem)',
     icon: <TipsAndUpdatesRoundedIcon />,
     clicked: 'text-white',
     unclicked: 'text-[#0288d1]',
@@ -83,10 +104,12 @@ export default {
     unclicked: 'text-gray-700',
     contentBackground: 'bg-[#77c7f2]'
   },
-} as { [key in StatementType]: {
-  color: string,
-  icon: JSX.Element,
-  clicked: string,
-  unclicked: string,
-  contentBackground: string
-} } 
+} as {
+  [key: string]: {
+    color: string,
+    icon: JSX.Element,
+    clicked: string,
+    unclicked: string,
+    contentBackground: string
+  }
+} 

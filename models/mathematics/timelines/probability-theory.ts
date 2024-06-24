@@ -122,7 +122,7 @@ export default
             <br/>
             1) $f(x)\\ge0, \\forall x\\in\\mathbb{R}$;
             <br/>
-            2) For any $a,b\\in\\mathbb{R}$ and $a<b$, we have $F_X(b)-F_X(a) = \\int_a^b f_X(x)\\,\\mathrm{d}x$.
+            2) For any $a,b\\in\\mathbb{R}$ and $a<b$, we have $F_X(b)-F_X(a) = \\int_a^b f_X(x)\\,\\dx$.
             Then $X$ is absolutely continuous.`,
             },
             {

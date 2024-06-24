@@ -2,7 +2,7 @@
 
 import data from '@models/computer-science/compiler-design-phases';
 import KnowledgeGraph from '@components/knowledge-graph';
-import ast from '@models/computer-science/ast';
+// import ast from '@models/computer-science/ast';
 import Latex from '@components/latex';
 import { useState } from 'react';
 
@@ -53,9 +53,9 @@ export default function SubjectNotes() {
                 : (data[shownChapter].sections !== undefined &&
                   data[shownChapter].sections?.[shownSection].content)) || ''}
             </Latex>
-            {data[shownChapter].name === 'Semantic Analysis' && (
+            {/* {data[shownChapter].name === 'Semantic Analysis' && (
               <KnowledgeGraph key={shownChapter} graph={ast} />
-            )}
+            )} */}
           </>
         )}
       </div>

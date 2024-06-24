@@ -212,26 +212,26 @@ export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9 }: { g
       .attr("x", -radius)
       .attr("y", -radius);
 
-    // const nodeDrag = drag()
-    //   .on("start", function dragStartedHandler(event, d) {
-    //     const vertex = d as Vertex;
-    //     vertex.fx = vertex.x;
-    //     vertex.fy = vertex.y;
-    //   })
-    //   .on("drag", function draggingHandler(event, d) {
-    //     const vertex = d as Vertex;
-    //     vertex.fx = event.x;
-    //     vertex.fy = event.y;
-    //     simulation.alphaTarget(0).restart()
-    //   })
-    //   .on("end", function dragEndedHandler(event, d) {
-    //     const vertex = d as Vertex;
-    //     if (!event.active) simulation.alphaTarget(0);
-    //     vertex.fx = undefined;
-    //     vertex.fy = undefined;
-    //   });
+    const nodeDrag = drag()
+      .on("start", function dragStartedHandler(event, d) {
+        const vertex = d as Vertex;
+        vertex.fx = vertex.x;
+        vertex.fy = vertex.y;
+      })
+      .on("drag", function draggingHandler(event, d) {
+        const vertex = d as Vertex;
+        vertex.fx = event.x;
+        vertex.fy = event.y;
+        simulation.alphaTarget(0).restart()
+      })
+      .on("end", function dragEndedHandler(event, d) {
+        const vertex = d as Vertex;
+        if (!event.active) simulation.alphaTarget(0);
+        vertex.fx = undefined;
+        vertex.fy = undefined;
+      });
 
-    // nodes.call(nodeDrag as any)
+    nodes.call(nodeDrag as any)
 
     foreignObjects.append("xhtml:div")
       .style("display", "flex")

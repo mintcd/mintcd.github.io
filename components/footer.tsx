@@ -5,7 +5,7 @@ import Link from "next/link";
 export default function Footer() {
 
   return (
-    <div className={`w-full bg-slate-100 p-2 mt-4
+    <div className={` bg-slate-100 p-2 mt-4
                     flex flex-wrap items-center justify-between`}>
       <span className={``}>
         <div itemID='slogan-container'

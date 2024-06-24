@@ -15,7 +15,6 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" rel="preload">
-      {/* <body className="bg-gradient-to-r from-cyan-200 to-blue-200"> */}
       <body>
         <Nav />
         <main className={`mt-4 min-h-[1000px]`}>

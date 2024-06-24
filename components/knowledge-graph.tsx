@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useState, KeyboardEvent } from 'react';
 import { createRoot } from 'react-dom/client';
+import CenterFocusStrongRoundedIcon from '@mui/icons-material/CenterFocusStrongRounded';
 
 import { D3DragEvent, extent } from 'd3';
 import { Selection, select } from 'd3-selection'
@@ -27,8 +28,6 @@ export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9 }: { g
     width: typeof window !== 'undefined' && window.visualViewport ? window.visualViewport.width * 0.9 : 500,
     height: typeof window !== 'undefined' && window.visualViewport ? window.visualViewport.height : 500,
   }
-
-  const padding = 4;
 
   let vertices: Vertex[] = breakLinesForCircle(graph, radius, fontSize, "Arial") as Vertex[];
   let edges = getEdges(graph);
@@ -75,7 +74,7 @@ export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9 }: { g
     const graph = svg.append("g")
 
     const zoomBehavior = zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.1, 1.3])
+      .scaleExtent([0.1, 3])
       .filter((event) => {
         // Allow zooming on wheel events and not on other events like drag
         return event.type === 'wheel' || event.type === 'dblclick';
@@ -97,7 +96,7 @@ export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9 }: { g
 
       const scaleFactor = 1 - event.deltaY * sensitivity;
       const newScale = currentTransform.k * scaleFactor;
-      const constrainedScale = Math.max(0.1, Math.min(newScale, 1.3));
+      const constrainedScale = Math.max(0.1, Math.min(newScale, 3));
 
       const x = currentTransform.x;
       const y = currentTransform.y;
@@ -117,9 +116,20 @@ export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9 }: { g
         .call(zoomBehavior.transform as any, newTransform);
     };
 
+    const resetZoom = () => {
+      svg.transition()
+        .duration(50)
+        .call(zoomBehavior.transform as any, zoomIdentity);
+    };
+
+    const resetButton = document.getElementById('reset-button');
+    if (resetButton) {
+      resetButton.addEventListener('click', resetZoom);
+    }
+
     svg.call(zoomBehavior as any)
       .on("wheel.zoom", handleZoom)
-      .on('dblclick.zoom', null);
+      .on('click.resetButton', resetZoom);
 
     // Style markers
     const markerStyles = graph.append("svg:defs")
@@ -137,8 +147,8 @@ export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9 }: { g
 
     const specializesMarker = markerStyles.append("svg:marker")
       .attr("id", "arrow-specializes")
-      .attr("viewBox", "0 -5 10 10")
-      .attr("refX", 13)
+      .attr("viewBox", "0 -6 12 12")
+      .attr("refX", 12)
       .attr("markerWidth", 10)
       .attr("markerHeight", 10)
       .attr("orient", "auto")
@@ -201,6 +211,7 @@ export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9 }: { g
     const shapes = nodes.append("circle")
       .attr("class", "shape")
       .attr("r", radius)
+      .attr("stroke", "none")
       .attr("fill", function (d) {
         const vertex = d as Vertex
         return vertex.color ? vertex.color : statementProps[vertex.type].color
@@ -240,7 +251,6 @@ export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9 }: { g
       .style("justify-content", "center")
       .style("width", "100%")
       .style("height", "100%")
-      .style("padding", `${padding}px 0`)
       .style("color", "white")
       .style("font-size", `${fontSize}px`)
       .each(function (this, d) {
@@ -271,21 +281,21 @@ export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9 }: { g
     const simulation = forceSimulation(vertices)
     simulation.alphaDecay(0.5)
 
-    simulation.force('fixed-root', forceRadial(0, graphSize.width / 2, radius)
-      .strength(function (d) {
-        const vertex = d as Vertex
-        return vertex === vertices[0] ? 2 : 0
-      }))
+    // simulation.force('fixed-root', forceRadial(0, graphSize.width / 2, radius)
+    //   .strength(function (d) {
+    //     const vertex = d as Vertex
+    //     return vertex === vertices[0] ? 2 : 0
+    //   }))
     simulation.force('center', forceCenter(graphSize.width / 2, graphSize.height / 2))
 
     simulation.force('link', forceLink(edges)
-      .distance(radius * 1.5)  // Increased from radius
+      .distance(radius * 2)  // Increased from radius
       .id(function (node) {
         const vertex = node as Vertex
         return vertex.key
       }))
 
-    // simulation.force('manyBody', forceManyBody().strength(-500))  // Changed from -100
+    simulation.force('manyBody', forceManyBody().strength(-500))  // Changed from -100
 
     simulation.force('collide', forceCollide(1.25 * radius))
 
@@ -337,22 +347,6 @@ export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9 }: { g
     };
   }, [graphRendered]);
 
-  // useEffect(() => {
-  //   if (graphRendered === true && sizeAdjusted === false) {
-  //     setSizeAdjusted(true)
-  //     const xRange = extent(vertices, (v: Vertex) => v.x) as [number, number];
-  //     const yRange = extent(vertices, (v: Vertex) => v.y) as [number, number];
-
-  //     setGraphSize({
-  //       width: (xRange[1] - xRange[0] + 2 * radius) * 5,
-  //       height: (yRange[1] - yRange[0] + 2 * radius) * 5,
-  //     });
-
-  //   } else {
-  //     setGraphRendered(true)
-  //   }
-  // })
-
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (contentRef.current && !(contentRef.current as HTMLElement).contains(event.target as Node)) {
@@ -379,7 +373,11 @@ export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9 }: { g
 
   return (
     <div className='flex flex-col items-center justify-center h-screen'>
-      <div className='w-[90vw] flex flex-col items-center justify-center bg-slate-200 overflow-hidden'>
+
+      <div className='flex flex-col items-center justify-center bg-slate-200 overflow-hidden'>
+        <div id='reset-button' className='cursor-pointer w-full'>
+          <CenterFocusStrongRoundedIcon className='w-10 h-10' />
+        </div>
         <svg ref={graphRef} className='graph-container' />
       </div>
 

@@ -236,7 +236,7 @@ export default
       parents: [{
         key: "stochastic-process"
       }],
-      content: "Let $X := \\{X_t\\}_{t\\in T}$. Usually, $T=\\NN$ equipped with $2^T$ as a $\\sigma$-algebra, or $T=\\RR_+$ equipped with $\\B(\\RR_+)$."
+      content: "Let $(\\Omega, \\F, \\PP)$ be a probability space and $X := \\{X_t\\}_{t\\in T}$ be a stochastic process. Let $\\{\\F_t\\}$ be an increasing class of sub-$\\sigma$-algebras of $\\FF$, called a filtration. The process $X$ is said to be adapted to $\\{\\F_t\\}$ if $X_t$ is $\\F_t$-measurable, for every $t\\in T$."
     },
     {
       name: "Jointly measurable stochastic process",

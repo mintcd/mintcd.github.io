@@ -16,7 +16,7 @@ export default function Mathematics() {
         <Terminology data={objects} category='all' />
       </div>
       <div className='w-full'>
-        <KnowledgeGraph graph={data} radius={50} />
+        <KnowledgeGraph graph={data} />
       </div>
     </div>
   );

@@ -118,18 +118,16 @@ export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9 }: { g
 
     const resetZoom = () => {
       svg.transition()
-        .duration(50)
+        .duration(100)
         .call(zoomBehavior.transform as any, zoomIdentity);
     };
 
-    const resetButton = document.getElementById('reset-button');
-    if (resetButton) {
-      resetButton.addEventListener('click', resetZoom);
-    }
+
+    const resetButton = select('#reset-button')
+    resetButton.on('click', resetZoom);
 
     svg.call(zoomBehavior as any)
       .on("wheel.zoom", handleZoom)
-      .on('click.resetButton', resetZoom);
 
     // Style markers
     const markerStyles = graph.append("svg:defs")
@@ -375,10 +373,9 @@ export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9 }: { g
     <div className='flex flex-col items-center justify-center h-screen'>
 
       <div className='flex flex-col items-center justify-center bg-slate-200 overflow-hidden'>
-        <div id='reset-button' className='cursor-pointer w-full'>
-          <CenterFocusStrongRoundedIcon className='w-10 h-10' />
-        </div>
-        <svg ref={graphRef} className='graph-container' />
+        <CenterFocusStrongRoundedIcon id='reset-button' className='cursor-pointer bg-transparent self-start m-4 w-10 h-10' />
+        <svg ref={graphRef} className='graph-container relative top-0 left-0'>
+        </svg>
       </div>
 
 

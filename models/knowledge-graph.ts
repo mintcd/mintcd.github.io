@@ -35,6 +35,24 @@ export default
       content: "A collection of subsets of $\\Omega$ such that\n                  <br/> \n                    1) $\\Omega\\in\\F$\n                  <br/>\n                    2) $A\\in\\F$ implies $A^c\\in\\F$\n                  <br/>\n                    3) $\\{A_n\\}_{n\\in\\NN}\\subset\\F$ implies $\\cup_{n=1}^{\\infty}A_n\\in\\F$\n                  <br/>\n                  The doublet $(\\Omega,\\F)$ is called a measurable space.\n                  "
     },
     {
+      name: 'Filtration',
+      key: 'filtration',
+      type: 'definition',
+      parents: [{
+        key: 'sigma-algebra'
+      }],
+      content: "A family of $\\sigma$-algebras \\{\\F_t:t\\in T\\}  is a filtration on $(\\Omega,\\F)$ if $t\\in T$ and $s\\le t$ imply $\\F_s\\subset\\F_t\\subset\\F$. The tuple $(\\Omega,\\F, \\{\\F_t:t\\in T\\},\\PP)$ is called a filtered probability space."
+    },
+    {
+      name: 'Stopping time',
+      key: 'stopping-time',
+      type: 'definition',
+      parents: [{
+        key: 'filtration'
+      }],
+      content: "Let $(\\Omega,\\F, \\{\\F_t:t\\in T\\},\\PP)$ be a filtered probability space. A random variable $\\tau: \\Omega\\to T$ is called a stopping time if for every $t\\in T$, $$\\{\\tau \\le t\\}\\in\\F_t.$$"
+    },
+    {
       name: "Generated $\\sigma$-algebra",
       key: "generated-sigma-algebra",
       type: "definition-theorem",
@@ -197,7 +215,8 @@ export default
       {
         key: 'measurable-function'
       }],
-      content: "Let $(\\Omega, \\F, \\PP)$ be a probability space. A function $X : \\Omega\\to\\RR^d$ is called a random variable if $X$ is $(\\F\\to\\B(\\RR^d))$-measurable. We will write $\\B_X := \\B(\\RR^d))$, the Borel $\\sigma$-algebra associated to $X$."
+      content: "Let $(\\Omega, \\F, \\PP)$ be a probability space. A function $X : \\Omega\\to\\RR^d$ is called a random variable if $X$ is $(\\F\\to\\B(\\RR^d))$-measurable. We will write $\\B_X := \\B(\\RR^d))$, the Borel $\\sigma$-algebra associated to $X$.",
+      examples: ["If $A$ is an event, then $\\1_A$ is a random variable. Therefore, $\\PP(A) = \\EE[\\1_A]$"]
     },
     {
       name: "Distribution",
@@ -210,13 +229,36 @@ export default
     },
     {
       name: "Expectation",
-      key: "expectation of a random variable",
+      key: "expectation",
       type: "definition",
       parents: [
         {
           key: 'random-variable'
         }
-      ]
+      ],
+      content: "Let $(\\Omega, \\F, \\PP)$ be a probability space and $X$ be a real-valued random variable. The expectation of $X$ is defined as $$\\EE[X] = \\int_\\Omega X\\d\\PP.$$"
+    },
+    {
+      name: "Expectation conditioned on an event",
+      key: "expectation-conditioned-on-an-event",
+      type: "definition",
+      parents: [
+        {
+          key: "expectation"
+        }
+      ],
+      content: "Let $(\\Omega, \\F, \\PP)$ be a probability space and $X$ be a real-valued random variable. The expectation of $X$ conditioned on an event $A$ is defined as $$\\EE[X | A] = \\int_A X\\d\\PP.$$"
+    },
+    {
+      name: "Expectation conditioned on a $\\sigma$-algebra",
+      key: "expectation-conditioned-on-an-event",
+      type: "definition-theorem",
+      parents: [
+        {
+          key: "expectation-conditioned-on-an-event"
+        }
+      ],
+      content: "Let $(\\Omega, \\F, \\PP)$ be a probability space, $X$ be a real-valued random variable and $\\G$ be a sub-$\\sigma$-algebra of $\\F$. Then there exists a unique linear operator $\\EE[\\cdot | \\G] : L^1(\\F)\\to L^1(\\G)$ such that $$\\EE[\\EE[X|\\G] | A] = \\EE[X | A], \\forall X\\in L^1(\\F), A\\in \\F.$$"
     },
     {
       name: "Stochastic process",
@@ -230,13 +272,33 @@ export default
       content: "Let $T$ be an index set. A stochastic process is a collection of random variables $\\{X_t\\}_{t\\in T}$, where $$X_t: \\Omega\\to\\RR^d.$$ We consider $T=\\NN$ equipped with the $\\sigma$-algebra $\\T = 2^T$ or $T=\\RR_+$ equipped with $\\T = \\B(\\RR_+)$. The tuple $(T,\\T)$ is called the time space, the tuple $(\\RR^d,\\B(\\RR^d))$ is called the state space."
     },
     {
+      name: "Random time",
+      key: 'random-time',
+      type: 'definition',
+      parents: [{
+        key: "stochastic-process"
+      }]
+    },
+    {
       name: "Adapted stochastic process",
       key: "adapted-stochastic-process",
       type: "definition",
       parents: [{
-        key: "stochastic-process"
+        key: "stochastic-process",
+      },
+      {
+        key: "filtration",
       }],
-      content: "Let $(\\Omega, \\F, \\PP)$ be a probability space and $X := \\{X_t\\}_{t\\in T}$ be a stochastic process. Let $\\{\\F_t\\}$ be an increasing class of sub-$\\sigma$-algebras of $\\FF$, called a filtration. The process $X$ is said to be adapted to $\\{\\F_t\\}$ if $X_t$ is $\\F_t$-measurable, for every $t\\in T$."
+      content: "Let $(\\Omega, \\F, \\PP)$ be a probability space and $X := \\{X_t\\}_{t\\in T}$ be a stochastic process. Let $\\{\\F_t\\}$ be an increasing class of sub-$\\sigma$-algebras of $\\F$, called a filtration. The process $X$ is said to be adapted to $\\{\\F_t\\}$ if $X_t$ is $\\F_t$-measurable, for every $t\\in T$."
+    },
+    {
+      name: "Natural filtration",
+      key: "natural filtration",
+      type: "definition",
+      parents: [{
+        key: "adapted-stochastic-process",
+      },],
+      content: ""
     },
     {
       name: "Jointly measurable stochastic process",
@@ -262,15 +324,32 @@ export default
       parents: [{
         key: "stochastic-process"
       }],
+      content: ``
+    },
+    {
+      name: "Martingale",
+      type: "definition",
+      key: "martingale",
+      parents: [{
+        key: "stochastic-process"
+      }],
+      content: "The process $X$ is a martingale with respect to  $\\F$ if $E(X_t∣\\F_s)=X_s$ for all $s,t\\in T$ with $s\\le t$"
     },
     {
       name: "Progressively measurable process",
       key: "progressively-measurable-process",
       type: "definition",
       content: "",
-      parents: [{
-        key: "adapted-stochastic-process"
-      }],
+      parents: [
+        {
+          key: "adapted-stochastic-process",
+          relation: 'specializes'
+        },
+        {
+          key: "jointly-measurable-stochastic-process",
+          relation: 'specializes'
+        }
+      ],
     },
     {
       name: "Diffusion",

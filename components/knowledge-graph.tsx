@@ -386,9 +386,17 @@ export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9 }: { g
           style={{ top: `${mousePosition.y}px`, left: `${mousePosition.x}px` }}
           ref={contentRef}
         >
-          <Latex>
-            {shownContent.content ? shownContent.content : ''}
-          </Latex>
+          {shownContent.content && <Latex>
+            {shownContent.content}
+          </Latex>}
+          <br />
+          {shownContent.examples &&
+            <div>
+              <Latex>
+                {shownContent.examples}
+              </Latex>
+            </div>}
+
         </div>
       )}
     </div>

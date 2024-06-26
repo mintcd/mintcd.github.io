@@ -41,6 +41,7 @@ type Vertex = {
     href?: string,
     notation?: string[],
     content?: string,
+    examples?: string[]
 
     // Taxonomy properties
     fields?: string[],

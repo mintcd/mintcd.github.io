@@ -100,8 +100,7 @@ export default
       key: "measure",
       parents: [{
         key: "measurable-space"
-      }
-      ],
+      }],
       content: "Let $(\\Omega,\\F)$ be a measurable space. A measure is a function $\\mu:\\F\\to[0,\\infty]$ such that\n                  </br>\n                  1) $\\mu(\\varnothing) = 0$\n                  </br>\n                  2) ($\\sigma$-additivity) For every family $\\{A_i\\}_{i\\in\\N}$ of disjoint measurable subsets, we have\n                  $$\\mu\\left(\\bigcup\\limits_{i=1}^\\infty A_i\\right) = \\sum\\limits_{i=1}^\\infty \\mu(A_i).$$"
     },
     {

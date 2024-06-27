@@ -3,9 +3,9 @@
 import { useRef, useEffect, useState, KeyboardEvent } from 'react';
 import { createRoot } from 'react-dom/client';
 import CenterFocusStrongRoundedIcon from '@mui/icons-material/CenterFocusStrongRounded';
+import VertexContent from '@components/statement-content';
 
-import { D3DragEvent, extent } from 'd3';
-import { Selection, select } from 'd3-selection'
+import { select } from 'd3-selection'
 import { drag } from 'd3-drag'
 import { zoom, zoomIdentity, zoomTransform } from 'd3-zoom'
 import { forceSimulation, forceLink, forceCenter, forceCollide, forceRadial, forceManyBody } from 'd3-force';
@@ -16,7 +16,7 @@ import { statementProps } from '@styles/statement-props';
 import Latex from '@components/latex';
 import { breakLinesForCircle, getEdges } from '@functions/graph-analysis';
 
-export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9 }: { graph: Vertex[], radius?: number, fontSize?: number }) {
+export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9, lectureView = false }: { graph: Vertex[], radius?: number, fontSize?: number, lectureView?: boolean }) {
 
   const contentRef = useRef(null);
   const graphRef = useRef<SVGSVGElement>(null);
@@ -65,13 +65,18 @@ export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9 }: { g
 
 
   useEffect(() => {
-    // Select the current svg element and use it as the graph
+    // Hook for SVG Graph Rendering
 
+    // Select the graph container
     const svg = select(graphRef.current as SVGSVGElement)
       .attr('width', graphSize.width)
       .attr('height', graphSize.height)
 
+    // Add graph from container
     const graph = svg.append("g")
+
+    //////////////// Drag behaviors ////////////////////////////////////////////////////
+
 
     const zoomBehavior = zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.1, 3])
@@ -122,14 +127,13 @@ export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9 }: { g
         .call(zoomBehavior.transform as any, zoomIdentity);
     };
 
-
     const resetButton = select('#reset-button')
     resetButton.on('click', resetZoom);
 
     svg.call(zoomBehavior as any)
       .on("wheel.zoom", handleZoom)
 
-    // Style markers
+    /////////////////////////////// Marker Styles /////////////////////////////////////////////////////////
     const markerStyles = graph.append("svg:defs")
 
     const defaultMarker = markerStyles.append("svg:marker")
@@ -182,6 +186,8 @@ export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9 }: { g
         // return edge.relation !== undefined ? edge.relation : '';
         return ''
       });
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     const nodes = graph
       .selectAll(".node")
@@ -257,14 +263,30 @@ export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9 }: { g
         createRoot(container).render(
           <div className={`text-center w-full hover:font-bold hover:cursor-pointer
                             ${shownContent && shownContent.name === vertex.name ? 'font-bold' : ''}`}
-            onClick={function handleClick(event) {
-              setShownContent(vertex);
-              setMousePosition({
-                x: event.clientX,
-                y: event.clientY,
-              });
-              console.log(mousePosition)
-            }}>
+            onMouseEnter={(event) => {
+              if (!lectureView) {
+                setShownContent(vertex);
+                setMousePosition({
+                  x: event.clientX,
+                  y: event.clientY,
+                });
+              }
+
+            }}
+            onMouseLeave={() => {
+              if (!lectureView) {
+                setShownContent(null);
+              }
+
+            }}
+            onClick={() => {
+              if (vertex.href && lectureView === false) {
+                window.open(vertex.href, '_blank');
+              } else {
+                setShownContent(vertex)
+              }
+            }}
+          >
             {vertex.lines
               && vertex.lines.map((line, i) => (
                 <Latex key={i}>
@@ -298,6 +320,13 @@ export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9 }: { g
     simulation.force('collide', forceCollide(1.25 * radius))
 
     simulation.on("tick", () => {
+      nodes.attr("transform", function (d) {
+        const vertex = d as VertexCoordinate;
+        vertex.x = Math.max(radius, Math.min(graphSize.width - radius, vertex.x));
+        vertex.y = Math.max(radius, Math.min(graphSize.height - radius, vertex.y));
+        return `translate(${vertex.x},${vertex.y})`;
+      });
+
       links
         .attr("x1", (d) => {
           const edge = d as any
@@ -329,12 +358,7 @@ export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9 }: { g
           const edge = d as any
           return (edge.source.y + edge.target.y) / 2
         });
-      nodes.attr("transform", function (d) {
-        const vertex = d as VertexCoordinate;
-        vertex.x = Math.max(radius, Math.min(graphSize.width - radius, vertex.x));
-        vertex.y = Math.max(radius, Math.min(graphSize.height - radius, vertex.y));
-        return `translate(${vertex.x},${vertex.y})`;
-      });
+
     })
 
     setGraphRendered(true)
@@ -370,35 +394,41 @@ export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9 }: { g
   });
 
   return (
-    <div className='flex flex-col items-center justify-center h-screen'>
-
-      <div className='flex flex-col items-center justify-center bg-slate-200 overflow-hidden'>
+    <div className='grid grid-cols-5 place-items-center'>
+      <div className={`${lectureView ? 'col-span-3' : 'col-span-5'} w-[90%] 
+                      flex flex-col items-center justify-center 
+                      bg-slate-200 overflow-hidden`}>
         <CenterFocusStrongRoundedIcon id='reset-button' className='cursor-pointer bg-transparent self-start m-4 w-10 h-10' />
         <svg ref={graphRef} className='graph-container relative top-0 left-0'>
         </svg>
       </div>
 
-
-      {shownContent !== null && shownContent.content && (
+      {shownContent !== null && shownContent.content && (lectureView
+        ?
         <div
-          className={`fixed bg-orange-200 z-50 rounded-md animate-fadeIn p-5
-            max-w-[600px]`}
-          style={{ top: `${mousePosition.y}px`, left: `${mousePosition.x}px` }}
+          className={`col-span-2 z-50 rounded-md 
+                      animate-fadeIn mr-5 h-full w-full`}
           ref={contentRef}
         >
-          {shownContent.content && <Latex>
-            {shownContent.content}
-          </Latex>}
-          <br />
-          {shownContent.examples &&
-            <div>
-              <Latex>
-                {shownContent.examples}
-              </Latex>
-            </div>}
-
+          <VertexContent statement={shownContent} />
         </div>
-      )}
+        :
+        <div
+          className={`z-50 rounded-md 
+         animate-fadeIn p-5 max-w-[600px]
+        `}
+          style={{
+            position: 'fixed',
+            top: `${mousePosition.y}px`,
+            left: `${mousePosition.x}px`
+          }}
+          ref={contentRef}
+          onMouseEnter={() => setShownContent(shownContent)}
+          onMouseLeave={() => setShownContent(null)}
+        >
+          <VertexContent statement={shownContent} />
+        </div>)
+      }
     </div>
   );
 };

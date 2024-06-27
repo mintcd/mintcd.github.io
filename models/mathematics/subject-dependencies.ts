@@ -3,7 +3,7 @@ export default [
     name: `Set Theory`,
     key: 'set-theory',
     color: `#6883ba`,
-    href: 'set-theory'
+    href: 'mathematics/set-theory'
   },
   {
     name: `Linear Algebra`,
@@ -56,7 +56,7 @@ export default [
   },
   {
     name: `Measure Theory`,
-    href: `measure-theory`,
+    href: `mathematics/measure-theory`,
     key: 'measure-theory',
     color: `#6883ba`,
     parents: [

@@ -32,7 +32,11 @@ export default
       name: "$\\sigma$-algebra",
       key: "sigma-algebra",
       type: "definition",
-      content: "A collection of subsets of $\\Omega$ such that\n                  <br/> \n                    1) $\\Omega\\in\\F$\n                  <br/>\n                    2) $A\\in\\F$ implies $A^c\\in\\F$\n                  <br/>\n                    3) $\\{A_n\\}_{n\\in\\NN}\\subset\\F$ implies $\\cup_{n=1}^{\\infty}A_n\\in\\F$\n                  <br/>\n                  The doublet $(\\Omega,\\F)$ is called a measurable space.\n                  "
+      fields: ["Measure Theory", "Probability Theory"],
+      content: `A collection of subsets of $\\Omega$ satisfying
+      $$$$ 1) $\\Omega\\in\\F$ .
+      $$$$ 2) (Closure under Complement) $A\\in\\F$ implies $A^c\\in\\F$.
+      $$$$ 3) (Closure under Countable Union) $\\{A_n\\}_{n\\in\\NN}\\subset\\F$ implies $\\cup_{n=1}^{\\infty}A_n\\in\\F$.`
     },
     {
       name: 'Filtration',
@@ -41,8 +45,10 @@ export default
       parents: [{
         key: 'sigma-algebra'
       }],
+      fields: ["Probability Theory"],
       content: "A family of $\\sigma$-algebras \\{\\F_t:t\\in T\\}  is a filtration on $(\\Omega,\\F)$ if $t\\in T$ and $s\\le t$ imply $\\F_s\\subset\\F_t\\subset\\F$. The tuple $(\\Omega,\\F, \\{\\F_t:t\\in T\\},\\PP)$ is called a filtered probability space."
     },
+
     {
       name: 'Stopping time',
       key: 'stopping-time',
@@ -56,6 +62,7 @@ export default
       name: "Generated $\\sigma$-algebra",
       key: "generated-sigma-algebra",
       type: "definition-theorem",
+      fields: ["Measure Theory"],
       parents: [
         {
           key: "sigma-algebra"
@@ -67,6 +74,7 @@ export default
       name: "Borel $\\sigma$-algebra",
       key: "borel-sigma-algebra",
       type: "definition",
+      fields: ["Measure Theory"],
       parents: [
         {
           key: "sigma-algebra"
@@ -82,22 +90,37 @@ export default
           key: "sigma-algebra"
         }
       ],
+      fields: ["Measure Theory"],
       content: "Let $\\F$ be a $\\sigma$-algebra on $\\Omega$. The doublet $(\\Omega,\\F)$ is called a measurable space."
+    },
+    {
+      name: `Measurability Criterion`,
+      key: `measurability-criterion`,
+      type: `proposition`,
+      fields: ["Measure Theory"],
+      content: `If there is a subset $\\C$ of $2^\\Omega$ such that $\\G = \\sigma(\\C)$ and 
+      $$\\forall G\\in\\G, f^{-1}(G)\\in\\C.$$
+      Then $f$ is measurable.`,
     },
     {
       name: "Measurable function",
       key: "measurable-function",
+      fields: ["Measure Theory"],
       type: "definition",
       parents: [
         {
           key: "measurable-space"
         }
       ],
+      content: `Let $(\\Omega, \\F)$ and $(\\Gamma, \\G)$ be measurable spaces. A function $f:\\Omega\\to\\Gamma$ is measurable $\\F\\to\\G$ if 
+      $$\\forall G\\in\\G, f^{-1}(G)\\in\\F.$$
+      If $\\B$ has been explicated, we say that $f$ is $\\F$-measurable.`,
     },
     {
       name: "Measure",
       type: "definition",
       key: "measure",
+      fields: ["Measure Theory"],
       parents: [{
         key: "measurable-space"
       }],

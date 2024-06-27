@@ -17,7 +17,6 @@ export default function SubjectNotes() {
 
   function handleShownSection(sectionIndex: number) {
     setShownSection(sectionIndex);
-    console.log(shownChapter, shownSection);
   }
 
   return (

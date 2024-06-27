@@ -1,7 +1,36 @@
 import { getTextWidth } from "./text-analysis";
 
+export function getVerticesOfTopic(vertices: Vertex[], topics: string[]) {
+  // Helper function to check if a vertex contains at least one of the specified topics
+  const hasAnyTopic = (vertex: Vertex, topics: string[]) => {
+    if (!vertex.fields) return false;
+    return topics.some(topic => vertex.fields && vertex.fields.includes(topic));
+  };
+
+  // Filter vertices that have at least one of the specified topics
+  const filteredVertices = vertices.filter((vertex: Vertex) => hasAnyTopic(vertex, topics));
+  const filteredVertexKeys = new Set(filteredVertices.map((vertex: Vertex) => vertex.key));
+
+  for (const vertex of filteredVertices) {
+    if (vertex.parents) {
+      for (const parent of vertex.parents) {
+        if (!filteredVertexKeys.has(parent.key)) {
+          const parentVertex = vertices.find((vertex: Vertex) => vertex.key === parent.key);
+          if (parentVertex) {
+            filteredVertices.push(parentVertex);
+            filteredVertexKeys.add(parentVertex.key);
+          }
+        }
+      }
+    }
+  }
+  return filteredVertices;
+}
+
+
+
 export function getEdges(vertices: Vertex[]): Edge[] {
-  const edges: Edge[] = [];
+  let edges: Edge[] = [];
 
   vertices.forEach(vertex => {
     if (vertex.parents && vertex.parents.length > 0) {
@@ -13,6 +42,13 @@ export function getEdges(vertices: Vertex[]): Edge[] {
         });
       });
     }
+
+    edges = edges.filter(function (edge) {
+      return vertices.map(vertex => vertex.key).includes(edge.source)
+    })
+
+    return edges
+
   });
 
   return edges;

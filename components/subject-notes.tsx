@@ -27,7 +27,6 @@ export default function SubjectNotes({ data }: { data: Chapter[] }) {
 
   function handleShownSection(sectionIndex: number) {
     setShownSection(sectionIndex)
-    console.log(shownChapter, shownSection)
   }
 
   return (

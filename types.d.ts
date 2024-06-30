@@ -4,8 +4,19 @@ type Chapter = {
     description?: string,
     sections?: Section[],
     notations?: string[],
-    statements: Vertex[]
+    statements: Statement[]
 }
+
+type Statement =
+    {
+        name: string,
+        type: string,
+        parents?: string[],
+        content?: string,
+        proof?: string,
+        implications?: Statement[]
+    }
+
 
 type Section = {
     name: string,

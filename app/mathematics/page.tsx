@@ -13,10 +13,10 @@ export default function Mathematics() {
         </a>
       </div>
       <div className='mb-4 w-full'>
-        <Terminology data={objects} category='all' />
+        <Terminology data={objects} />
       </div>
       <div className='w-full'>
-        <KnowledgeGraph graph={data} />
+        <KnowledgeGraph graphData={data} />
       </div>
     </div>
   );

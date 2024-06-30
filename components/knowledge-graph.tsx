@@ -2,139 +2,80 @@
 
 import { useRef, useEffect, useState, KeyboardEvent } from 'react';
 import { createRoot } from 'react-dom/client';
-import CenterFocusStrongRoundedIcon from '@mui/icons-material/CenterFocusStrongRounded';
-import VertexContent from '@components/statement-content';
 
+import CenterFocusStrongRoundedIcon from '@mui/icons-material/CenterFocusStrongRounded';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+
+import * as d3 from 'd3'
 import { select } from 'd3-selection'
 import { drag } from 'd3-drag'
 import { zoom, zoomIdentity, zoomTransform } from 'd3-zoom'
 import { forceSimulation, forceLink, forceCenter, forceCollide, forceRadial, forceManyBody } from 'd3-force';
 
-import dagre from 'dagre';
 
 import { statementProps } from '@styles/statement-props';
 import Latex from '@components/latex';
-import { breakLinesForCircle, getEdges } from '@functions/graph-analysis';
+import VertexContent from '@components/statement-content';
+import { breakLinesForCircle, getEdges, initiateLayout, computeNodeDepths, getVerticesOfTopic } from '@functions/graph-analysis';
 
-export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9, lectureView = false }: { graph: Vertex[], radius?: number, fontSize?: number, lectureView?: boolean }) {
+export default function KnowledgeGraph({
+  graphData,
+  radius,
+  fontSize = 9,
+  lectureView = false,
+  filter = false,
+}
+  : { graphData: Graph, radius?: number, fontSize?: number, lectureView?: boolean, filter?: boolean }) {
 
   const contentRef = useRef(null);
   const graphRef = useRef<SVGSVGElement>(null);
+  const dropdownRef = useRef(null);
 
   const [graphRendered, setGraphRendered] = useState(false)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [shownContent, setShownContent] = useState<Vertex | null>(null)
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedField, setSelectedField] = useState<Field | "all-fields">("all-fields");
+
+  const fields = [
+    { value: "all-fields", label: "All Fields" },
+    { value: "measure-theory", label: "Measure Theory" },
+    { value: "real-analysis", label: "Real Analysis" },
+    { value: "probability-theory", label: "Probability Theory" },
+  ];
+
+
   const graphSize = {
-    width: typeof window !== 'undefined' && window.visualViewport ? window.visualViewport.width * 0.9 : 500,
+    width: typeof window !== 'undefined' && window.visualViewport ? window.visualViewport.width * 0.6 : 500,
     height: typeof window !== 'undefined' && window.visualViewport ? window.visualViewport.height : 500,
   }
 
-  let vertices: Vertex[] = breakLinesForCircle(graph, radius, fontSize, "Arial") as Vertex[];
-  let edges = getEdges(graph);
+  if (radius === undefined) {
+    radius = graphSize.width / 30
+  }
 
-  const dagreGraph = new dagre.graphlib.Graph();
-  dagreGraph.setGraph({
-    rankdir: 'TB', // Top to bottom direction
-    nodesep: 1,
-    edgesep: 1,   // Example value less than default
-    ranksep: 1,     // Example value less than default
-  });
+  let vertices = graphData.vertices
+  if (selectedField !== "all-fields") {
+    vertices = getVerticesOfTopic(graphData.vertices, [selectedField])
+  }
+  vertices = breakLinesForCircle(vertices, radius, fontSize, "Arial") as Vertex[];
+  vertices = computeNodeDepths(vertices)
+  vertices = initiateLayout(vertices, 2 * radius, 2 * radius)
 
-  vertices.forEach((vertex: Vertex) => {
-    dagreGraph.setNode(vertex.key, {
-      width: radius,
-      height: radius,
-      ...vertex,
-    });
-  });
+  let edges = getEdges(vertices);
 
-  edges.forEach((edge: Edge) => {
-    dagreGraph.setEdge(edge.source, edge.target, {
-      // label: edge.relation,
-      ...edge,
-    });
-  });
-
-  dagre.layout(dagreGraph)
-
-  vertices = vertices.map((vertex: Vertex) => ({
-    ...vertex,
-    x: dagreGraph.node(vertex.key).x,
-    y: dagreGraph.node(vertex.key).y,
-  }));
-
-
+  // Hook for SVG Graph Rendering
   useEffect(() => {
-    // Hook for SVG Graph Rendering
-
     // Select the graph container
-    const svg = select(graphRef.current as SVGSVGElement)
+    const svgContainer = select(graphRef.current as SVGSVGElement)
       .attr('width', graphSize.width)
       .attr('height', graphSize.height)
 
     // Add graph from container
-    const graph = svg.append("g")
-
-    //////////////// Drag behaviors ////////////////////////////////////////////////////
-
-
-    const zoomBehavior = zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.1, 3])
-      .filter((event) => {
-        // Allow zooming on wheel events and not on other events like drag
-        return event.type === 'wheel' || event.type === 'dblclick';
-      })
-      .on('zoom', (event) => {
-        graph.attr('transform', event.transform);
-      });
-
-    const handleZoom = (event: WheelEvent) => {
-      event.preventDefault();
-
-      const svg = select(graphRef.current as SVGSVGElement);
-      const currentTransform = zoomTransform(graphRef.current as SVGSVGElement);
-      const sensitivity = 0.001;
-
-      const svgBounds = (graphRef.current as SVGSVGElement).getBoundingClientRect();
-      const mouseX = event.clientX - svgBounds.left;
-      const mouseY = event.clientY - svgBounds.top;
-
-      const scaleFactor = 1 - event.deltaY * sensitivity;
-      const newScale = currentTransform.k * scaleFactor;
-      const constrainedScale = Math.max(0.1, Math.min(newScale, 3));
-
-      const x = currentTransform.x;
-      const y = currentTransform.y;
-      const k = currentTransform.k;
-
-      const newX = mouseX - (mouseX - x) * (constrainedScale / k);
-      const newY = mouseY - (mouseY - y) * (constrainedScale / k);
-
-      const newTransform = zoomIdentity
-        .translate(newX, newY)
-        .scale(constrainedScale);
-
-
-      svg
-        .transition()
-        .duration(50)
-        .call(zoomBehavior.transform as any, newTransform);
-    };
-
-    const resetZoom = () => {
-      svg.transition()
-        .duration(100)
-        .call(zoomBehavior.transform as any, zoomIdentity);
-    };
-
-    const resetButton = select('#reset-button')
-    resetButton.on('click', resetZoom);
-
-    svg.call(zoomBehavior as any)
-      .on("wheel.zoom", handleZoom)
+    const svgGraph = svgContainer.append("g")
 
     /////////////////////////////// Marker Styles /////////////////////////////////////////////////////////
-    const markerStyles = graph.append("svg:defs")
+    const markerStyles = svgGraph.append("svg:defs")
 
     const defaultMarker = markerStyles.append("svg:marker")
       .attr("id", "arrow")
@@ -158,7 +99,7 @@ export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9, lectu
       .attr("d", "M0,0 L6,-6 L12,0 L6,6 Z")
       .style("fill", "#aaa");
 
-    const links = graph.selectAll("line")
+    const links = svgGraph.selectAll("line")
       .data(edges)
       .enter()
       .append("line")
@@ -172,7 +113,7 @@ export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9, lectu
       });
 
 
-    const linkText = graph.append("g")
+    const linkText = svgGraph.append("g")
       .attr("class", "link-texts")
       .selectAll("text")
       .data(edges)
@@ -189,14 +130,14 @@ export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9, lectu
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    const nodes = graph
+    const nodes = svgGraph
       .selectAll(".node")
       .data(vertices)
       .enter()
       .append("g")
       .attr("class", "node")
 
-    const gradients = graph.append('defs')
+    const gradients = svgGraph.append('defs')
       .append('linearGradient')
       .attr('id', 'definition-theorem')
       .attr('x1', '0%')
@@ -221,7 +162,8 @@ export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9, lectu
         return vertex.color ? vertex.color : statementProps[vertex.type].color
       })
 
-    const foreignObjects = nodes.append("foreignObject")
+    const foreignObjects = nodes
+      .append("foreignObject")
       .style('width', 2 * radius)
       .style('height', 2 * radius)
       .attr("x", -radius)
@@ -297,27 +239,22 @@ export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9, lectu
           </div>
         );
       })
-
+    /////////////////////////// Simulation //////////////////////////////////////
     const simulation = forceSimulation(vertices)
     simulation.alphaDecay(0.5)
-
-    // simulation.force('fixed-root', forceRadial(0, graphSize.width / 2, radius)
-    //   .strength(function (d) {
-    //     const vertex = d as Vertex
-    //     return vertex === vertices[0] ? 2 : 0
-    //   }))
-    simulation.force('center', forceCenter(graphSize.width / 2, graphSize.height / 2))
-
-    simulation.force('link', forceLink(edges)
-      .distance(radius * 2)  // Increased from radius
-      .id(function (node) {
-        const vertex = node as Vertex
-        return vertex.key ? vertex.key : ''
-      }))
-
-    simulation.force('manyBody', forceManyBody().strength(-500))  // Changed from -100
-
-    simulation.force('collide', forceCollide(1.25 * radius))
+      .force('center', forceCenter(graphSize.width / 2, graphSize.height / 2))
+      .force('link', forceLink(edges)
+        .distance(radius * 2)
+        .id(function (node) {
+          const vertex = node as Vertex
+          return vertex.key ? vertex.key : ''
+        }))
+      .force('collide', forceCollide(1.5 * radius))
+      .force('x', d3.forceX(graphSize.width / 2).strength(0.1))
+      .force('y', d3.forceY().strength(0.1).y(function (d) {
+        const v = d as Vertex
+        return v.depth ? v.depth * 200 : 0
+      }));
 
     simulation.on("tick", () => {
       nodes.attr("transform", function (d) {
@@ -361,18 +298,78 @@ export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9, lectu
 
     })
 
-    setGraphRendered(true)
+    //////////////// Drag behaviors ////////////////////////////////////////////////////
+    const zoomBehavior = zoom<SVGSVGElement, unknown>()
+      .scaleExtent([0.1, 3])
+      .filter((event) => {
+        // Allow zooming on wheel events and not on other events like drag
+        return event.type === 'wheel' || event.type === 'dblclick';
+      })
+      .on('zoom', (event) => {
+        svgGraph.attr('transform', event.transform);
+      });
+
+    const handleZoom = (event: WheelEvent) => {
+      event.preventDefault();
+
+      const svg = select(graphRef.current as SVGSVGElement);
+      const currentTransform = zoomTransform(graphRef.current as SVGSVGElement);
+      const sensitivity = 0.001;
+
+      const svgBounds = (graphRef.current as SVGSVGElement).getBoundingClientRect();
+      const mouseX = event.clientX - svgBounds.left;
+      const mouseY = event.clientY - svgBounds.top;
+
+      const scaleFactor = 1 - event.deltaY * sensitivity;
+      const newScale = currentTransform.k * scaleFactor;
+      const constrainedScale = Math.max(0.1, Math.min(newScale, 3));
+
+      const x = currentTransform.x;
+      const y = currentTransform.y;
+      const k = currentTransform.k;
+
+      const newX = mouseX - (mouseX - x) * (constrainedScale / k);
+      const newY = mouseY - (mouseY - y) * (constrainedScale / k);
+
+      const newTransform = zoomIdentity
+        .translate(newX, newY)
+        .scale(constrainedScale);
+
+      svg
+        .transition()
+        .duration(50)
+        .call(zoomBehavior.transform as any, newTransform);
+    };
+
+    const resetZoom = () => {
+      svgContainer.transition()
+        .duration(100)
+        .call(zoomBehavior.transform as any, zoomIdentity);
+    };
+
+    const resetButton = select('#reset-button')
+    resetButton.on('click', resetZoom);
+
+    svgContainer.call(zoomBehavior as any)
+      .on("wheel.zoom", handleZoom)
 
     return () => {
-      graph.selectAll('*').remove();
+      setGraphRendered(true)
+      svgGraph.selectAll('*').remove();
       simulation.stop();
     };
-  }, [graphRendered]);
+  }, [graphRendered, selectedField]);
+
+
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (contentRef.current && !(contentRef.current as HTMLElement).contains(event.target as Node)) {
         setShownContent(null);
+      }
+
+      if (dropdownRef.current && !(dropdownRef.current as HTMLElement).contains(event.target as Node)) {
+        setIsOpen(false);
       }
     }
 
@@ -394,41 +391,78 @@ export default function KnowledgeGraph({ graph, radius = 30, fontSize = 9, lectu
   });
 
   return (
-    <div className='grid grid-cols-5 place-items-center'>
-      <div className={`${lectureView ? 'col-span-3' : 'col-span-5'} w-[90%] 
+    <div className='grid grid-cols-6 place-items-center'>
+      {filter && <div ref={dropdownRef} id='select' className=' col-span-4 mb-4 w-48'>
+        <div
+          className="bg-white border border-gray-300 rounded-md p-2 flex justify-between items-center cursor-pointer col-span-4"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <span className="text-gray-700">
+            {fields.find(f => f.value === selectedField)?.label}
+          </span>
+          <ArrowDropDownIcon className={`text-gray-500 transition-transform duration-300 ${isOpen ? 'transform rotate-180' : ''}`} />
+        </div>
+        {isOpen && (
+          <div className="absolute w-48 bg-white border border-gray-300 mt-1 rounded-md shadow-lg z-10">
+            {fields.map((field) => (
+              <div
+                key={field.value}
+                className="p-2 hover:bg-gray-100 cursor-pointer"
+                onClick={() => {
+                  setSelectedField(field.value as Field | "all-fields");
+                  setIsOpen(false);
+                }}
+              >
+                {field.label}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>}
+      <div className={`${lectureView ? 'col-span-4' : 'col-span-6'} w-[90%] 
                       flex flex-col items-center justify-center 
-                      bg-slate-200 overflow-hidden`}>
-        <CenterFocusStrongRoundedIcon id='reset-button' className='cursor-pointer bg-transparent self-start m-4 w-10 h-10' />
-        <svg ref={graphRef} className='graph-container relative top-0 left-0'>
-        </svg>
+                     overflow-hidden`}>
+
+
+
+        <div className='bg-slate-200'>
+          <svg ref={graphRef} className='graph-container fill-slate-200'>
+            <foreignObject id='reset-button' className='cursor-pointer w-[50px] h-[50px] translate-x-[25px] translate-y-[25px]'>
+              <CenterFocusStrongRoundedIcon className='w-[50px] h-[50px]' />
+            </foreignObject>
+          </svg>
+        </div>
+
+
       </div>
 
-      {shownContent !== null && shownContent.content && (lectureView
-        ?
-        <div
-          className={`col-span-2 z-50 rounded-md 
-                      animate-fadeIn mr-5 h-full w-full`}
-          ref={contentRef}
-        >
-          <VertexContent statement={shownContent} />
-        </div>
-        :
-        <div
-          className={`z-50 rounded-md 
+      {
+        shownContent !== null && shownContent.content && (lectureView
+          ?
+          <div
+            className={`col-span-2 z-50 rounded-md 
+                      mr-5 h-full w-full`}
+            ref={contentRef}
+          >
+            <VertexContent statement={shownContent} />
+          </div>
+          :
+          <div
+            className={`z-50 rounded-md 
          animate-fadeIn p-5 max-w-[600px]
         `}
-          style={{
-            position: 'fixed',
-            top: `${mousePosition.y}px`,
-            left: `${mousePosition.x}px`
-          }}
-          ref={contentRef}
-          onMouseEnter={() => setShownContent(shownContent)}
-          onMouseLeave={() => setShownContent(null)}
-        >
-          <VertexContent statement={shownContent} />
-        </div>)
+            style={{
+              position: 'fixed',
+              top: `${mousePosition.y}px`,
+              left: `${mousePosition.x}px`
+            }}
+            ref={contentRef}
+            onMouseEnter={() => setShownContent(shownContent)}
+            onMouseLeave={() => setShownContent(null)}
+          >
+            <VertexContent statement={shownContent} />
+          </div>)
       }
-    </div>
+    </div >
   );
 };

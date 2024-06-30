@@ -1,21 +1,35 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import { GoSearch } from 'react-icons/go';
 import Fuse from 'fuse.js';
 import Latex from '@components/latex';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
-export default function Terminology({ data, category }: { data: Vertex[], category: Category }) {
-  const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({});
+export default function Terminology({ data, field }: { data: Term[], field?: Field | 'all-fields' }) {
+  const fields = [
+    { value: "all-fields", label: "All Fields" },
+    { value: "measure-theory", label: "Measure Theory" },
+    { value: "real-analysis", label: "Real Analysis" },
+    { value: "probability-theory", label: "Probability Theory" },
+  ];
+
+  const dropdownRef = useRef(null);
+  const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>(() => {
+    const state: { [key: string]: boolean } = {};
+    for (let i = 65; i <= 90; i++) { // ASCII codes for A-Z
+      state[String.fromCharCode(i)] = true;
+    }
+    return state;
+  });
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [filteredTerms, setFilteredTerms] = useState<Vertex[]>(category === 'all'
-    ? data
-    : data.filter(term => term.fields ? term.fields.includes(category) : false));
+  const [selectedField, setSelectedField] = useState<Field | 'all-fields'>(field ? field : 'all-fields');
+  const [isOpen, setIsOpen] = useState(false);
+  const [filteredTerms, setFilteredTerms] = useState<Term[]>(data);
 
-  const groupedTerms: { [key: string]: Vertex[] } = {};
-  filteredTerms.forEach((term: Vertex) => {
+  const groupedTerms: { [key: string]: Term[] } = {};
+  filteredTerms.forEach((term: Term) => {
     const firstLetter = term.name[0].toUpperCase();
     if (!groupedTerms[firstLetter]) {
       groupedTerms[firstLetter] = [];
@@ -27,33 +41,25 @@ export default function Terminology({ data, category }: { data: Vertex[], catego
   const termsPerColumn = Math.ceil(sortedKeys.length / 3);
 
   function toggleSection(letter: string) {
-    setExpandedSections(prevState => ({
-      ...prevState,
-      [letter]: !prevState[letter]
-    }));
+    let newExpandedSections = { ...expandedSections, [letter]: !expandedSections[letter] };
+    console.log(newExpandedSections);
+    setExpandedSections(newExpandedSections);
   }
+
 
   function handleSearchInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     const query = event.target.value;
     setSearchQuery(query);
-
-    if (!query.trim()) {
-      filterTerms(query, selectedCategory);
-      return;
+    if (query === '') {
+      filterOnTopic()
+    } else {
+      filterOnQuery(query);
     }
 
-    filterTerms(query, selectedCategory);
   }
 
-  function handleCategoryChange(event: React.ChangeEvent<HTMLSelectElement>) {
-    const category = event.target.value;
-    setSelectedCategory(category === 'all' ? null : category);
-    filterTerms(searchQuery, category === 'all' ? null : category);
-  }
-
-  function filterTerms(query: string, category: string | null) {
-    let filtered = data.filter(term => {
-      if (category && term.fields && !term.fields.includes(category)) return false;
+  function filterOnQuery(query: string) {
+    let filtered = filteredTerms.filter(term => {
       if (query.trim()) {
         const fuse = new Fuse([term], {
           keys: ['name'],
@@ -65,68 +71,92 @@ export default function Terminology({ data, category }: { data: Vertex[], catego
       }
       return true;
     });
-
-    setFilteredTerms(filtered);
+    setFilteredTerms(filtered)
   }
 
-  return (
-    <div className='m-5'>
-      <div className="my-1 text-center mb-8 flex justify-center items-center">
-        {/* <h2 className="text-2xl font-bold cursor-pointer mr-2">
-          Terminology
-        </h2> */}
+  function filterOnTopic() {
+    if (selectedField === 'all-fields') {
+      setFilteredTerms(data);
+    } else {
+      setFilteredTerms(data.filter(term => term.fields.includes(selectedField)));
+    }
+  }
 
-        <div className="cursor-pointer">
-          <GoSearch size={20} onClick={() => setSearchQuery('')} />
+  useEffect(() => {
+    filterOnTopic()
+  }, [selectedField, data]);
+
+  return (
+    <div className='max-w-6xl mx-auto px-4 py-8'>
+      <div className="mb-8 text-center">
+        <h2 className="text-3xl font-bold mb-4 text-gray-800">Terminology</h2>
+      </div>
+      <div className='grid grid-cols-5'>
+        <div ref={dropdownRef} id='select' className='col-span-2 mb-4 w-48'>
+          <div
+            className="bg-white border border-gray-300 rounded-md p-2 flex justify-between items-center cursor-pointer col-span-4"
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            <span className="text-gray-700">
+              {fields.find(f => f.value === selectedField)?.label}
+            </span>
+            <ArrowDropDownIcon className={`text-gray-500 transition-transform duration-300 ${isOpen ? 'transform rotate-180' : ''}`} />
+          </div>
+
+          {isOpen && (
+            <div className="absolute w-48 bg-white border border-gray-300 mt-1 rounded-md shadow-lg z-10">
+              {fields.map((field) => (
+                <div
+                  key={field.value}
+                  className="p-2 hover:bg-gray-100 cursor-pointer"
+                  onClick={() => {
+                    setSelectedField(field.value as Field | "all-fields");
+                    setIsOpen(false);
+                  }}
+                >
+                  {field.label}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="relative mx-auto">
+          <GoSearch className="absolute left-3 top-3 text-gray-400" size={20} />
+          <input
+            type="text"
+            placeholder="Search terms..."
+            value={searchQuery}
+            onChange={handleSearchInputChange}
+            className="w-full px-4 py-2 pl-10 pr-4 text-gray-700 bg-white border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+
         </div>
       </div>
-      <div className="text-lg font-bold cursor-pointer mr-2">
+      <div className="text-lg font-semibold text-gray-700 mb-4">
         {filteredTerms.length} terms
       </div>
-      <div key="search-box" className="flex justify-center my-3">
-        <input
-          type="text"
-          placeholder="Search terms..."
-          value={searchQuery}
-          onChange={handleSearchInputChange}
-          className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500 mr-2"
-        />
-        {/* <select
-          value={selectedCategory || 'all'}
-          onChange={handleCategoryChange}
-          className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500"
-        >
-          <option value="all">All Categories</option>
-          {Object.keys(groupedTerms).map(category => (
-            <option key={category} value={category}>
-              {category}
-            </option>
-          ))}
-        </select> */}
-      </div>
-      <div className="grid grid-cols-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {[0, 1, 2].map(columnIndex => (
-          <div key={columnIndex}>
+          <div key={`column-${columnIndex}`} className="space-y-4">
             {sortedKeys.slice(columnIndex * termsPerColumn, (columnIndex + 1) * termsPerColumn).map(letter => (
-              <div key={letter}>
-                <div className="cursor-pointer flex items-center" onClick={() => toggleSection(letter)}>
-                  <span className='mr-3 w-[10px]'>{letter}</span>
-                  {expandedSections[letter] ? <FaChevronDown /> : <FaChevronUp />}
+              <div key={letter} className="bg-white shadow-md rounded-lg overflow-hidden">
+                <div
+                  className="cursor-pointer flex items-center justify-between px-4 py-3 bg-gray-100"
+                  onClick={() => {
+                    console.log("Clicked", letter)
+                    toggleSection(letter)
+                  }}
+                >
+                  <span className='font-bold text-xl text-gray-700'>{letter}</span>
+                  {expandedSections[letter] ? <FaChevronUp className="text-gray-500" /> : <FaChevronDown className="text-gray-500" />}
                 </div>
                 {expandedSections[letter] && (
-                  <ul>
+                  <ul className="divide-y divide-gray-200">
                     {groupedTerms[letter].map((term, index) => (
-                      <li key={index}>
-                        <div>
-                          <Latex>
-                            {term.name}
-                          </Latex>
+                      <li key={index} className="px-4 py-3 hover:bg-gray-50 transition-colors duration-150">
+                        <div className="text-gray-800">
+                          <Latex>{term.name}</Latex>
                         </div>
-                        {/* {term.definition !== "" && <div className="bg-green-200 p-3 rounded-xl">
-                          <Latex>
-                            term.definition
-                          </Latex>
-                        </div>} */}
                       </li>
                     ))}
                   </ul>

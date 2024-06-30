@@ -1,10 +1,46 @@
 import { getTextWidth } from "./text-analysis";
+import dagre from 'dagre';
 
-export function getVerticesOfTopic(vertices: Vertex[], topics: string[]) {
+export function initiateLayout(vertices: Vertex[], width: number, height: number) {
+  const dagreGraph = new dagre.graphlib.Graph();
+  dagreGraph.setGraph({
+    rankdir: 'TB',
+    nodesep: 10,
+    edgesep: 10,
+    ranksep: 10,
+  });
+
+  vertices.forEach((vertex: Vertex) => {
+    dagreGraph.setNode(vertex.key, {
+      width: width,
+      height: height,
+      ...vertex,
+    });
+  });
+
+  const edges = getEdges(vertices)
+
+  edges.forEach((edge: Edge) => {
+    dagreGraph.setEdge(edge.source, edge.target, {
+      ...edge,
+    });
+  });
+
+  dagre.layout(dagreGraph)
+
+  vertices = vertices.map((vertex: Vertex) => ({
+    ...vertex,
+    x: dagreGraph.node(vertex.key).x,
+    y: dagreGraph.node(vertex.key).y,
+  }));
+  return vertices
+}
+
+export function getVerticesOfTopic(vertices: Vertex[], topics: Field[]) {
   // Helper function to check if a vertex contains at least one of the specified topics
-  const hasAnyTopic = (vertex: Vertex, topics: string[]) => {
+  const hasAnyTopic = (vertex: Vertex, topics: Field[]) => {
     if (!vertex.fields) return false;
-    return topics.some(topic => vertex.fields && vertex.fields.includes(topic));
+    return topics.some((topic) => vertex.fields && vertex.fields.includes(topic));
   };
 
   // Filter vertices that have at least one of the specified topics
@@ -79,54 +115,50 @@ export function computeGraphDepth(graph: Graph, vertexName?: string): number {
   return maxDepth;
 }
 
-// export function computeNodeDepths(terms: Vertex[]): Vertex[] {
-//   // Create a map of node names to their corresponding nodes
-//   const termMap = new Map<string, Vertex>();
-//   terms.forEach(term => termMap.set(term.name, term));
+export function computeNodeDepths(terms: Vertex[]): Vertex[] {
+  const termMap = new Map<string, Vertex>();
+  const visited = new Set<string>();
 
-//   // Iterate over each node to compute its depth iteratively
-//   terms.forEach(term => {
-//     const stack = [{ node: term.name, depth: term.depth ?? 0 }];
+  // Create a map of node keys to their corresponding nodes
+  terms.forEach(term => {
+    termMap.set(term.key, term);
+    term.depth = undefined; // Reset depths
+  });
 
-//     while (stack.length > 0) {
-//       const { node, depth } = stack.pop()!;
-//       const currentNode = termMap.get(node)!;
+  // Depth-First Search function
+  function dfs(node: Vertex, depth: number) {
+    if (visited.has(node.key)) return;
+    visited.add(node.key);
 
-//       // Update the depth of the current node
-//       if (currentNode.depth === undefined || depth < currentNode.depth) {
-//         currentNode.depth = depth;
-//       }
+    node.depth = Math.min(node.depth ?? Infinity, depth);
 
-//       // Add parents of the current node to the stack with increased depth
-//       if (currentNode.parents) {
-//         currentNode.parents.forEach(parentName => {
-//           stack.push({ node: parentName, depth: depth - 1 });
-//         });
-//       }
-//     }
-//   });
+    if (node.parents) {
+      node.parents.forEach(parent => {
+        const parentNode = termMap.get(parent.key);
+        if (parentNode) {
+          dfs(parentNode, depth - 1);
+        }
+      });
+    }
+  }
 
-//   const depths = terms.map(term => term.depth).filter(depth => depth !== undefined) as number[];
-//   const minDepth = Math.min(...depths);
+  // Start DFS from each node
+  terms.forEach(term => {
+    if (!visited.has(term.key)) {
+      dfs(term, 0);
+    }
+  });
 
-//   terms.forEach(term => {
-//     term.depth = term.depth !== undefined ? term.depth - minDepth : term.depth
-//   })
+  // Adjust depths to ensure minimum depth is 0
+  const minDepth = Math.min(...Array.from(termMap.values()).map(term => term.depth ?? Infinity));
+  terms.forEach(term => {
+    if (term.depth !== undefined) {
+      term.depth -= minDepth;
+    }
+  });
 
-//   // Last adjust to ensure minimum depth is 0 and correct depth based on parents
-//   terms.forEach(term => {
-//     if (term.parents) {
-//       const parentDepths = term.parents
-//         .map(parent => terms.find(t => t.name === parent)?.depth)
-//         .filter((depth): depth is number => depth !== undefined);
-
-//       if (parentDepths.length > 0) {
-//         term.depth = Math.min(...parentDepths) + 1;
-//       }
-//     }
-//   });
-//   return terms;
-// }
+  return terms;
+}
 
 export function breakLines(terms: Vertex[], maxWidth: number, fontSize: number, fontFamily: string): Vertex[] {
   return terms.map(term => {

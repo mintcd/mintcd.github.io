@@ -2,491 +2,489 @@ export default [
   {
     name: `chi-square test`,
     definition: ``,
-    categories: [`statistics`],
-    subcategories: [],
-    dependants: []
+    fields: [`statistics`],
+    parents: []
   },
   {
     name: `null set`,
     definition: ``,
-    categories: [`measureTheory`],
-    subcategories: [],
-    dependants: []
+    fields: [`measure-theory`],
+    parents: []
   },
   {
     name: `statistic`,
     definition: ``,
-    categories: [`statistics`],
-    dependants: [`function`]
+    fields: [`statistics`],
+    parents: [`function`]
   },
   {
     name: `continuous function`,
     definition: ``,
-    categories: [`analysis`],
-    subcategories: [`real analysis`],
-    dependants: [`function`]
+    fields: [`real-analysis`],
+    subcategories: [`real-analysis`],
+    parents: [`function`]
   },
   {
     name: `norm`,
     definition: ``,
-    categories: [`analysis`, `linear algebra`],
-    subcategories: [`real analysis`],
-    dependants: [`function`, `triangle inequality`, `positive semidefiniteness`, `homogeneity`]
+    fields: [`real-analysis`, `linear-algebra`],
+    subcategories: [`real-analysis`],
+    parents: [`function`, `triangle inequality`, `positive semidefiniteness`, `homogeneity`]
   },
   {
     name: `inner product space`,
     definition: ``,
-    categories: [`analysis`, `linear algebra`],
-    subcategories: [`real analysis`],
-    dependants: [`dot product`]
+    fields: [`analysis`, `linear-algebra`],
+    subcategories: [`real-analysis`],
+    parents: [`dot product`]
   },
   {
     name: `convex combination`,
     definition: ``,
-    categories: [`analysis`],
-    subcategories: [`real analysis`, `convex analysis`],
-    dependants: [`convexity`]
+    fields: [`analysis`],
+    subcategories: [`real-analysis`, `convex analysis`],
+    parents: [`convexity`]
   },
   {
     name: `convexity`,
     definition: ``,
-    categories: [`analysis`],
-    subcategories: [`real analysis`, `convex analysis`]
+    fields: [`analysis`],
+    subcategories: [`real-analysis`, `convex analysis`]
   },
   {
     name: `unit sphere`,
     definition: ``,
-    categories: [`analysis`],
-    subcategories: [`real analysis`]
+    fields: [`analysis`],
+    subcategories: [`real-analysis`]
   },
   {
     name: `unit ball`,
     definition: ``,
-    categories: [`analysis`],
-    subcategories: [`real analysis`]
+    fields: [`analysis`],
+    subcategories: [`real-analysis`]
   },
   {
     name: `box`,
     definition: ``,
-    categories: [`analysis`],
-    subcategories: [`real analysis`]
+    fields: [`analysis`],
+    subcategories: [`real-analysis`]
   },
   {
     name: `triangle inequality`,
     definition: ``,
-    categories: [`linear algebra`, `analysis`],
-    subcategories: [`real analysis`]
+    fields: [`linear-algebra`, `analysis`],
+    subcategories: [`real-analysis`]
   },
   {
     name: `positive (semi)definiteness`,
     definition: ``,
-    categories: [`linear algebra`, `analysis`],
-    subcategories: [`real analysis`]
+    fields: [`linear-algebra`, `analysis`],
+    subcategories: [`real-analysis`]
   },
   {
     name: `dot product`,
     definition: ``,
-    categories: [`linear algebra`, `analysis`],
-    subcategories: [`real analysis`]
+    fields: [`linear-algebra`, `analysis`],
+    subcategories: [`real-analysis`]
   },
   {
     name: `interval`,
     definition: ``,
-    categories: [`algebra`, `analysis`],
+    fields: [`algebra`, `analysis`],
   },
   {
     name: `translation`,
     definition: ``,
-    categories: [`algebra`, `analysis`],
+    fields: [`algebra`, `analysis`],
   },
   {
     name: `trichotomy`,
     definition: ``,
-    categories: [`algebra`],
+    fields: [`algebra`],
   },
   {
     name: `symmetry`,
     definition: ``,
-    categories: [`algebra`],
+    fields: [`algebra`],
   },
   {
     name: `associativity`,
     definition: ``,
-    categories: [`algebra`],
+    fields: [`algebra`],
   },
   {
     name: `rational cut`,
     definition: ``,
-    categories: [`analysis`],
-    dependants: [`Dedekind cut`]
+    fields: [`analysis`],
+    parents: [`Dedekind cut`]
   },
   {
     name: `Dedekind cut`,
     definition: ``,
-    categories: [`analysis`]
+    fields: [`analysis`]
   },
   {
     name: `equivalence class`,
     definition: ``,
-    categories: [`algebra`]
+    fields: [`algebra`]
   },
   {
     name: `equivalence relation`,
     definition: ``,
-    categories: [`algebra`]
+    fields: [`algebra`]
   },
   {
     name: `class`,
     definition: ``,
-    categories: [`set theory`]
+    fields: [`set theory`]
   },
   {
     name: `difference`,
     definition: ``,
-    categories: [`set theory`]
+    fields: [`set theory`]
   },
   {
     name: `symmetric difference`,
     definition: ``,
-    categories: [`set theory`]
+    fields: [`set theory`]
   },
   {
     name: `disjoint sets`,
     definition: ``,
-    categories: [`set theory`]
+    fields: [`set theory`]
   },
   {
     name: `singleton set`,
     definition: ``,
-    categories: [`set theory`]
+    fields: [`set theory`]
   },
   {
     name: `empty set`,
     definition: ``,
-    categories: [`set theory`]
+    fields: [`set theory`]
   },
   {
     name: `sigma algebra`,
     definition: ``,
-    categories: [`analysis`]
+    fields: [`analysis`]
   },
   {
     name: `Borel sigma algebra`,
     definition: ``,
-    categories: [`analysis`],
-    dependants: [`open set`]
+    fields: [`analysis`],
+    parents: [`open set`]
   },
   {
     name: `topological space`,
     definition: ``,
-    categories: [`topology`]
+    fields: [`topology`]
   },
   {
     name: `open set`,
     definition: ``,
-    categories: [`topology`]
+    fields: [`topology`]
   },
   {
     name: `intersection`,
     definition: ``,
-    categories: [`set theory`]
+    fields: [`set theory`]
   },
   {
     name: `union`,
     definition: ``,
-    categories: [`set theory`]
+    fields: [`set theory`]
   },
   {
     name: `complement`,
     definition: ``,
-    categories: [`set theory`]
+    fields: [`set theory`]
   },
   {
     name: `set difference`,
     definition: ``,
-    categories: [`set theory`]
+    fields: [`set theory`]
   },
   {
     name: `disjoint`,
     definition: ``,
-    categories: [`set theory`]
+    fields: [`set theory`]
   },
   {
     name: `De Morgan's Laws`,
     definition: ``,
-    categories: [`set theory`]
+    fields: [`set theory`]
   },
   {
     name: `measure`,
     definition: ``,
-    categories: [`analysis`]
+    fields: [`analysis`]
   },
   {
     name: `measure space`,
     definition: ``,
-    categories: [`analysis`],
-    dependants: [`measurable space`]
+    fields: [`analysis`],
+    parents: [`measurable space`]
   },
   {
     name: `well - ordering property`,
     definition: ``,
-    categories: [`set theory`, `algebra`],
+    fields: [`set theory`, `algebra`],
   },
   {
     name: `counting measure`,
     definition: ``,
-    categories: [`analysis`],
-    dependants: [`measure`]
+    fields: [`analysis`],
+    parents: [`measure`]
   },
   {
     name: `Dirac measure`,
     definition: ``,
-    categories: [`analysis`],
-    dependants: [`measure`]
+    fields: [`analysis`],
+    parents: [`measure`]
   },
   {
     name: `upper bound`,
     definition: ``,
-    categories: [`analysis`],
-    dependants: [`order`]
+    fields: [`analysis`],
+    parents: [`order`]
   },
   {
     name: `ordered field`,
     definition: ``,
-    categories: [`algebra`, `analysis`],
-    dependants: [`order`, `field`]
+    fields: [`algebra`, `analysis`],
+    parents: [`order`, `field`]
   },
   {
     name: `Archimedian property`,
     definition: ``,
-    categories: [`algebra`, `analysis`],
-    dependants: [`order`, `field`]
+    fields: [`algebra`, `analysis`],
+    parents: [`order`, `field`]
   },
   {
     name: `triangle inequality`,
     definition: ``,
-    categories: [`algebra`, `analysis`],
-    dependants: [`absolute value`]
+    fields: [`algebra`, `analysis`],
+    parents: [`absolute value`]
   },
   {
     name: `least upper bound`,
     definition: ``,
-    categories: [`analysis`],
-    dependants: [`upper bound`]
+    fields: [`analysis`],
+    parents: [`upper bound`]
   },
   {
     name: `Lebesgue measure`,
     definition: ``,
-    categories: [`analysis`],
+    fields: [`analysis`],
     subcategories: [`measure theory`],
-    dependants: [`measure`]
+    parents: [`measure`]
   },
   {
     name: `measurable space`,
     definition: ``,
-    categories: [`analysis`],
+    fields: [`analysis`],
     subcategories: [`measure theory`],
   },
   {
     name: `random variable`,
     definition: ``,
-    categories: [`probability - theory`],
+    fields: [`probability - theory`],
     subcategories: [],
   },
   {
     name: `distribution function`,
     definition: ``,
-    categories: [`probability - theory`],
+    fields: [`probability - theory`],
   },
   {
     name: `expectation`,
     definition: ``,
-    categories: [`analysis`],
+    fields: [`analysis`],
     subcategories: [`probability theory`],
-    dependants: [`random variable`]
+    parents: [`random variable`]
   },
   {
     name: `Bernoulli distribution`,
     definition: ``,
-    categories: [`analysis`],
+    fields: [`analysis`],
     subcategories: [`probability theory`, `probability distribution`],
   },
   {
     name: `Poisson distribution`,
     definition: ``,
-    categories: [`analysis`],
+    fields: [`analysis`],
     subcategories: [`probability theory`, `probability distribution`],
   },
   {
     name: `multinomial distribution`,
     definition: ``,
-    categories: [`analysis`],
+    fields: [`analysis`],
     subcategories: [`probability theory`, `probability distribution`],
   },
   {
     name: `uniform distribution`,
     definition: ``,
-    categories: [`analysis`],
+    fields: [`analysis`],
     subcategories: [`probability theory`, `probability distribution`],
   },
   {
     name: `exponential distribution`,
     definition: ``,
-    categories: [`analysis`],
+    fields: [`analysis`],
     subcategories: [`probability theory`, `probability distribution`],
   },
   {
     name: `multinomial distribution`,
     definition: ``,
-    categories: [`analysis`],
+    fields: [`analysis`],
     subcategories: [`probability theory`, `probability distribution`],
   },
   {
     name: `Gamma distribution`,
     definition: ``,
-    categories: [`analysis`],
+    fields: [`analysis`],
     subcategories: [`probability theory`, `probability distribution`],
   },
   {
     name: `chi - square distribution`,
     definition: ``,
-    categories: [`analysis`],
+    fields: [`analysis`],
     subcategories: [`probability theory`, `probability distribution`],
   },
   {
     name: `normal distribution`,
     definition: ``,
-    categories: [`analysis`],
+    fields: [`analysis`],
     subcategories: [`probability theory`, `probability distribution`],
   },
   {
     name: `joint distribution`,
     definition: ``,
-    categories: [`analysis`],
+    fields: [`analysis`],
     subcategories: [`probability theory`],
   },
   {
     name: `marginal distribution`,
     definition: ``,
-    categories: [`analysis`],
+    fields: [`analysis`],
     subcategories: [`probability theory`],
   },
   {
     name: `binomial distribution`,
     definition: ``,
-    categories: [`analysis`],
+    fields: [`analysis`],
     subcategories: [`probability theory`, `probability distribution`],
   },
   {
     name: `variance`,
     definition: ``,
-    categories: [`analysis`],
+    fields: [`analysis`],
     subcategories: [`probability theory`],
   },
   {
     name: `Borel function`,
     definition: ``,
-    categories: [`analysis`],
+    fields: [`analysis`],
     subcategories: [`probability theory`],
   },
   {
     name: `measurable set`,
     definition: ``,
-    categories: [`analysis`],
+    fields: [`analysis`],
     subcategories: [`measure theory`],
   },
   {
     name: `discrete random variable`,
     definition: `a random variable which takes a finite or countably number of values with strictly positive probability`,
-    categories: [`analysis`],
+    fields: [`analysis`],
     subcategories: [`probability theory`],
-    dependants: [`random variable`]
+    parents: [`random variable`]
   },
   {
     name: `continuous random variable`,
     definition: `a random variable whose distribution function is continuous`,
-    categories: [`analysis`],
+    fields: [`analysis`],
     subcategories: [`probability theory`],
-    dependants: [`random variable`]
+    parents: [`random variable`]
   },
   {
     name: `absolutely continuous random variable`,
     definition: `a random variable with Borel measurable density function`,
-    categories: [`analysis`],
+    fields: [`analysis`],
     subcategories: [`probability theory`],
-    dependants: [`continuous random variable`]
+    parents: [`continuous random variable`]
   },
   {
     name: `power set`,
     definition: ``,
-    categories: [`set theory`]
+    fields: [`set theory`]
   },
   {
     name: `subset`,
     definition: ``,
-    categories: [`set theory`]
+    fields: [`set theory`]
   },
   {
     name: `vector space`,
     definition: ``,
-    categories: [`linear algebra`]
+    fields: [`linear-algebra`]
   },
   {
     name: `Vitali set`,
     definition: ``,
-    categories: [`analysis`]
+    fields: [`analysis`]
   },
   {
     name: `probability measure`,
     definition: ``,
-    categories: [`analysis`]
+    fields: [`analysis`]
   },
   {
     name: `probability space`,
     definition: ``,
-    categories: [`analysis`]
+    fields: [`analysis`]
   },
   {
     name: `conditional probability`,
     definition: ``,
-    categories: [`analysis`]
+    fields: [`analysis`]
   },
   {
     name: `independent events`,
     definition: ``,
-    categories: [`analysis`]
+    fields: [`analysis`]
   },
   {
     name: `measurable map`,
     definition: ``,
-    categories: [`analysis`],
-    dependants: [`map`]
+    fields: [`analysis`],
+    parents: [`map`]
   },
   {
     name: `map`,
     definition: ``,
-    categories: [`analysis`]
+    fields: [`analysis`]
   },
   {
     name: `event`,
     definition: ``,
-    categories: [`analysis`]
+    fields: [`analysis`]
   },
   {
     name: `indicator function`,
     definition: ``,
-    categories: [`analysis`]
+    fields: [`analysis`]
   },
   {
     name: `metric space`,
     definition: ``,
-    categories: [`analysis`]
+    fields: [`analysis`]
   },
   {
     name: `Cauchy sequence`,
     definition: `A sequence $\\{ u_n\\ }$ of real numbers is called Cauchy if
     $$\\forall \\epsilon > 0, \\exists N\\in\\mathbb{ N }, \\forall m, n > N, | u_n - u_m | <\\epsilon.$$`,
-    categories: [`analysis`],
-    subcategories: [`real analysis`],
+    fields: [`analysis`],
+    subcategories: [`real-analysis`],
   },
-] as unknown as Vertex[]
+] as Term[]

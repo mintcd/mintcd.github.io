@@ -32,6 +32,7 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
+    "@types/cytoscape": "^3.21.4",
     "@types/d3-force": "^3.0.10",
     "@types/dagre-d3": "^0.6.6",
     "@types/node": "^20",

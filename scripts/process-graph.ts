@@ -1,5 +1,5 @@
 import fs from 'fs';
-import graph from '../models/knowledge-graph.mjs'
+import graph from '../models/knowledge-graph'
 
 const filePath = `\models\\knowledge-graph.json`
 

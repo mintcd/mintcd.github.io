@@ -3,7 +3,7 @@ import graph from '@models/knowledge-graph'
 
 const App = () => {
   return (
-    <KnowledgeGraph graph={graph} lectureView={true} />
+    <KnowledgeGraph graphData={graph} lectureView={true} filter={true} />
   );
 };
 

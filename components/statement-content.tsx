@@ -44,7 +44,7 @@ export default function StatementContent({ statement }: { statement: Vertex }) {
 
   return (
     <div
-      className={`cursor-pointer transition-all duration-300 ease-in-out
+      className={`transition-all duration-300 ease-in-out
                       rounded-md overflow-hidden
                       bg-blue-200 p-4 w-full h-full`}>
       <span className={`mr-1 text-lg font-semibold`}>
@@ -57,11 +57,17 @@ export default function StatementContent({ statement }: { statement: Vertex }) {
       {statement.content && <Latex>{statement.content}</Latex>}
       {statement.proof && (
         <div className="mt-4">
+          <span className={`mr-1 text-lg font-semibold`}>
+            Proof
+          </span>
           <Latex>{statement.proof}</Latex>
         </div>
       )}
       {statement.examples && (
         <div className="mt-4">
+          <span className={`mr-1 text-lg font-semibold`}>
+            Example
+          </span>
           <Latex>{statement.examples}</Latex>
         </div>
       )}

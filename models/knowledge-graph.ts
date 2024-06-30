@@ -1,42 +1,135 @@
-export default
-  [
-    // {
-    //   name: "Metric space",
-    //   key: "metric-space",
-    //   type: "definition",
-    //   content: ""
-    // },
-    // {
-    //   name: "Dense subset of a metric space",
-    //   key: "dense-subset-of-a-metric-space",
-    //   type: "definition",
-    //   parents: [
-    //     {
-    //       key: "metric-space"
-    //     }
-    //   ],
-    //   content: "Let $(M,d)$ be a metric space. A subset $N$ of $M$ is said to be dense if every ball $B(x,r)\\subset M$, we have\n      $$B(x,r)\\cap N \\neq \\varnothing.$$."
-    // },
-    // {
-    //   name: "Lipschitz continuity",
-    //   key: "lipschitz-continuity",
-    //   type: "definition",
-    //   parents: [
-    //     {
-    //       key: "metric-space"
-    //     }
-    //   ],
-    //   content: ""
-    // },
+
+export default {
+  vertices: [
+    {
+      name: "Metric space",
+      key: "metric-space",
+      type: "definition",
+      content: ""
+    },
+    {
+      name: "Dense subset of a metric space",
+      key: "dense-subset-of-a-metric-space",
+      type: "definition",
+      parents: [
+        {
+          key: "metric-space"
+        }
+      ],
+      content: "Let $(M,d)$ be a metric space. A subset $N$ of $M$ is said to be dense if every ball $B(x,r)\\subset M$, we have\n      $$B(x,r)\\cap N \\neq \\varnothing.$$."
+    },
+    {
+      name: "Lipschitz continuity",
+      key: "lipschitz-continuity",
+      type: "definition",
+      parents: [
+        {
+          key: "metric-space"
+        }
+      ],
+      content: ""
+    },
+    {
+      name: "Upper Bound and Lower Bound",
+      key: "upper-bound-and-lower-bound",
+      type: 'definition',
+      fields: ['real-analysis'],
+      content: `Suppose that $S$ is an ordered set. If
+    $$\\forall E\\subset S, \\exists \\beta \\in S , \\forall x\\in E: x\\le \\beta,$$
+    then we say that $E$ is bounded above and $\\beta$ is called an upper bound of $E$.`
+    },
+    {
+      name: `Supremum and Infimum`,
+      key: 'supremum-and-infimum',
+      type: `definition`,
+      fields: ["real-analysis"],
+      parents: [
+        {
+          key: "upper-bound-and-lower-bound",
+        }
+      ],
+      content: `An element $b_0\\in A$ is called a least lower bound, or a supremum of $A$ if 
+    </br>
+    (i) $b_0$ is an upper bound,
+    </br>
+    (ii) for any upper bound $b$ of $A$, we have $b_0\\le b$. 
+    </br>
+    Similarly, we say that $c_0$ is a greatest lower bound, or an infimum of $A$ if 
+    </br>
+    (i) $c_0$ is a lower bound, 
+    </br>
+    (ii) for any lower bound $c$ of $A$, we have $c_0\\le c$.`,
+    },
+    {
+      name: `Least Upper Bound Property`,
+      key: 'least-upper-bound-property',
+      type: `definition`,
+      fields: ['real-analysis'],
+      parents: [
+        {
+          key: 'supremum-and-infimum',
+        }
+      ],
+      content: `A set $S$ has least upper bound property if for every nonempty subset $E$ of $S$, $\\sup E$ exists.`,
+    },
+    {
+      name: "The Real Numbers",
+      key: "the-real-numbers",
+      fields: ["real-analysis"],
+      type: `definition-theorem`,
+      parents: [
+        {
+          key: 'least-upper-bound-property',
+        }
+      ]
+    },
+    {
+      name: `The $\\epsilon$-principle`,
+      key: 'the-epsilon-principle',
+      fields: ["real-analysis"],
+      type: `theorem`,
+      parents: [
+        {
+          key: "the-real-numbers",
+        }
+      ],
+      content: `If $x,y\\in\\RR$ and for any $\\epsilon>0$, $|x-y|<\\epsilon$, then $x=y$.`,
+      proof: `Suppose that $x\\ne y$. We have $|x-y|\\ge \\dfrac{|x-y|}{2} > 0$, a contradiction.`
+    },
+    {
+      name: `Archimedian Property`,
+      key: 'archimedian-property',
+      type: `theorem`,
+      fields: ["real-analysis"],
+      parents: [
+        {
+          key: "the-real-numbers",
+        }
+      ],
+      content: `If $x, y\\in\\mathbb{R}$ and $x > 0$, then $\\exist n \\in \\mathbb{N}$ such that $nx > y$.`,
+    },
+    {
+      name: `Density of $\\mathbb{Q}$`,
+      type: `theorem`,
+      key: 'density-of-q',
+      fields: ["real-analysis"],
+      parents: [
+        {
+          key: 'archimedian-property',
+        }
+      ],
+      content: `If $x, y\\in \\mathbb{R}$ and $x < y$ then $\\exist r\\in\\mathbb{Q}$ such that $x < r < y$.`,
+      dependants: []
+    },
     {
       name: "$\\sigma$-algebra",
       key: "sigma-algebra",
       type: "definition",
-      fields: ["Measure Theory", "Probability Theory"],
+      fields: ["measure-theory", "probability-theory"],
       content: `A collection of subsets of $\\Omega$ satisfying
-      $$$$ 1) $\\Omega\\in\\F$ .
-      $$$$ 2) (Closure under Complement) $A\\in\\F$ implies $A^c\\in\\F$.
-      $$$$ 3) (Closure under Countable Union) $\\{A_n\\}_{n\\in\\NN}\\subset\\F$ implies $\\cup_{n=1}^{\\infty}A_n\\in\\F$.`
+    $$$$ 1) $\\Omega\\in\\F$ .
+    $$$$ 2) (Closure under Complement) $A\\in\\F$ implies $A^c\\in\\F$.
+    $$$$ 3) (Closure under Countable Union) $\\{A_n\\}_{n\\in\\NN}\\subset\\F$ implies $\\cup_{n=1}^{\\infty}A_n\\in\\F$.`
     },
     {
       name: 'Filtration',
@@ -45,7 +138,7 @@ export default
       parents: [{
         key: 'sigma-algebra'
       }],
-      fields: ["Probability Theory"],
+      fields: ["probability-theory"],
       content: "A family of $\\sigma$-algebras \\{\\F_t:t\\in T\\}  is a filtration on $(\\Omega,\\F)$ if $t\\in T$ and $s\\le t$ imply $\\F_s\\subset\\F_t\\subset\\F$. The tuple $(\\Omega,\\F, \\{\\F_t:t\\in T\\},\\PP)$ is called a filtered probability space."
     },
 
@@ -53,16 +146,18 @@ export default
       name: 'Stopping time',
       key: 'stopping-time',
       type: 'definition',
-      parents: [{
-        key: 'filtration'
-      }],
+      parents: [
+        {
+          key: 'filtration'
+        }
+      ],
       content: "Let $(\\Omega,\\F, \\{\\F_t:t\\in T\\},\\PP)$ be a filtered probability space. A random variable $\\tau: \\Omega\\to T$ is called a stopping time if for every $t\\in T$, $$\\{\\tau \\le t\\}\\in\\F_t.$$"
     },
     {
       name: "Generated $\\sigma$-algebra",
       key: "generated-sigma-algebra",
       type: "definition-theorem",
-      fields: ["Measure Theory"],
+      fields: ["measure-theory"],
       parents: [
         {
           key: "sigma-algebra"
@@ -74,7 +169,7 @@ export default
       name: "Borel $\\sigma$-algebra",
       key: "borel-sigma-algebra",
       type: "definition",
-      fields: ["Measure Theory"],
+      fields: ["measure-theory"],
       parents: [
         {
           key: "sigma-algebra"
@@ -90,22 +185,22 @@ export default
           key: "sigma-algebra"
         }
       ],
-      fields: ["Measure Theory"],
+      fields: ["measure-theory"],
       content: "Let $\\F$ be a $\\sigma$-algebra on $\\Omega$. The doublet $(\\Omega,\\F)$ is called a measurable space."
     },
     {
       name: `Measurability Criterion`,
       key: `measurability-criterion`,
       type: `proposition`,
-      fields: ["Measure Theory"],
+      fields: ["measure-theory"],
       content: `If there is a subset $\\C$ of $2^\\Omega$ such that $\\G = \\sigma(\\C)$ and 
-      $$\\forall G\\in\\G, f^{-1}(G)\\in\\C.$$
-      Then $f$ is measurable.`,
+    $$\\forall G\\in\\G, f^{-1}(G)\\in\\C.$$
+    Then $f$ is measurable.`,
     },
     {
       name: "Measurable function",
       key: "measurable-function",
-      fields: ["Measure Theory"],
+      fields: ["measure-theory"],
       type: "definition",
       parents: [
         {
@@ -113,14 +208,14 @@ export default
         }
       ],
       content: `Let $(\\Omega, \\F)$ and $(\\Gamma, \\G)$ be measurable spaces. A function $f:\\Omega\\to\\Gamma$ is measurable $\\F\\to\\G$ if 
-      $$\\forall G\\in\\G, f^{-1}(G)\\in\\F.$$
-      If $\\B$ has been explicated, we say that $f$ is $\\F$-measurable.`,
+    $$\\forall G\\in\\G, f^{-1}(G)\\in\\F.$$
+    If $\\B$ has been explicated, we say that $f$ is $\\F$-measurable.`,
     },
     {
       name: "Measure",
       type: "definition",
       key: "measure",
-      fields: ["Measure Theory"],
+      fields: ["measure-theory"],
       parents: [{
         key: "measurable-space"
       }],
@@ -382,4 +477,10 @@ export default
         key: "adapted-stochastic-process"
       }],
     },
-  ] as Vertex[]
+  ],
+  metadata: {
+    edgesIncluded: true,
+    depthComputed: true,
+    positionInitialized: true
+  }
+} as Graph

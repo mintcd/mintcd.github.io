@@ -1,6 +1,3 @@
-// declare module 'katex'
-declare module 'dagre'
-
 type Chapter = {
     name: string,
     content?: string,
@@ -17,34 +14,51 @@ type Section = {
 }
 
 type Graph = {
+    metadata: {
+        edgesIncluded: boolean,
+        depthComputed: boolean,
+        positionInitialized: boolean
+    }
     vertices: Vertex[],
     edges: Edge[]
 }
 
+type Term = {
+    name: string,
+    definition: string,
+    fields: Field[],
+    parent?: string
+}
+
 type Vertex = {
     // Basic Properties
-    key?: string,
+    key: string,
     name: string,
     abbreviation?: string,
-    type: string,
-    implications?: Vertex[],
+    type: StatementType
+
 
     // Graph properties
-    parents?: { key: string, relation?: RelationType }[],
+    parents: { key: string, relation?: RelationType }[],
+    implications?: Vertex[],
     depth?: number,
-    short?: string,
-    implication?: Vertex[],
 
     // Knowledge properties
+    notation?: string[],
+    short?: string,
+    content?: string,
+    examples?: string[]
     proof?: string,
     otherNames?: string[],
     href?: string,
-    notation?: string[],
-    content?: string,
-    examples?: string[]
+    implications?: {
+        type: StatementType
+        content: string,
+        proof?: string,
+    }[]
 
     // Taxonomy properties
-    fields?: string[],
+    fields: Field[],
     chapter?: string,
 
     // Style properties
@@ -76,6 +90,8 @@ type VertexCoordinate = {
     fy: number
 }
 
+type Field = 'real-analysis' | 'measure-theory' | 'probability-theory' | 'linear-algebra'
+
 type StatementType =
     'axiom'
     | 'corollary'
@@ -87,6 +103,7 @@ type StatementType =
     | 'proposition'
     | 'thought-bubble'
     | 'theorem'
+    | 'definition-theorem'
 
 type Category = 'all' | 'real-analysis' | 'probability-theory' | 'measure-theory' | 'stochastic-processes'
 type Type = 'metric' | 'architecture' | 'dataset' | 'problem' | 'mechanism' | StatementType

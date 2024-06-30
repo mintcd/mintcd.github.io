@@ -6,7 +6,6 @@ export default [
       {
         name: `Cauchy-Schwartz inequality`,
         type: `theorem`,
-        key: "",
         content: ``,
       },
     ]

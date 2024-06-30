@@ -122,6 +122,17 @@ export default {
       dependants: []
     },
     {
+      name: "Roots of a positive real number",
+      key: "roots-of-a-positive-real-number",
+      fields: ["real-analysis"],
+      parents: [
+        {
+          key: "the-real-numbers",
+        }
+      ],
+      content: `For every real number $x>0$ and every integer $n>0$, there exists a unique $y>0$ such that $y^n = x$.`
+    },
+    {
       name: "$\\sigma$-algebra",
       key: "sigma-algebra",
       type: "definition",

@@ -48,7 +48,6 @@ type Vertex = {
     abbreviation?: string,
     type: StatementType
 
-
     // Graph properties
     parents: { key: string, relation?: RelationType }[],
     depth?: number,

@@ -1,260 +1,262 @@
-const fs = require('fs')
-const path = require('path')
-const dagre = require('dagre')
-
-let graph = require('../models/knowledge-graph.js')
-
-type Chapter = {
-  name: string,
-  content?: string,
-  description?: string,
-  sections?: Section[],
-  notations?: string[],
-  statements: Statement[]
-}
-
-type Statement =
-  {
-    name: string,
-    type: string,
-    parents?: string[],
-    content?: string,
-    proof?: string,
-    implications?: Statement[]
-  }
+// const fs = require('fs')
+// const path = require('path')
+// const dagre = require('dagre')
 
 
-type Section = {
-  name: string,
-  content?: string,
-  statements: Vertex[]
-}
 
-type Graph = {
-  metadata: {
-    edgesIncluded: boolean,
-    depthComputed: boolean,
-    positionInitialized: boolean
-  }
-  vertices: Vertex[],
-  edges: Edge[]
-}
+// let graph = require('../models/knowledge-graph.js')
 
-type Term = {
-  name: string,
-  definition: string,
-  fields: Field[],
-  parent?: string
-}
+// type Chapter = {
+//   name: string,
+//   content?: string,
+//   description?: string,
+//   sections?: Section[],
+//   notations?: string[],
+//   statements: Statement[]
+// }
 
-type Vertex = {
-  // Basic Properties
-  key: string,
-  name: string,
-  abbreviation?: string,
-  type: StatementType
+// type Statement =
+//   {
+//     name: string,
+//     type: string,
+//     parents?: string[],
+//     content?: string,
+//     proof?: string,
+//     implications?: Statement[]
+//   }
 
 
-  // Graph properties
-  parents: { key: string, relation?: RelationType }[],
-  depth?: number,
+// type Section = {
+//   name: string,
+//   content?: string,
+//   statements: Vertex[]
+// }
 
-  // Knowledge properties
-  notation?: string[],
-  short?: string,
-  content?: string,
-  examples?: string[]
-  proof?: string,
-  otherNames?: string[],
-  href?: string,
-  implications?: {
-    type: StatementType
-    content: string,
-    proof?: string,
-  }[]
+// type Graph = {
+//   metadata: {
+//     edgesIncluded: boolean,
+//     depthComputed: boolean,
+//     positionInitialized: boolean
+//   }
+//   vertices: Vertex[],
+//   edges: Edge[]
+// }
 
-  // Taxonomy properties
-  fields: Field[],
-  chapter?: string,
+// type Term = {
+//   name: string,
+//   definition: string,
+//   fields: Field[],
+//   parent?: string
+// }
 
-  // Style properties
-  color?: string,
-  lines?: string[],
-  fx?: number,
-  fy?: number,
-  x?: number,
-  y?: number,
-  height?: number,
-  width?: number
-}
-
-type Edge = {
-  source: string,
-  target: string,
-  relation?: RelationType
-}
-
-type EdgeCoordinate = {
-  source: VertexCoordinate,
-  target: VertexCoordinate
-}
-
-type VertexCoordinate = {
-  x: number,
-  y: number,
-  fx: number,
-  fy: number
-}
-
-type Field = 'real-analysis' | 'measure-theory' | 'probability-theory' | 'linear-algebra'
-
-type StatementType =
-  'axiom'
-  | 'corollary'
-  | 'definition'
-  | 'example'
-  | 'lemma'
-  | 'notation'
-  | 'note'
-  | 'proposition'
-  | 'thought-bubble'
-  | 'theorem'
-  | 'definition-theorem'
-
-type Category = 'all' | 'real-analysis' | 'probability-theory' | 'measure-theory' | 'stochastic-processes'
-type Type = 'metric' | 'architecture' | 'dataset' | 'problem' | 'mechanism' | StatementType
-type SubjectType = 'mathematics' | 'computer-science' | 'philosophy'
-
-type RelationType =
-  'composited-in'
-  | 'included-in'
-  | 'derives'
-  | 'specializes'
+// type Vertex = {
+//   // Basic Properties
+//   key: string,
+//   name: string,
+//   abbreviation?: string,
+//   type: StatementType
 
 
-function getEdges(vertices: Vertex[]): Edge[] {
-  let edges: Edge[] = [];
+//   // Graph properties
+//   parents: { key: string, relation?: RelationType }[],
+//   depth?: number,
 
-  vertices.forEach(vertex => {
-    if (vertex.parents && vertex.parents.length > 0) {
-      vertex.parents.forEach(parent => {
-        edges.push({
-          source: parent.key,
-          target: vertex.key ? vertex.key : '',
-          relation: parent.relation
-        });
-      });
-    }
+//   // Knowledge properties
+//   notation?: string[],
+//   short?: string,
+//   content?: string,
+//   examples?: string[]
+//   proof?: string,
+//   otherNames?: string[],
+//   href?: string,
+//   implications?: {
+//     type: StatementType
+//     content: string,
+//     proof?: string,
+//   }[]
 
-    edges = edges.filter(function (edge) {
-      return vertices.map(vertex => vertex.key).includes(edge.source)
-    })
+//   // Taxonomy properties
+//   fields: Field[],
+//   chapter?: string,
 
-    return edges
+//   // Style properties
+//   color?: string,
+//   lines?: string[],
+//   fx?: number,
+//   fy?: number,
+//   x?: number,
+//   y?: number,
+//   height?: number,
+//   width?: number
+// }
 
-  });
+// type Edge = {
+//   source: string,
+//   target: string,
+//   relation?: RelationType
+// }
 
-  return edges;
-}
+// type EdgeCoordinate = {
+//   source: VertexCoordinate,
+//   target: VertexCoordinate
+// }
 
-function initiateLayout(vertices: Vertex[], width: number, height: number) {
-  const dagreGraph = new dagre.graphlib.Graph();
-  dagreGraph.setGraph({
-    rankdir: 'TB',
-    nodesep: 10,
-    edgesep: 10,
-    ranksep: 10,
-  });
+// type VertexCoordinate = {
+//   x: number,
+//   y: number,
+//   fx: number,
+//   fy: number
+// }
 
-  vertices.forEach((vertex: Vertex) => {
-    dagreGraph.setNode(vertex.key, {
-      width: width,
-      height: height,
-      ...vertex,
-    });
-  });
+// type Field = 'real-analysis' | 'measure-theory' | 'probability-theory' | 'linear-algebra'
 
-  const edges = getEdges(vertices)
+// type StatementType =
+//   'axiom'
+//   | 'corollary'
+//   | 'definition'
+//   | 'example'
+//   | 'lemma'
+//   | 'notation'
+//   | 'note'
+//   | 'proposition'
+//   | 'thought-bubble'
+//   | 'theorem'
+//   | 'definition-theorem'
 
-  edges.forEach((edge: Edge) => {
-    dagreGraph.setEdge(edge.source, edge.target, {
-      ...edge,
-    });
-  });
+// type Category = 'all' | 'real-analysis' | 'probability-theory' | 'measure-theory' | 'stochastic-processes'
+// type Type = 'metric' | 'architecture' | 'dataset' | 'problem' | 'mechanism' | StatementType
+// type SubjectType = 'mathematics' | 'computer-science' | 'philosophy'
 
-  dagre.layout(dagreGraph)
+// type RelationType =
+//   'composited-in'
+//   | 'included-in'
+//   | 'derives'
+//   | 'specializes'
 
-  vertices = vertices.map((vertex: Vertex) => ({
-    ...vertex,
-    x: dagreGraph.node(vertex.key).x,
-    y: dagreGraph.node(vertex.key).y,
-  }));
-  return vertices
-}
 
-function computeNodeDepths(terms: Vertex[]): Vertex[] {
-  const termMap = new Map<string, Vertex>();
-  const visited = new Set<string>();
+// function getEdges(vertices: Vertex[]): Edge[] {
+//   let edges: Edge[] = [];
 
-  // Create a map of node keys to their corresponding nodes
-  terms.forEach(term => {
-    termMap.set(term.key, term);
-    term.depth = undefined; // Reset depths
-  });
+//   vertices.forEach(vertex => {
+//     if (vertex.parents && vertex.parents.length > 0) {
+//       vertex.parents.forEach(parent => {
+//         edges.push({
+//           source: parent.key,
+//           target: vertex.key ? vertex.key : '',
+//           relation: parent.relation
+//         });
+//       });
+//     }
 
-  // Depth-First Search function
-  function dfs(node: Vertex, depth: number) {
-    if (visited.has(node.key)) return;
-    visited.add(node.key);
+//     edges = edges.filter(function (edge) {
+//       return vertices.map(vertex => vertex.key).includes(edge.source)
+//     })
 
-    node.depth = Math.min(node.depth ?? Infinity, depth);
+//     return edges
 
-    if (node.parents) {
-      node.parents.forEach(parent => {
-        const parentNode = termMap.get(parent.key);
-        if (parentNode) {
-          dfs(parentNode, depth - 1);
-        }
-      });
-    }
-  }
+//   });
 
-  // Start DFS from each node
-  terms.forEach(term => {
-    if (!visited.has(term.key)) {
-      dfs(term, 0);
-    }
-  });
+//   return edges;
+// }
 
-  // Adjust depths to ensure minimum depth is 0
-  const minDepth = Math.min(...Array.from(termMap.values()).map(term => term.depth ?? Infinity));
-  terms.forEach(term => {
-    if (term.depth !== undefined) {
-      term.depth -= minDepth;
-    }
-  });
+// function initiateLayout(vertices: Vertex[], width: number, height: number) {
+//   const dagreGraph = new dagre.graphlib.Graph();
+//   dagreGraph.setGraph({
+//     rankdir: 'TB',
+//     nodesep: 10,
+//     edgesep: 10,
+//     ranksep: 10,
+//   });
 
-  return terms;
-}
+//   vertices.forEach((vertex: Vertex) => {
+//     dagreGraph.setNode(vertex.key, {
+//       width: width,
+//       height: height,
+//       ...vertex,
+//     });
+//   });
 
-console.log(graph.default.vertices)
+//   const edges = getEdges(vertices)
 
-graph = {
-  vertices: computeNodeDepths(initiateLayout(graph.default.vertices, 30, 30)),
-  edges: getEdges(graph.default.vertices),
-  metadata: {
-    edgesIncluded: true,
-    depthComputed: true,
-    positionInitialized: true
-  }
-}
+//   edges.forEach((edge: Edge) => {
+//     dagreGraph.setEdge(edge.source, edge.target, {
+//       ...edge,
+//     });
+//   });
 
-const jsonContent = JSON.stringify(graph, null, 2);
+//   dagre.layout(dagreGraph)
 
-// Define the output path for the JSON file
-const outputPath = path.join(__dirname, 'output.json');
+//   vertices = vertices.map((vertex: Vertex) => ({
+//     ...vertex,
+//     x: dagreGraph.node(vertex.key).x,
+//     y: dagreGraph.node(vertex.key).y,
+//   }));
+//   return vertices
+// }
 
-// Write the JSON content to the output file
-fs.writeFileSync(outputPath, jsonContent, 'utf-8');
+// function computeNodeDepths(terms: Vertex[]): Vertex[] {
+//   const termMap = new Map<string, Vertex>();
+//   const visited = new Set<string>();
 
-console.log(`JSON file has been saved to ${outputPath}`);
+//   // Create a map of node keys to their corresponding nodes
+//   terms.forEach(term => {
+//     termMap.set(term.key, term);
+//     term.depth = undefined; // Reset depths
+//   });
+
+//   // Depth-First Search function
+//   function dfs(node: Vertex, depth: number) {
+//     if (visited.has(node.key)) return;
+//     visited.add(node.key);
+
+//     node.depth = Math.min(node.depth ?? Infinity, depth);
+
+//     if (node.parents) {
+//       node.parents.forEach(parent => {
+//         const parentNode = termMap.get(parent.key);
+//         if (parentNode) {
+//           dfs(parentNode, depth - 1);
+//         }
+//       });
+//     }
+//   }
+
+//   // Start DFS from each node
+//   terms.forEach(term => {
+//     if (!visited.has(term.key)) {
+//       dfs(term, 0);
+//     }
+//   });
+
+//   // Adjust depths to ensure minimum depth is 0
+//   const minDepth = Math.min(...Array.from(termMap.values()).map(term => term.depth ?? Infinity));
+//   terms.forEach(term => {
+//     if (term.depth !== undefined) {
+//       term.depth -= minDepth;
+//     }
+//   });
+
+//   return terms;
+// }
+
+// console.log(graph.default.vertices)
+
+// graph = {
+//   vertices: computeNodeDepths(initiateLayout(graph.default.vertices, 30, 30)),
+//   edges: getEdges(graph.default.vertices),
+//   metadata: {
+//     edgesIncluded: true,
+//     depthComputed: true,
+//     positionInitialized: true
+//   }
+// }
+
+// const jsonContent = JSON.stringify(graph, null, 2);
+
+// // Define the output path for the JSON file
+// const outputPath = path.join(__dirname, 'output.json');
+
+// // Write the JSON content to the output file
+// fs.writeFileSync(outputPath, jsonContent, 'utf-8');
+
+// console.log(`JSON file has been saved to ${outputPath}`);

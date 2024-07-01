@@ -31,7 +31,7 @@ type Graph = {
         positionInitialized: boolean
     }
     vertices: Vertex[],
-    edges: Edge[]
+    edges?: Edge[]
 }
 
 type Term = {

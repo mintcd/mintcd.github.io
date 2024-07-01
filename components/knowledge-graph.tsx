@@ -6,7 +6,6 @@ import { createRoot } from 'react-dom/client';
 import CenterFocusStrongRoundedIcon from '@mui/icons-material/CenterFocusStrongRounded';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
-import * as d3 from 'd3'
 import { select } from 'd3-selection'
 import { drag } from 'd3-drag'
 import { zoom, zoomIdentity, zoomTransform } from 'd3-zoom'

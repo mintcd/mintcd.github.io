@@ -124,6 +124,7 @@ export default {
     {
       name: "Roots of a positive real number",
       key: "roots-of-a-positive-real-number",
+      type: `theorem`,
       fields: ["real-analysis"],
       parents: [
         {

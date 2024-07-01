@@ -12,7 +12,7 @@ export default
         {
           name: `probability space`,
           type: `definition`,
-          content: `A probability measure $\\mathbb{P}$ on a mesurable space $(\\Omega, \\mathcal{F})$ is a measure satisfying $\\mathbb{P}(\\Omega)=1$. The triplet $(\\Omega,\\mathcal{F},\\mathbb{P})$ is called a probability space.`,
+          content: `A probability measure $\\mathbb{P}$ on a measurable space $(\\Omega, \\mathcal{F})$ is a measure satisfying $\\mathbb{P}(\\Omega)=1$. The triplet $(\\Omega,\\mathcal{F},\\mathbb{P})$ is called a probability space.`,
           dependants: [],
           implications: [
             {

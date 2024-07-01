@@ -7,7 +7,7 @@ export default [
         name: `set cardinality`,
         type: `definition`,
         content: `Two sets $A$ and $B$ have the same cardinality if there is a bijection $f:A\\to B$.`,
-        dependants: [],
+        parents: [],
       },
       {
         name: `Cantor-Schröder-Bernstein theorem`,
@@ -79,7 +79,7 @@ export default [
         name: `Least upper bound property`,
         type: `theorem`,
         content: `The set $\\RR$ constructed as above has the Least upper bound property: every nonempty and bounded subset $S$ of $\\RR$ has a supremum in $\\RR$.`,
-        dependants: [],
+        parents: [],
         implications: [
           {
             name: ``,
@@ -92,31 +92,31 @@ export default [
         name: `The $\\epsilon$-principle`,
         type: `theorem`,
         content: `If $x,y\\in\\RR$ and for any $\\epsilon>0$, $|x-y|<\\epsilon$, then $x=y$.`,
-        key: '',
+
       },
       {
         name: `Archimedian Property`,
         type: `theorem`,
         content: `If $x, y\\in\\mathbb{R}$ and $x > 0$, then $\\exist n \\in \\mathbb{N}$ such that $nx > y$.`,
-        key: '',
+
       },
       {
         name: `Density of $\\mathbb{Q}$`,
         type: `theorem`,
         content: `If $x, y\\in \\mathbb{R}$ and $x < y$ then $\\exist r\\in\\mathbb{Q}$ such that $x < r < y$.`,
-        dependants: []
+        parents: []
       },
       {
         name: `Absolute value`,
         type: `definition`,
         content: ``,
-        dependants: []
+        parents: []
       },
       {
         name: `Triangle inequality`,
         type: `theorem`,
         content: `$\\forall x,y\\in\\mathbb{R}, |x+y|\\le |x|+|y|$.`,
-        dependants: []
+        parents: []
       },
     ]
   }

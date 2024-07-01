@@ -5,7 +5,7 @@ export default [
       {
         name: `stochastic process`,
         type: `definition`,
-        key: '',
+
         content: `A stochastic process is a collection of random variable $\\{X(t)\\}_{t\\in T}$, where $T$ is an index set.`,
         parents: [],
         implications: [
@@ -29,13 +29,13 @@ export default [
       {
         name: `filtration and adaptation`,
         type: `definition`,
-        key: '',
+
         content: `A filtration is a family of sub-$\\sigma$-algebra $\\{\\F_i\\}_{i\\in\\I}$ of $\\F$ such that $\\F_i\\subset\\F_j$ for any $i,j\\in\\I$ and $i\\le j$.`,
         implications: [
           {
             name: ``,
             type: `definition`,
-            key: '',
+
             content: `The tuple $(\\Omega,\\F,\\{\\F_i\\},\\PP)$ is called an filtered probability space.`,
           },
           {

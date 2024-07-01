@@ -1,4 +1,4 @@
-type Chapter = {
+export type Chapter = {
     name: string,
     content?: string,
     description?: string,
@@ -7,7 +7,7 @@ type Chapter = {
     statements: Statement[]
 }
 
-type Statement =
+export type Statement =
     {
         name: string,
         type: string,
@@ -18,13 +18,13 @@ type Statement =
     }
 
 
-type Section = {
+export type Section = {
     name: string,
     content?: string,
     statements: Vertex[]
 }
 
-type Graph = {
+export type Graph = {
     metadata: {
         edgesIncluded: boolean,
         depthComputed: boolean,
@@ -34,14 +34,14 @@ type Graph = {
     edges: Edge[]
 }
 
-type Term = {
+export type Term = {
     name: string,
     definition: string,
     fields: Field[],
     parent?: string
 }
 
-type Vertex = {
+export type Vertex = {
     // Basic Properties
     key: string,
     name: string,
@@ -82,27 +82,27 @@ type Vertex = {
     width?: number
 }
 
-type Edge = {
+export type Edge = {
     source: string,
     target: string,
     relation?: RelationType
 }
 
-type EdgeCoordinate = {
+export type EdgeCoordinate = {
     source: VertexCoordinate,
     target: VertexCoordinate
 }
 
-type VertexCoordinate = {
+export type VertexCoordinate = {
     x: number,
     y: number,
     fx: number,
     fy: number
 }
 
-type Field = 'real-analysis' | 'measure-theory' | 'probability-theory' | 'linear-algebra'
+export type Field = 'real-analysis' | 'measure-theory' | 'probability-theory' | 'linear-algebra'
 
-type StatementType =
+export type StatementType =
     'axiom'
     | 'corollary'
     | 'definition'
@@ -115,11 +115,11 @@ type StatementType =
     | 'theorem'
     | 'definition-theorem'
 
-type Category = 'all' | 'real-analysis' | 'probability-theory' | 'measure-theory' | 'stochastic-processes'
-type Type = 'metric' | 'architecture' | 'dataset' | 'problem' | 'mechanism' | StatementType
-type SubjectType = 'mathematics' | 'computer-science' | 'philosophy'
+export type Category = 'all' | 'real-analysis' | 'probability-theory' | 'measure-theory' | 'stochastic-processes'
+export type Type = 'metric' | 'architecture' | 'dataset' | 'problem' | 'mechanism' | StatementType
+export type SubjectType = 'mathematics' | 'computer-science' | 'philosophy'
 
-type RelationType =
+export type RelationType =
     'composited-in'
     | 'included-in'
     | 'derives'

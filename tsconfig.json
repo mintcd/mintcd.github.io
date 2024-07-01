@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
     "allowImportingTsExtensions": true,
+    "allowSyntheticDefaultImports": true,
     "jsx": "preserve",
-    "target": "es5",
+    "target": "es6",
     "lib": [
       "dom",
       "dom.iterable",
@@ -10,7 +11,7 @@
     ],
     "typeRoots": [
       "./node_modules/@types",
-      "./src/types"
+      "./scripts",
     ],
     "allowJs": true,
     "skipLibCheck": true,
@@ -36,11 +37,9 @@
   },
   "include": [
     "next-env.d.ts",
-    "types.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "models/knowledge-graph.mjs",
   ],
   "exclude": [
     "node_modules"

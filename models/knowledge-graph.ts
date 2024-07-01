@@ -1,5 +1,5 @@
 
-export default {
+const graph = {
   vertices: [
     {
       name: "Metric space",
@@ -132,6 +132,177 @@ export default {
         }
       ],
       content: `For every real number $x>0$ and every integer $n>0$, there exists a unique $y>0$ such that $y^n = x$.`
+    },
+    {
+      name: `Absolute value`,
+      key: "absolute-value",
+      type: `definition`,
+      fields: ["real-analysis"],
+      parents: [
+        {
+          key: "the-real-numbers",
+        }
+      ],
+      content: ``,
+    },
+    {
+      name: `Decimal representation`,
+      key: "decimal-representation",
+      type: `definition`,
+      fields: ["real-analysis"],
+      parents: [
+        {
+          key: "the-real-numbers",
+        }
+      ],
+      content: ``,
+    },
+    {
+      name: `Sequence of real numbers`,
+      key: "sequence-of-real-numbers",
+      type: `definition`,
+      fields: ["real-analysis"],
+      parents: [
+        {
+          key: "the-real-numbers",
+        }
+      ],
+      content: ``,
+    },
+    {
+      name: `Subsequence`,
+      key: "subsequence",
+      type: `definition`,
+      fields: ["real-analysis"],
+      parents: [
+        {
+          key: "sequence-of-real-numbers",
+        }
+      ],
+      content: ``,
+    },
+    {
+      name: `Monotonic sequence`,
+      key: "monotonic-sequence",
+      type: `definition`,
+      fields: ["real-analysis"],
+      parents: [
+        {
+          key: "sequence-of-real-numbers",
+        }
+      ],
+      content: ``,
+    },
+    {
+      name: `Boundedness of a sequence`,
+      key: "boundedness-of-a-sequence",
+      type: `definition`,
+      fields: ["real-analysis"],
+      parents: [
+        {
+          key: "sequence-of-real-numbers",
+        }
+      ],
+      content: ``,
+    },
+    {
+      name: `Convergence of a sequence`,
+      key: "convergence-of-a-sequence",
+      type: `definition-theorem`,
+      fields: ["real-analysis"],
+      parents: [
+        {
+          key: "sequence-of-real-numbers",
+        },
+        {
+          key: "absolute-value",
+        }
+      ],
+      content: ``,
+    },
+    {
+      name: `Limit of subsequence`,
+      key: "limit-of-subsequence",
+      type: `definition`,
+      fields: ["real-analysis"],
+      parents: [
+        {
+          key: "subsequence",
+        },
+        {
+          key: "convergence-of-a-sequence",
+        }
+      ],
+      content: ``,
+    },
+    {
+      name: `Convergent sequence is bounded`,
+      key: "convergent-sequence-is-bounded",
+      type: `theorem`,
+      fields: ["real-analysis"],
+      parents: [
+        {
+          key: "boundedness-of-a-sequence",
+        },
+        {
+          key: "convergence-of-a-sequence",
+        }
+      ],
+      content: ``,
+    },
+    {
+      name: `Bounded monotonic sequence converges`,
+      key: "bounded-monotonic-sequence-converges",
+      type: `theorem`,
+      fields: ["real-analysis"],
+      parents: [
+        {
+          key: "boundedness-of-a-sequence",
+        },
+        {
+          key: "convergence-of-a-sequence",
+        },
+        {
+          key: "monotonic-sequence",
+        }
+      ],
+      content: ``,
+    },
+    {
+      name: `Squeeze theorem`,
+      key: "squeeze-theorem",
+      type: `theorem`,
+      fields: ["real-analysis"],
+      parents: [
+        {
+          key: "convergence-of-a-sequence",
+        }
+      ],
+      content: ``,
+    },
+    {
+      name: `Comparison of limits`,
+      key: "comparison-of-limits",
+      type: `theorem`,
+      fields: ["real-analysis"],
+      parents: [
+        {
+          key: "convergence-of-a-sequence",
+        }
+      ],
+      content: ``,
+    },
+    {
+      name: `Algebra of limits`,
+      key: "algebra-of-limits",
+      type: `theorem`,
+      fields: ["real-analysis"],
+      parents: [
+        {
+          key: "convergence-of-a-sequence",
+        }
+      ],
+      content: ``,
     },
     {
       name: "$\\sigma$-algebra",
@@ -491,8 +662,10 @@ export default {
     },
   ],
   metadata: {
-    edgesIncluded: true,
-    depthComputed: true,
-    positionInitialized: true
+    edgesIncluded: false,
+    depthComputed: false,
+    positionInitialized: false
   }
-} as Graph
+}
+
+export default graph

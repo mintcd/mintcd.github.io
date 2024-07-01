@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect, useState, KeyboardEvent } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import CenterFocusStrongRoundedIcon from '@mui/icons-material/CenterFocusStrongRounded';
@@ -59,7 +59,7 @@ export default function KnowledgeGraph({
     vertices = getVerticesOfTopic(graphData.vertices, [selectedField])
   }
   vertices = breakLinesForCircle(vertices, radius, fontSize, "Arial") as Vertex[];
-  vertices = computeNodeDepths(vertices)
+  // vertices = computeNodeDepths(vertices)
   vertices = initiateLayout(vertices, 2 * radius, 2 * radius)
 
   let edges = getEdges(vertices);
@@ -250,11 +250,8 @@ export default function KnowledgeGraph({
           return vertex.key ? vertex.key : ''
         }))
       .force('collide', forceCollide(1.5 * radius))
-      .force('x', d3.forceX(graphSize.width / 2).strength(0.1))
-      .force('y', d3.forceY().strength(0.1).y(function (d) {
-        const v = d as Vertex
-        return v.depth ? v.depth * 200 : 0
-      }));
+    // .force('x', d3.forceX(graphSize.width / 2).strength(0.1))
+    // .force('y', d3.forceY().strength(0.1).y(0));
 
     simulation.on("tick", () => {
       nodes.attr("transform", function (d) {
@@ -422,9 +419,6 @@ export default function KnowledgeGraph({
       <div className={`${lectureView ? 'col-span-4' : 'col-span-6'} w-[90%] 
                       flex flex-col items-center justify-center 
                      overflow-hidden`}>
-
-
-
         <div className='bg-slate-200'>
           <svg ref={graphRef} className='graph-container fill-slate-200'>
             <foreignObject id='reset-button' className='cursor-pointer w-[50px] h-[50px] translate-x-[25px] translate-y-[25px]'>
@@ -432,13 +426,10 @@ export default function KnowledgeGraph({
             </foreignObject>
           </svg>
         </div>
-
-
       </div>
 
       {
-        shownContent !== null && shownContent.content && (lectureView
-          ?
+        shownContent !== null && shownContent.content && (lectureView ?
           <div
             className={`col-span-2 z-50 rounded-md 
                       mr-5 h-full w-full`}
@@ -461,8 +452,8 @@ export default function KnowledgeGraph({
             onMouseLeave={() => setShownContent(null)}
           >
             <VertexContent statement={shownContent} />
-          </div>)
-      }
+          </div>
+        )}
     </div >
   );
 };

@@ -43,7 +43,6 @@ export default function KnowledgeGraph({
     { value: "probability-theory", label: "Probability Theory" },
   ];
 
-
   const graphSize = {
     width: typeof window !== 'undefined' && window.visualViewport ? window.visualViewport.width * 0.6 : 500,
     height: typeof window !== 'undefined' && window.visualViewport ? window.visualViewport.height : 500,
@@ -243,7 +242,7 @@ export default function KnowledgeGraph({
     simulation.alphaDecay(0.5)
       .force('center', forceCenter(graphSize.width / 2, graphSize.height / 2))
       .force('link', forceLink(edges)
-        .distance(radius * 2)
+        .distance(radius * 3)
         .id(function (node) {
           const vertex = node as Vertex
           return vertex.key ? vertex.key : ''
@@ -355,8 +354,6 @@ export default function KnowledgeGraph({
       simulation.stop();
     };
   }, [graphRendered, selectedField]);
-
-
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

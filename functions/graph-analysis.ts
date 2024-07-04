@@ -91,6 +91,10 @@ export function getEdges(vertices: Vertex[]): Edge[] {
 }
 
 export function computeGraphDepth(graph: Graph, vertexName?: string): number {
+  if (graph.edges === undefined) {
+    graph.edges = getEdges(graph.vertices)
+  }
+
   if (vertexName === undefined) {
     const targetVertices = graph.edges.map(edge => edge.target);
     vertexName = graph.vertices.filter(vertex => !targetVertices.includes(vertex.name))[0].name;
@@ -219,6 +223,9 @@ export function breakLinesForCircle(terms: Vertex[], radius: number, fontSize: n
 }
 
 export function toAdjacencyMatrix(graph: Graph) {
+  if (graph.edges === undefined) {
+    graph.edges = getEdges(graph.vertices)
+  }
   const adjacencyMatrix: number[][] = [];
   const nameToIndex: Record<string, number> = {};
   graph.vertices.forEach((vertex, i) => {

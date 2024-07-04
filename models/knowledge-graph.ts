@@ -305,6 +305,36 @@ const graph = {
       content: ``,
     },
     {
+      name: `limsup and liminf of a bounded sequence converges`,
+      key: "limsup-and-liminf-of-a-bounded-sequence-converges",
+      type: `definition-theorem`,
+      fields: ["real-analysis"],
+      parents: [
+        {
+          key: "convergence-of-a-sequence",
+        },
+        {
+          key: 'supremum-and-infimum',
+        }
+      ],
+      content: ``,
+    },
+    {
+      name: `Bolzano-Weierstrass`,
+      key: "bolzano-weierstrass",
+      type: `theorem`,
+      fields: ["real-analysis"],
+      parents: [
+        {
+          key: "limsup-and-liminf-of-a-bounded-sequence-converges",
+        },
+        {
+          key: 'squeeze-theorem',
+        }
+      ],
+      content: ``,
+    },
+    {
       name: "$\\sigma$-algebra",
       key: "sigma-algebra",
       type: "definition",

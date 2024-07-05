@@ -14,13 +14,15 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="en" rel="preload">
-      <body>
-        <Nav />
-        <main className={`mt-4 min-h-[1000px]`}>
-          {children}
-        </main>
-        <Footer />
+    <html lang="en">
+      <body className="bg-black min-h-screen">
+        <div className="flex flex-col min-h-screen">
+          <Nav />
+          <main className="flex-grow mt-4 container mx-auto px-4">
+            {children}
+          </main>
+          <Footer />
+        </div>
       </body>
     </html>
   );

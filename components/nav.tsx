@@ -2,48 +2,69 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { BsList } from 'react-icons/bs';
+import { BsList, BsX } from 'react-icons/bs';
 import Image from 'next/image';
 import Favicon from '@app/favicon.ico';
 
+
+import GitHubIcon from '@public/github.png';
+import Email from '@public/email.png';
+import Cv from '@public/cv.png';
+
 export default function Nav() {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const navItems: string[] = ['Trailblazers', 'Philosophy', 'Mathematics', 'Computer Science'];
+  const navItems = [
+    <Link key={1} href='https://github.com/mintcd' target="_blank" className='hover:opacity-75 transition duration-150 ease-in-out'>
+      <Image src={GitHubIcon} alt="GitHub" width={30} height={30} />
+    </Link>,
 
-  const toggleDropdown = () => {
-    setDropdownOpen(!dropdownOpen);
+    <Link key={2} href='mailto:dangminh2208@gmail.com' className='hover:opacity-75 transition duration-150 ease-in-out'>
+      <Image src={Email} alt="github-icon" width={30} height={30} />
+    </Link>,
+
+    <Link key={3} href='/about' className='hover:opacity-75 transition duration-150 ease-in-out'>
+      <Image src={Cv} alt="github-icon" width={30} height={30} />
+    </Link>
+
+  ]
+
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
   };
 
   return (
-    <div className="max-w-screen-xl mx-auto px-4">
-      <nav className="w-full">
-        <a href="/"
-          className={`w-full m-5
-                    flex justify-center items-center`}>
-          <Image src={Favicon} alt="bagel" width={100} height={100} className='mr-3' />
-          <br />
-          <div itemID='slogan-container' className={`font-semibold md:text-lg sm:text-2xl`}>
-            Chocomint&apos;s Study Space
+    <nav className="bg-inherit mt-3">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-center">
+          <Link href="/" className="flex items-center">
+            <Image src={Favicon} alt="bagel" width={70} height={70} className="mr-3 rounded-full" />
+          </Link>
+
+          <div className="hidden md:block">
+            <div className="ml-10 flex items-center space-x-10">
+              {navItems.map((item, index) => (
+                item
+              ))}
+            </div>
           </div>
-        </a>
 
-        {/* <button onClick={toggleDropdown} className={`focus:outline-none sm:mr-10 md:hidden md:mr-20`}>
-        <BsList size={24} />
-      </button> */}
+          <div className="md:hidden">
+            <button onClick={toggleMobileMenu} className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+              {mobileMenuOpen ? <BsX size={24} /> : <BsList size={24} />}
+            </button>
+          </div>
+        </div>
+      </div>
 
-        <div itemID='nav-item-container'
-          className={`w-full m-5
-                    flex justify-center items-center text-gray-900 md:flex-wrap`}>
+      {mobileMenuOpen && (
+        <div className="md:hidden flex items-center justify-between space-x-4 mx-4">
           {navItems.map((item, index) => (
-            <Link key={`nav-item-${index}`} href={`/${item.toLowerCase().replace(" ", "-")}`}
-              className='m-4 hover:text-blue-500'>
-              {item}
-            </Link>
+            item
           ))}
         </div>
-      </nav>
-    </div>
-
+      )}
+    </nav>
   );
 }

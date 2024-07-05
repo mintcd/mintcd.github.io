@@ -2,27 +2,42 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import RealAnalysis from '@public/real-analysis.png'
 
-import GitHubIcon from '@public/github.png';
-import Email from '@public/email.png';
-import Cv from '@public/cv.png';
+const NAV_ITEMS = [
+  { title: 'Philosophy', image: RealAnalysis },
+  { title: 'Mathematics', image: RealAnalysis },
+  { title: 'Computer Science', image: RealAnalysis },
+]
 
 export default function Home() {
   return (
-    <div className={`flex justify-center items-center`}>
-      <div className='flex'>
-        <Link href='https://github.com/mintcd' target="_blank" className='mx-5'>
-          <Image src={GitHubIcon} alt="github-icon" width={50} height={50} />
-        </Link>
-
-        <Link href='mailto:dangminh2208@gmail.com' className='mx-5'>
-          <Image src={Email} alt="github-icon" width={50} height={50} />
-        </Link>
-
-        <Link href='/about' className='mx-5'>
-          <Image src={Cv} alt="github-icon" width={50} height={50} />
-        </Link>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="mt-20 h-20 text-center font-extrabold text-transparent text-6xl bg-clip-text text-gray-300">
+        Ignite the Meaning...?
       </div>
+
+      <ul className="grid sm:grid-cols-3 gap-6">
+        {NAV_ITEMS.map(({ title, image }, index) => (
+          <Link
+            key={index}
+            href={`/${title.toLowerCase().replace(' ', '-')}`}
+            className="group flex flex-col items-center p-2 rounded-md transition duration-150 ease-in-out w-full hover:opacity-80"
+          >
+            <div className="bg-gray-300 w-full h-11 flex justify-center items-center text-balance">
+              Image soon...
+            </div>
+            {/* <Image
+              src={image}
+              alt={title}
+              className="transition-transform duration-300 group-hover:scale-105"
+            /> */}
+            <div className="mt-2 h-20 flex justify-center items-center text-center font-bold text-transparent text-xl bg-clip-text bg-gradient-to-r from-green-200 via-blue-200 to-purple-200">
+              {title}
+            </div>
+          </Link>
+        ))}
+      </ul>
     </div>
   )
 }

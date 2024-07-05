@@ -5,9 +5,9 @@ import Link from "next/link";
 export default function Footer() {
 
   return (
-    <div className={` bg-slate-100 p-2 mt-4
+    <div className={` bg-inherit p-2 mt-4
                     flex flex-wrap items-center justify-between`}>
-      <span className={``}>
+      {/* <span className={``}>
         <div itemID='slogan-container'
           className={`font-semibold
                           md:text-lg
@@ -25,7 +25,7 @@ export default function Footer() {
             Facebook: facebook.com/minh.chaudangg
           </Link>
         </div>
-      </span>
+      </span> */}
     </div>
   );
 }

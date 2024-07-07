@@ -19,9 +19,8 @@ import { breakLinesForCircle, getEdges, initiateLayout, computeNodeDepths, getVe
 export default function KnowledgeGraph({
   graphData,
   radiusRatio,
-  filter = false,
 }
-  : { graphData: Graph, radiusRatio?: number, lectureView?: boolean, filter?: boolean }) {
+  : { graphData: Graph, radiusRatio?: number }) {
 
 
   const contentRef = useRef(null);
@@ -34,11 +33,7 @@ export default function KnowledgeGraph({
   const [shownContent, setShownContent] = useState<Vertex | undefined>(undefined)
   const [isOpen, setIsOpen] = useState(false);
 
-  const [selectedField, setSelectedField] = useState<Field | "all-fields">(() => {
-    // Retrieve the saved selected field from localStorage
-    const savedField = window.localStorage.getItem('selectedField') as Field;
-    return savedField || "all-fields";
-  });
+  const [selectedField, setSelectedField] = useState<Field | "all-fields">('all-fields');
 
   const fields = [
     { value: "all-fields", label: "All Fields" },
@@ -52,8 +47,8 @@ export default function KnowledgeGraph({
     height: 500,
   });
 
-  radiusRatio = radiusRatio || 35
-  const radius = graphSize.width / radiusRatio
+  radiusRatio = radiusRatio || 0.02
+  const radius = graphSize.width * radiusRatio
 
   let vertices = graphData.vertices
   if (selectedField !== "all-fields") {
@@ -66,11 +61,12 @@ export default function KnowledgeGraph({
   let edges = getEdges(vertices);
 
   useEffect(() => {
+    setSelectedField(window.localStorage.getItem('selectedField') as Field || 'all-fields')
     const calculateFontSize = (width: number): number => {
       if (width <= 414) {  // Phone screen
         return 4;
       } else {  // Larger screens
-        return 9;
+        return 6;
       }
     };
     const updateFontSize = () => {
@@ -106,7 +102,7 @@ export default function KnowledgeGraph({
 
     /////////////////////////////// Marker Styles /////////////////////////////////////////////////////////
     const markerStyles = svgGraph.append("svg:defs")
-    const markerSize = graphSize.width / 100;
+    const markerSize = graphSize.width * radiusRatio / 4;
 
     const defaultMarker = markerStyles.append("svg:marker")
       .attr("id", "arrow")
@@ -192,7 +188,9 @@ export default function KnowledgeGraph({
         const v = d as Vertex
         return v.color ? v.color : statementProps[v.type].color
       })
-      .style("opacity", 0.8)
+      .style("opacity", (v: Vertex) => {
+        return (v.parents === undefined || v.parents.length === 0) ? 1 : 0.7
+      })
 
 
     const foreignObjects = nodes
@@ -234,7 +232,7 @@ export default function KnowledgeGraph({
     simulation.alphaDecay(0.5)
       .force('center', forceCenter(graphSize.width / 2, graphSize.height / 2))
       .force('link', forceLink(edges)
-        .distance(radius * 2)
+        .distance(radius)
         .id(function (node) {
           const v = node as Vertex
           return v.key ? v.key : ''
@@ -377,7 +375,7 @@ export default function KnowledgeGraph({
       svgContainer.selectAll(".shape")
         .style("opacity", (d) => {
           const v = d as Vertex
-          return shownContent !== undefined && v.name === shownContent.name ? 1 : 0.8;
+          return shownContent !== undefined && v.name === shownContent.name ? 1 : 0.7;
         });
     }
   }, [shownContent, graphRendered]);
@@ -409,7 +407,7 @@ export default function KnowledgeGraph({
 
   return (
     <div className='sm:grid grid-cols-6 place-items-center'>
-      {filter && <div ref={dropdownRef} id='select' className=' col-span-4 mb-4 w-48'>
+      <div ref={dropdownRef} id='select' className=' col-span-4 mb-4 w-48'>
         <div
           className="bg-white border border-gray-300 rounded-md p-2 flex justify-between items-center cursor-pointer col-span-4"
           onClick={() => setIsOpen(!isOpen)}
@@ -436,7 +434,7 @@ export default function KnowledgeGraph({
             ))}
           </div>
         )}
-      </div>}
+      </div>
       <div ref={containerRef} className={`col-span-4 w-full
                       flex flex-col items-center justify-center 
                      overflow-hidden`}>

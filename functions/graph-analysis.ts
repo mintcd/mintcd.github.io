@@ -5,9 +5,9 @@ export function initiateLayout(vertices: Vertex[], width: number, height: number
   const dagreGraph = new dagre.graphlib.Graph();
   dagreGraph.setGraph({
     rankdir: 'TB',
-    nodesep: 10,
-    edgesep: 10,
-    ranksep: 10,
+    nodesep: 5,
+    edgesep: 5,
+    ranksep: 5,
   });
 
   vertices.forEach((vertex: Vertex) => {

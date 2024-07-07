@@ -13,11 +13,11 @@ const NAV_ITEMS = [
 export default function Home() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="mt-20 h-20 text-center font-extrabold text-transparent text-6xl bg-clip-text text-gray-300">
-        Ignite the Meaning...?
+      <div className="my-10 sm:my-20 text-center font-extrabold text-5xl sm:text-6xl text-gray-300">
+        Ignite the Meaning?
       </div>
 
-      <ul className="grid sm:grid-cols-3 gap-6">
+      <div className="grid sm:grid-cols-3 gap-6">
         {NAV_ITEMS.map(({ title, image }, index) => (
           <Link
             key={index}
@@ -37,7 +37,7 @@ export default function Home() {
             </div>
           </Link>
         ))}
-      </ul>
+      </div>
     </div>
   )
 }

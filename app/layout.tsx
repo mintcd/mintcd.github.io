@@ -15,7 +15,7 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
-      <body className="bg-black min-h-screen">
+      <body className="bg-black min-h-screen sm:mx-5 mx-2">
         <div className="flex flex-col min-h-screen">
           <Nav />
           <main className="flex-grow mt-4 container mx-auto px-4">

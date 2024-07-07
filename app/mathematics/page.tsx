@@ -1,4 +1,4 @@
-import KnowledgeGraph from '@components/knowledge-graph'
+import DependencyGraph from '@components/knowledge-graph'
 
 import data from '@models/mathematics/subject-dependencies'
 import Terminology from '@components/terminology'
@@ -17,7 +17,7 @@ export default function Mathematics() {
         </a>
       </div>
       <div className='w-full'>
-        <KnowledgeGraph graphData={data} />
+        <DependencyGraph graphData={data} />
       </div>
     </div>
   );

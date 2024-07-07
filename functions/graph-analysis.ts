@@ -204,7 +204,7 @@ export function breakLinesForCircle(terms: Vertex[], radius: number, fontSize: n
       const word = words[i];
       const testLine = currentLine + ' ' + word;
       const testWidth = getTextWidth(testLine, fontSize, fontFamily);
-      const maxWidth = 2 * Math.sqrt(radius * radius - (currentHeight + lineIndex * fontSize) * currentHeight + lineIndex * fontSize);
+      const maxWidth = 2 * Math.sqrt(radius * radius - Math.pow(currentHeight + lineIndex * fontSize, 2));
 
       if (testWidth <= maxWidth) {
         currentLine = testLine;
@@ -212,15 +212,37 @@ export function breakLinesForCircle(terms: Vertex[], radius: number, fontSize: n
         lines.push(currentLine);
         currentLine = word;
         lineIndex++;
+        currentHeight += fontSize; // Update the height for the next line
+
+        if (currentHeight + lineIndex * fontSize >= radius) {
+          break; // Stop if the text exceeds the circle's height
+        }
       }
     }
-    lines.push(currentLine);
+    if (currentHeight + lineIndex * fontSize < radius) {
+      lines.push(currentLine);
+    } else {
+      // Truncate text with ellipses
+      const lastLine = lines.pop() || '';
+      const availableWidth = 2 * Math.sqrt(radius * radius - Math.pow(currentHeight + lineIndex * fontSize, 2));
+      let truncated = '';
+      for (let j = 0; j < lastLine.length; j++) {
+        truncated += lastLine[j];
+        if (getTextWidth(truncated + '...', fontSize, fontFamily) > availableWidth) {
+          truncated = truncated.slice(0, -1);
+          break;
+        }
+      }
+      lines.push(truncated + '...');
+    }
+
     return {
       ...term,
       lines: lines
     };
   });
 }
+
 
 export function toAdjacencyMatrix(graph: Graph) {
   if (graph.edges === undefined) {

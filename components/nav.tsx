@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { BsList, BsX } from 'react-icons/bs';
+import { BsList } from 'react-icons/bs';
 import Image from 'next/image';
 import Favicon from '@app/favicon.ico';
 
@@ -51,15 +51,15 @@ export default function Nav() {
           </div>
 
           <div className="md:hidden">
-            <button onClick={toggleMobileMenu} className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
-              {mobileMenuOpen ? <BsX size={24} /> : <BsList size={24} />}
+            <button onClick={toggleMobileMenu} className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-700">
+              <BsList size={24} />
             </button>
           </div>
         </div>
       </div>
 
       {mobileMenuOpen && (
-        <div className="md:hidden flex items-center justify-between space-x-4 mx-4">
+        <div className="md:hidden mt-2 flex items-center justify-center space-x-4 mx-4">
           {navItems.map((item, index) => (
             item
           ))}

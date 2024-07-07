@@ -17,9 +17,10 @@ import Latex from '@components/latex';
 import VertexContent from '@components/statement-content';
 import { breakLinesForCircle, getEdges, initiateLayout, computeNodeDepths, getVerticesOfTopic } from '@functions/graph-analysis';
 
-export default function KnowledgeGraph({
+export default function DependencyGraph({
   graphData,
   radius,
+  lectureView = false,
   filter = false,
 }
   : { graphData: Graph, radius?: number, lectureView?: boolean, filter?: boolean }) {
@@ -31,6 +32,7 @@ export default function KnowledgeGraph({
   const [fontSize, setFontSize] = useState(9);
 
   const [graphRendered, setGraphRendered] = useState(false)
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [shownContent, setShownContent] = useState<Vertex | null>(null)
   const [isOpen, setIsOpen] = useState(false);
   const [selectedField, setSelectedField] = useState<Field | "all-fields">("all-fields");
@@ -188,8 +190,6 @@ export default function KnowledgeGraph({
         const v = d as Vertex
         return v.color ? v.color : statementProps[v.type].color
       })
-      .style("opacity", 0.8)
-
 
     const foreignObjects = nodes
       .append("foreignObject")
@@ -232,8 +232,31 @@ export default function KnowledgeGraph({
         const v = d as Vertex
         const container = this as HTMLElement
         createRoot(container).render(
-          <div className={`text-center w-full hover:font-bold hover:cursor-pointer`}
-            onClick={() => setShownContent(v)}
+          <div className={`text-center w-full hover:font-bold hover:cursor-pointer
+                            ${shownContent && shownContent.name === v.name ? 'font-bold' : ''}`}
+            onMouseEnter={(event) => {
+              if (!lectureView) {
+                setShownContent(v);
+                setMousePosition({
+                  x: event.clientX,
+                  y: event.clientY,
+                });
+              }
+
+            }}
+            onMouseLeave={() => {
+              if (!lectureView) {
+                setShownContent(null);
+              }
+
+            }}
+            onClick={() => {
+              if (v.href && lectureView === false) {
+                window.open(v.href, '_blank');
+              } else {
+                setShownContent(v)
+              }
+            }}
           >
             {v.lines
               && v.lines.map((line, i) => (
@@ -245,7 +268,6 @@ export default function KnowledgeGraph({
           </div>
         );
       })
-
     /////////////////////////// Simulation //////////////////////////////////////
     const simulation = forceSimulation(vertices)
     simulation.alphaDecay(0.5)
@@ -365,17 +387,34 @@ export default function KnowledgeGraph({
     };
   }, [graphRendered, selectedField]);
 
-  useEffect(() => {
-    if (graphRendered) {
-      const svgContainer = select(graphRef.current as SVGSVGElement);
-      svgContainer.selectAll(".shape")
-        .style("opacity", (d) => {
-          const v = d as Vertex
-          return shownContent !== null && v.name === shownContent.name ? 1 : 0.8;
-        });
-    }
-  }, [shownContent, graphRendered]);
 
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (contentRef.current && !(contentRef.current as HTMLElement).contains(event.target as Node)) {
+        setShownContent(null);
+      }
+
+      if (dropdownRef.current && !(dropdownRef.current as HTMLElement).contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+
+    function escHandler(event: globalThis.KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setShownContent(null);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', escHandler);
+
+    // Clean up
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', escHandler);
+    };
+
+  });
 
   return (
     <div className='sm:grid grid-cols-6 place-items-center'>
@@ -406,27 +445,44 @@ export default function KnowledgeGraph({
           </div>
         )}
       </div>}
-      <div ref={containerRef} className={`col-span-4 w-full
+      <div ref={containerRef} className={`${lectureView ? 'col-span-4' : 'col-span-6'} w-full
                       flex flex-col items-center justify-center 
                      overflow-hidden`}>
         <div className='bg-slate-200'>
           <svg ref={graphRef} className='graph-container fill-slate-200'>
             <foreignObject id='reset-button' className='cursor-pointer w-[50px] h-[50px] translate-x-[25px] translate-y-[25px]'>
-              <CenterFocusStrongRoundedIcon className={`w-${graphSize.width / 20} h-${graphSize.height / 20}`} />
+              <CenterFocusStrongRoundedIcon className={`w-${graphSize.width / 25} h-${graphSize.height / 25}`} />
             </foreignObject>
           </svg>
         </div>
       </div>
 
       {
-        shownContent !== null && shownContent.content &&
-        <div
-          className={`col-span-2 z-50 rounded-md sm:mt-0 sm:ml-5 mt-5
+        shownContent !== null && shownContent.content && (lectureView ?
+          <div
+            className={`col-span-2 z-50 rounded-md sm:mt-0 sm:ml-5 mt-5
                         h-full w-full`}
-          ref={contentRef}>
-          <VertexContent statement={shownContent} />
-        </div>
-      }
+            ref={contentRef}
+          >
+            <VertexContent statement={shownContent} />
+          </div>
+          :
+          <div
+            className={`z-50 rounded-md 
+         animate-fadeIn p-5 max-w-[600px]
+        `}
+            style={{
+              position: 'fixed',
+              top: `${mousePosition.y}px`,
+              left: `${mousePosition.x}px`
+            }}
+            ref={contentRef}
+            onMouseEnter={() => setShownContent(shownContent)}
+            onMouseLeave={() => setShownContent(null)}
+          >
+            <VertexContent statement={shownContent} />
+          </div>
+        )}
     </div >
   );
 };

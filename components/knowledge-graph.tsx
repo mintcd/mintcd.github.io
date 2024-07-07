@@ -1,5 +1,4 @@
 'use client'
-
 import { useRef, useEffect, useState, RefObject } from 'react';
 import { createRoot } from 'react-dom/client';
 
@@ -19,10 +18,11 @@ import { breakLinesForCircle, getEdges, initiateLayout, computeNodeDepths, getVe
 
 export default function KnowledgeGraph({
   graphData,
-  radius,
+  radiusRatio,
   filter = false,
 }
-  : { graphData: Graph, radius?: number, lectureView?: boolean, filter?: boolean }) {
+  : { graphData: Graph, radiusRatio?: number, lectureView?: boolean, filter?: boolean }) {
+
 
   const contentRef = useRef(null);
   const graphRef = useRef<SVGSVGElement>(null);
@@ -31,9 +31,14 @@ export default function KnowledgeGraph({
   const [fontSize, setFontSize] = useState(9);
 
   const [graphRendered, setGraphRendered] = useState(false)
-  const [shownContent, setShownContent] = useState<Vertex | null>(null)
+  const [shownContent, setShownContent] = useState<Vertex | undefined>(undefined)
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedField, setSelectedField] = useState<Field | "all-fields">("all-fields");
+
+  const [selectedField, setSelectedField] = useState<Field | "all-fields">(() => {
+    // Retrieve the saved selected field from localStorage
+    const savedField = window.localStorage.getItem('selectedField') as Field;
+    return savedField || "all-fields";
+  });
 
   const fields = [
     { value: "all-fields", label: "All Fields" },
@@ -47,9 +52,8 @@ export default function KnowledgeGraph({
     height: 500,
   });
 
-  if (radius === undefined) {
-    radius = graphSize.width / 35
-  }
+  radiusRatio = radiusRatio || 35
+  const radius = graphSize.width / radiusRatio
 
   let vertices = graphData.vertices
   if (selectedField !== "all-fields") {
@@ -198,27 +202,6 @@ export default function KnowledgeGraph({
       .attr("x", -radius)
       .attr("y", -radius);
 
-    const nodeDrag = drag()
-      .on("start", function dragStartedHandler(event, d) {
-        const v = d as Vertex;
-        v.fx = v.x;
-        v.fy = v.y;
-      })
-      .on("drag", function draggingHandler(event, d) {
-        const v = d as Vertex;
-        v.fx = event.x;
-        v.fy = event.y;
-        simulation.alphaTarget(0).restart()
-      })
-      .on("end", function dragEndedHandler(event, d) {
-        const v = d as Vertex;
-        if (!event.active) simulation.alphaTarget(0);
-        v.fx = undefined;
-        v.fy = undefined;
-      });
-
-    nodes.call(nodeDrag as any)
-
     foreignObjects.append("xhtml:div")
       .style("display", "flex")
       .style("flex-direction", "column")
@@ -304,6 +287,29 @@ export default function KnowledgeGraph({
     })
 
     //////////////// Drag behaviors ////////////////////////////////////////////////////
+
+    const nodeDrag = drag()
+      .on("start", function dragStartedHandler(event, d) {
+        const v = d as Vertex;
+        v.fx = v.x;
+        v.fy = v.y;
+      })
+      .on("drag", function draggingHandler(event, d) {
+        const v = d as Vertex;
+        v.fx = event.x;
+        v.fy = event.y;
+        simulation.alphaTarget(0).restart()
+      })
+      .on("end", function dragEndedHandler(event, d) {
+        const v = d as Vertex;
+        if (!event.active) simulation.alphaTarget(0);
+        v.fx = undefined;
+        v.fy = undefined;
+      });
+
+    nodes.call(nodeDrag as any)
+
+    //////////////// Zoom behaviors ////////////////////////////////////////////////////
     const zoomBehavior = zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.1, 3])
       .filter((event) => {
@@ -371,10 +377,34 @@ export default function KnowledgeGraph({
       svgContainer.selectAll(".shape")
         .style("opacity", (d) => {
           const v = d as Vertex
-          return shownContent !== null && v.name === shownContent.name ? 1 : 0.8;
+          return shownContent !== undefined && v.name === shownContent.name ? 1 : 0.8;
         });
     }
   }, [shownContent, graphRendered]);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !(dropdownRef.current as HTMLElement).contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+
+    function escHandler(event: globalThis.KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', escHandler);
+
+    // Clean up
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', escHandler);
+    };
+
+  });
 
 
   return (
@@ -397,6 +427,7 @@ export default function KnowledgeGraph({
                 className="p-2 hover:bg-gray-100 cursor-pointer"
                 onClick={() => {
                   setSelectedField(field.value as Field | "all-fields");
+                  localStorage.setItem('selectedField', field.value)
                   setIsOpen(false);
                 }}
               >
@@ -409,24 +440,20 @@ export default function KnowledgeGraph({
       <div ref={containerRef} className={`col-span-4 w-full
                       flex flex-col items-center justify-center 
                      overflow-hidden`}>
-        <div className='bg-slate-200'>
-          <svg ref={graphRef} className='graph-container fill-slate-200'>
+        <div className='bg-gray-200 rounded-3xl'>
+          <svg ref={graphRef} className='graph-container'>
             <foreignObject id='reset-button' className='cursor-pointer w-[50px] h-[50px] translate-x-[25px] translate-y-[25px]'>
               <CenterFocusStrongRoundedIcon className={`w-${graphSize.width / 20} h-${graphSize.height / 20}`} />
             </foreignObject>
           </svg>
         </div>
       </div>
-
-      {
-        shownContent !== null && shownContent.content &&
-        <div
-          className={`col-span-2 z-50 rounded-md sm:mt-0 sm:ml-5 mt-5
-                        h-full w-full`}
-          ref={contentRef}>
-          <VertexContent statement={shownContent} />
-        </div>
-      }
+      <div
+        className={`col-span-2 z-50 rounded-3xl sm:mt-0 sm:ml-5 mt-5
+                      text-gray-800 w-full h-full`}
+        ref={contentRef}>
+        <VertexContent statement={shownContent} />
+      </div>
     </div >
   );
 };

@@ -1,4 +1,4 @@
-import DependencyGraph from '@components/knowledge-graph'
+import DependencyGraph from '@components/dependency-graph'
 
 import data from '@models/mathematics/subject-dependencies'
 import Terminology from '@components/terminology'
@@ -9,6 +9,9 @@ export default function Mathematics() {
     <div className='flex flex-col items-center justify-center'>
 
       <div className='mb-4 w-full'>
+        <div className="text-center text-3xl font-bold">
+          Terminology
+        </div>
         <Terminology data={objects} />
       </div>
       <div className='text-center m-4'>
@@ -16,8 +19,8 @@ export default function Mathematics() {
           Maths Knowledge Graph
         </a>
       </div>
-      <div className='w-full'>
-        <DependencyGraph graphData={data} />
+      <div className='w-[60%]'>
+        <DependencyGraph graphData={data} radiusRatio={20} />
       </div>
     </div>
   );

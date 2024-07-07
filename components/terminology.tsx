@@ -19,7 +19,7 @@ export default function Terminology({ data, field }: { data: Term[], field?: Fie
   const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>(() => {
     const state: { [key: string]: boolean } = {};
     for (let i = 65; i <= 90; i++) { // ASCII codes for A-Z
-      state[String.fromCharCode(i)] = true;
+      state[String.fromCharCode(i)] = false;
     }
     return state;
   });
@@ -88,19 +88,16 @@ export default function Terminology({ data, field }: { data: Term[], field?: Fie
 
   return (
     <div className='max-w-6xl mx-auto px-4 py-8'>
-      <div className="mb-8 text-center">
-        <h2 className="text-3xl font-bold mb-4 text-gray-800">Terminology</h2>
-      </div>
       <div className='grid grid-cols-5'>
         <div ref={dropdownRef} id='select' className='col-span-2 mb-4 w-48'>
           <div
             className="bg-white border border-gray-300 rounded-md p-2 flex justify-between items-center cursor-pointer col-span-4"
             onClick={() => setIsOpen(!isOpen)}
           >
-            <span className="text-gray-700">
+            <span>
               {fields.find(f => f.value === selectedField)?.label}
             </span>
-            <ArrowDropDownIcon className={`text-gray-500 transition-transform duration-300 ${isOpen ? 'transform rotate-180' : ''}`} />
+            <ArrowDropDownIcon className={`transition-transform duration-300 ${isOpen ? 'transform rotate-180' : ''}`} />
           </div>
 
           {isOpen && (
@@ -121,17 +118,17 @@ export default function Terminology({ data, field }: { data: Term[], field?: Fie
           )}
         </div>
         <div className="relative mx-auto">
-          <GoSearch className="absolute left-3 top-3 text-gray-400" size={20} />
+          <GoSearch className="absolute left-3 top-3 " size={20} />
           <input
             type="text"
             placeholder="Search terms..."
             value={searchQuery}
             onChange={handleSearchInputChange}
-            className="w-full px-4 py-2 pl-10 pr-4 text-gray-700 bg-white border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 pl-10 pr-4  bg-white border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
       </div>
-      <div className="text-lg font-semibold text-gray-700 mb-4">
+      <div className="text-lg font-semibold  mb-4">
         {filteredTerms.length} terms
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -146,14 +143,14 @@ export default function Terminology({ data, field }: { data: Term[], field?: Fie
                     toggleSection(letter)
                   }}
                 >
-                  <span className='font-bold text-xl text-gray-700'>{letter}</span>
-                  {expandedSections[letter] ? <FaChevronUp className="text-gray-500" /> : <FaChevronDown className="text-gray-500" />}
+                  <span className='font-bold text-xl '>{letter}</span>
+                  {expandedSections[letter] ? <FaChevronUp className="" /> : <FaChevronDown className="" />}
                 </div>
                 {expandedSections[letter] && (
                   <ul className="divide-y divide-gray-200">
                     {groupedTerms[letter].map((term, index) => (
                       <li key={index} className="px-4 py-3 hover:bg-gray-50 transition-colors duration-150">
-                        <div className="text-gray-800">
+                        <div className="">
                           <Latex>{term.name}</Latex>
                         </div>
                       </li>

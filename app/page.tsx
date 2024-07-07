@@ -13,7 +13,7 @@ const NAV_ITEMS = [
 export default function Home() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="my-10 sm:my-20 text-center font-extrabold text-5xl sm:text-6xl text-gray-300">
+      <div className="my-10 sm:my-20 text-center font-extrabold text-5xl sm:text-6xl">
         Ignite the Meaning?
       </div>
 

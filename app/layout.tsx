@@ -18,7 +18,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <body className="bg-black min-h-screen sm:mx-5 mx-2">
         <div className="flex flex-col min-h-screen">
           <Nav />
-          <main className="flex-grow mt-4 container mx-auto px-4">
+          <main className="flex-grow mt-4 container mx-auto px-4 text-gray-500">
             {children}
           </main>
           <Footer />

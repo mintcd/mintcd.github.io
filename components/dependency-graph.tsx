@@ -4,37 +4,30 @@ import { useRef, useEffect, useState, RefObject } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import CenterFocusStrongRoundedIcon from '@mui/icons-material/CenterFocusStrongRounded';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 import { select } from 'd3-selection'
 import { drag } from 'd3-drag'
-import { zoom, zoomIdentity, zoomTransform, ZoomBehavior } from 'd3-zoom'
+import { zoom, zoomIdentity, zoomTransform } from 'd3-zoom'
 import { forceSimulation, forceLink, forceCenter, forceCollide, forceRadial, forceManyBody } from 'd3-force';
 
 
 import { statementProps } from '@styles/statement-props';
 import Latex from '@components/latex';
-import VertexContent from '@components/statement-content';
 import { breakLinesForCircle, getEdges, initiateLayout, computeNodeDepths, getVerticesOfTopic } from '@functions/graph-analysis';
 
 export default function DependencyGraph({
   graphData,
-  radius,
-  lectureView = false,
-  filter = false,
+  radiusRatio
 }
-  : { graphData: Graph, radius?: number, lectureView?: boolean, filter?: boolean }) {
+  : { graphData: Graph, radiusRatio?: number }) {
 
-  const contentRef = useRef(null);
   const graphRef = useRef<SVGSVGElement>(null);
   const dropdownRef = useRef(null);
   const containerRef: RefObject<HTMLDivElement> = useRef(null);
   const [fontSize, setFontSize] = useState(9);
 
   const [graphRendered, setGraphRendered] = useState(false)
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [shownContent, setShownContent] = useState<Vertex | null>(null)
-  const [isOpen, setIsOpen] = useState(false);
   const [selectedField, setSelectedField] = useState<Field | "all-fields">("all-fields");
 
   const fields = [
@@ -49,9 +42,8 @@ export default function DependencyGraph({
     height: 500,
   });
 
-  if (radius === undefined) {
-    radius = graphSize.width / 35
-  }
+  radiusRatio = radiusRatio || 35
+  const radius = graphSize.width / radiusRatio
 
   let vertices = graphData.vertices
   if (selectedField !== "all-fields") {
@@ -66,9 +58,9 @@ export default function DependencyGraph({
   useEffect(() => {
     const calculateFontSize = (width: number): number => {
       if (width <= 414) {  // Phone screen
-        return 4;
-      } else {  // Larger screens
         return 9;
+      } else {  // Larger screens
+        return 14;
       }
     };
     const updateFontSize = () => {
@@ -234,24 +226,8 @@ export default function DependencyGraph({
         createRoot(container).render(
           <div className={`text-center w-full hover:font-bold hover:cursor-pointer
                             ${shownContent && shownContent.name === v.name ? 'font-bold' : ''}`}
-            onMouseEnter={(event) => {
-              if (!lectureView) {
-                setShownContent(v);
-                setMousePosition({
-                  x: event.clientX,
-                  y: event.clientY,
-                });
-              }
-
-            }}
-            onMouseLeave={() => {
-              if (!lectureView) {
-                setShownContent(null);
-              }
-
-            }}
             onClick={() => {
-              if (v.href && lectureView === false) {
+              if (v.href) {
                 window.open(v.href, '_blank');
               } else {
                 setShownContent(v)
@@ -388,101 +364,19 @@ export default function DependencyGraph({
   }, [graphRendered, selectedField]);
 
 
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (contentRef.current && !(contentRef.current as HTMLElement).contains(event.target as Node)) {
-        setShownContent(null);
-      }
-
-      if (dropdownRef.current && !(dropdownRef.current as HTMLElement).contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    }
-
-    function escHandler(event: globalThis.KeyboardEvent) {
-      if (event.key === 'Escape') {
-        setShownContent(null);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', escHandler);
-
-    // Clean up
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', escHandler);
-    };
-
-  });
-
   return (
-    <div className='sm:grid grid-cols-6 place-items-center'>
-      {filter && <div ref={dropdownRef} id='select' className=' col-span-4 mb-4 w-48'>
-        <div
-          className="bg-white border border-gray-300 rounded-md p-2 flex justify-between items-center cursor-pointer col-span-4"
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          <span className="text-gray-700">
-            {fields.find(f => f.value === selectedField)?.label}
-          </span>
-          <ArrowDropDownIcon className={`text-gray-500 transition-transform duration-300 ${isOpen ? 'transform rotate-180' : ''}`} />
-        </div>
-        {isOpen && (
-          <div className="absolute w-48 bg-white border border-gray-300 mt-1 rounded-md shadow-lg z-10">
-            {fields.map((field) => (
-              <div
-                key={field.value}
-                className="p-2 hover:bg-gray-100 cursor-pointer"
-                onClick={() => {
-                  setSelectedField(field.value as Field | "all-fields");
-                  setIsOpen(false);
-                }}
-              >
-                {field.label}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>}
-      <div ref={containerRef} className={`${lectureView ? 'col-span-4' : 'col-span-6'} w-full
+    <div className='place-items-center'>
+
+      <div ref={containerRef} className={`w-full
                       flex flex-col items-center justify-center 
                      overflow-hidden`}>
         <div className='bg-slate-200'>
-          <svg ref={graphRef} className='graph-container fill-slate-200'>
+          <svg ref={graphRef} className='graph-container fill-gray-500'>
             <foreignObject id='reset-button' className='cursor-pointer w-[50px] h-[50px] translate-x-[25px] translate-y-[25px]'>
-              <CenterFocusStrongRoundedIcon className={`w-${graphSize.width / 25} h-${graphSize.height / 25}`} />
             </foreignObject>
           </svg>
         </div>
       </div>
-
-      {
-        shownContent !== null && shownContent.content && (lectureView ?
-          <div
-            className={`col-span-2 z-50 rounded-md sm:mt-0 sm:ml-5 mt-5
-                        h-full w-full`}
-            ref={contentRef}
-          >
-            <VertexContent statement={shownContent} />
-          </div>
-          :
-          <div
-            className={`z-50 rounded-md 
-         animate-fadeIn p-5 max-w-[600px]
-        `}
-            style={{
-              position: 'fixed',
-              top: `${mousePosition.y}px`,
-              left: `${mousePosition.x}px`
-            }}
-            ref={contentRef}
-            onMouseEnter={() => setShownContent(shownContent)}
-            onMouseLeave={() => setShownContent(null)}
-          >
-            <VertexContent statement={shownContent} />
-          </div>
-        )}
     </div >
   );
 };

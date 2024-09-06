@@ -191,58 +191,50 @@ export function breakLines(terms: Vertex[], maxWidth: number, fontSize: number, 
 }
 
 
-export function breakLinesForCircle(terms: Vertex[], radius: number, fontSize: number, fontFamily: string): Vertex[] {
-  return terms.map(term => {
-    // Split the text into lines based on the maximum width at each height
-    const lines: string[] = [];
-    const words = term.name.split(' ');
-    let currentLine = words[0];
-    let currentHeight = -radius + fontSize / 2; // Start from the top of the circle
-    let lineIndex = 0;
+export function breakLinesForCircle(vertex: Vertex, radius: number, fontSize: number = radius / 20, fontFamily: string = "Arial"): string[] {
+  const lines: string[] = [];
+  const words = vertex.name.split(' ');
+  let currentLine = words[0];
+  let currentHeight = -radius + fontSize / 2; // Start from the top of the circle
+  let lineIndex = 0;
 
-    for (let i = 1; i < words.length; i++) {
-      const word = words[i];
-      const testLine = currentLine + ' ' + word;
-      const testWidth = getTextWidth(testLine, fontSize, fontFamily);
-      const maxWidth = 2 * Math.sqrt(radius * radius - Math.pow(currentHeight + lineIndex * fontSize, 2));
+  for (let i = 1; i < words.length; i++) {
+    const word = words[i];
+    const testLine = currentLine + ' ' + word;
+    const testWidth = getTextWidth(testLine, fontSize, fontFamily);
+    const maxWidth = 2 * Math.sqrt(radius * radius - Math.pow(currentHeight + lineIndex * fontSize, 2));
 
-      if (testWidth <= maxWidth) {
-        currentLine = testLine;
-      } else {
-        lines.push(currentLine);
-        currentLine = word;
-        lineIndex++;
-        currentHeight += fontSize; // Update the height for the next line
-
-        if (currentHeight + lineIndex * fontSize >= radius) {
-          break; // Stop if the text exceeds the circle's height
-        }
-      }
-    }
-    if (currentHeight + lineIndex * fontSize < radius) {
-      lines.push(currentLine);
+    if (testWidth <= maxWidth) {
+      currentLine = testLine;
     } else {
-      // Truncate text with ellipses
-      const lastLine = lines.pop() || '';
-      const availableWidth = 2 * Math.sqrt(radius * radius - Math.pow(currentHeight + lineIndex * fontSize, 2));
-      let truncated = '';
-      for (let j = 0; j < lastLine.length; j++) {
-        truncated += lastLine[j];
-        if (getTextWidth(truncated + '...', fontSize, fontFamily) > availableWidth) {
-          truncated = truncated.slice(0, -1);
-          break;
-        }
+      lines.push(currentLine);
+      currentLine = word;
+      lineIndex++;
+      currentHeight += fontSize; // Update the height for the next line
+
+      if (currentHeight + lineIndex * fontSize >= radius) {
+        break; // Stop if the text exceeds the circle's height
       }
-      lines.push(truncated + '...');
     }
-
-    return {
-      ...term,
-      lines: lines
-    };
-  });
+  }
+  if (currentHeight + lineIndex * fontSize < radius) {
+    lines.push(currentLine);
+  } else {
+    // Truncate text with ellipses
+    const lastLine = lines.pop() || '';
+    const availableWidth = 2 * Math.sqrt(radius * radius - Math.pow(currentHeight + lineIndex * fontSize, 2));
+    let truncated = '';
+    for (let j = 0; j < lastLine.length; j++) {
+      truncated += lastLine[j];
+      if (getTextWidth(truncated + '...', fontSize, fontFamily) > availableWidth) {
+        truncated = truncated.slice(0, -1);
+        break;
+      }
+    }
+    lines.push(truncated + '...');
+  }
+  return lines
 }
-
 
 export function toAdjacencyMatrix(graph: Graph) {
   if (graph.edges === undefined) {

@@ -17,9 +17,10 @@ import { breakLinesForCircle, getEdges, initiateLayout, computeNodeDepths, getVe
 
 export default function DependencyGraph({
   graphData,
-  radiusRatio
+  radiusRatio,
+  background
 }
-  : { graphData: Graph, radiusRatio?: number }) {
+  : { graphData: Graph, radiusRatio?: number, background?: string }) {
 
   const graphRef = useRef<SVGSVGElement>(null);
   const dropdownRef = useRef(null);
@@ -42,8 +43,8 @@ export default function DependencyGraph({
     height: 500,
   });
 
-  radiusRatio = radiusRatio || 35
-  const radius = graphSize.width / radiusRatio
+  radiusRatio = radiusRatio || 0.07
+  const radius = graphSize.width * radiusRatio
 
   let vertices = graphData.vertices
   if (selectedField !== "all-fields") {
@@ -370,8 +371,8 @@ export default function DependencyGraph({
       <div ref={containerRef} className={`w-full
                       flex flex-col items-center justify-center 
                      overflow-hidden`}>
-        <div className='bg-slate-200'>
-          <svg ref={graphRef} className='graph-container fill-gray-500'>
+        <div className={`bg-${background || 'slate-200'}`}>
+          <svg ref={graphRef} className='graph-container'>
             <foreignObject id='reset-button' className='cursor-pointer w-[50px] h-[50px] translate-x-[25px] translate-y-[25px]'>
             </foreignObject>
           </svg>

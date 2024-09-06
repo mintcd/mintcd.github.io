@@ -97,16 +97,11 @@ body {
   /* Color of the scrollbar thumb on hover */
 }
 
-.node {
-  stroke: #fff;
-  stroke-width: 1.5px;
-}
-
-.link {
-  stroke: #999;
-  stroke-opacity: 0.6;
-}
-
 text {
   font-size: 12px;
+}
+
+.node:focus,
+.node *:focus {
+  outline: none;
 }

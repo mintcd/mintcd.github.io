@@ -1,0 +1,30 @@
+body {
+  font-family: Arial, sans-serif;
+  line-height: 1.5;
+  margin: 20px;
+}
+
+ul {
+  list-style-type: none;
+  padding-left: 20px;
+}
+
+.element {
+  cursor: pointer;
+  margin: 5px 0;
+  display: inline-block;
+}
+
+.element:hover {
+  background-color: #f0f0f0;
+}
+
+.attributes {
+  margin-left: 20px;
+  font-size: 0.9em;
+  color: #555;
+}
+
+.nested {
+  margin-left: 20px;
+}

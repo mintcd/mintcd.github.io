@@ -41,9 +41,10 @@ export default function Terminology({ data, field }: { data: Term[], field?: Fie
   const termsPerColumn = Math.ceil(sortedKeys.length / 3);
 
   function toggleSection(letter: string) {
-    let newExpandedSections = { ...expandedSections, [letter]: !expandedSections[letter] };
-    console.log(newExpandedSections);
-    setExpandedSections(newExpandedSections);
+    setExpandedSections(prev => {
+      const newState = { ...prev, [letter]: !prev[letter] };
+      return newState;
+    });
   }
 
 
@@ -137,26 +138,31 @@ export default function Terminology({ data, field }: { data: Term[], field?: Fie
             {sortedKeys.slice(columnIndex * termsPerColumn, (columnIndex + 1) * termsPerColumn).map(letter => (
               <div key={letter} className="bg-white shadow-md rounded-lg overflow-hidden">
                 <div
-                  className="cursor-pointer flex items-center justify-between px-4 py-3 bg-gray-100"
-                  onClick={() => {
-                    console.log("Clicked", letter)
-                    toggleSection(letter)
-                  }}
+                  className="cursor-pointer flex items-center justify-between px-4 py-1 bg-gray-100"
+                  onClick={() => toggleSection(letter)}
                 >
-                  <span className='font-bold text-xl '>{letter}</span>
-                  {expandedSections[letter] ? <FaChevronUp className="" /> : <FaChevronDown className="" />}
+                  <span className='font-bold text-xl'>{letter}</span>
+                  <div className={`transition-transform duration-300 ${expandedSections[letter] ? 'rotate-180' : ''
+                    }`}>
+                    <FaChevronDown />
+                  </div>
                 </div>
-                {expandedSections[letter] && (
+                <div
+                  className={`transition-all duration-300 ease-in-out ${expandedSections[letter]
+                    ? 'max-h-[1000px] opacity-100'
+                    : 'max-h-0 opacity-0'
+                    } overflow-hidden`}
+                >
                   <ul className="divide-y divide-gray-200">
                     {groupedTerms[letter].map((term, index) => (
-                      <li key={index} className="px-4 py-3 hover:bg-gray-50 transition-colors duration-150">
-                        <div className="">
+                      <li key={index} className="px-4 py-1 hover:bg-gray-50 transition-colors duration-150">
+                        <div>
                           <Latex>{term.name}</Latex>
                         </div>
                       </li>
                     ))}
                   </ul>
-                )}
+                </div>
               </div>
             ))}
           </div>

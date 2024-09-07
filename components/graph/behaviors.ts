@@ -2,6 +2,7 @@ import { drag } from 'd3-drag'
 import { Simulation } from 'd3-force';
 import { select, Selection } from 'd3-selection'
 import { zoom, zoomIdentity, zoomTransform, ZoomBehavior } from 'd3-zoom'
+import { useEffect } from 'react';
 
 
 export function dragBehavior(simulation: Simulation<Vertex, undefined>) {
@@ -28,59 +29,64 @@ export function dragBehavior(simulation: Simulation<Vertex, undefined>) {
 
 }
 
-export function zoomBehavior(graphContainer: Selection<SVGElement, null, null, null>, graph: Selection<SVGGElement, null, null, null>) {
-  const zoomBehavior = zoom<SVGSVGElement, unknown>()
-    .scaleExtent([0.1, 3])
-    .filter((event) => {
-      // Allow zooming on wheel events and not on other events like drag
-      return event.type === 'wheel' || event.type === 'dblclick';
-    })
-    .on('zoom', (event) => {
-      graph.attr('transform', event.transform);
-    });
+export function useZoomBehavior(graphContainerSelection: Selection<SVGElement, null, null, undefined>) {
+  return useEffect(() => {
+    const graphContainer = graphContainerSelection.node() as SVGElement
+    const graph = graphContainerSelection.select(".graph")
 
-  const handleZoom = (event: WheelEvent) => {
+    const zoomBehavior = zoom<SVGSVGElement, unknown>()
+      .scaleExtent([0.1, 3])
+      .filter((event) => {
+        // Allow zooming on wheel events and not on other events like drag
+        return event.type === 'wheel' || event.type === 'dblclick';
+      })
+      .on('zoom', (event) => {
+        graph.attr('transform', event.transform);
+      });
 
-    event.preventDefault();
+    const handleZoom = (event: WheelEvent) => {
 
-    const svg = graphContainer;
-    const currentTransform = zoomTransform(graphContainer);
-    const sensitivity = 0.001;
+      event.preventDefault();
 
-    const svgBounds = graphContainer.getBoundingClientRect();
-    const mouseX = event.clientX - svgBounds.left;
-    const mouseY = event.clientY - svgBounds.top;
+      const currentTransform = zoomTransform(graphContainer);
+      const sensitivity = 0.001;
 
-    const scaleFactor = 1 - event.deltaY * sensitivity;
-    const newScale = currentTransform.k * scaleFactor;
-    const constrainedScale = Math.max(0.1, Math.min(newScale, 3));
+      const svgBounds = graphContainer.getBoundingClientRect();
+      const mouseX = event.clientX - svgBounds.left;
+      const mouseY = event.clientY - svgBounds.top;
 
-    const x = currentTransform.x;
-    const y = currentTransform.y;
-    const k = currentTransform.k;
+      const scaleFactor = 1 - event.deltaY * sensitivity;
+      const newScale = currentTransform.k * scaleFactor;
+      const constrainedScale = Math.max(0.1, Math.min(newScale, 3));
 
-    const newX = mouseX - (mouseX - x) * (constrainedScale / k);
-    const newY = mouseY - (mouseY - y) * (constrainedScale / k);
+      const x = currentTransform.x;
+      const y = currentTransform.y;
+      const k = currentTransform.k;
 
-    const newTransform = zoomIdentity
-      .translate(newX, newY)
-      .scale(constrainedScale);
+      const newX = mouseX - (mouseX - x) * (constrainedScale / k);
+      const newY = mouseY - (mouseY - y) * (constrainedScale / k);
 
-    svg
-      .transition()
-      .duration(50)
-      .call(zoomBehavior.transform as any, newTransform);
-  };
+      const newTransform = zoomIdentity
+        .translate(newX, newY)
+        .scale(constrainedScale);
 
-  const resetZoom = () => {
-    graphContainer.transition()
-      .duration(100)
-      .call(zoomBehavior.transform as any, zoomIdentity);
-  };
+      graphContainerSelection
+        .transition()
+        .duration(50)
+        .call(zoomBehavior.transform as any, newTransform);
+    };
 
-  const resetButton = select('#reset-button')
-  resetButton.on('click', resetZoom);
+    const resetZoom = () => {
+      graphContainerSelection
+        .transition()
+        .duration(100)
+        .call(zoomBehavior.transform as any, zoomIdentity);
+    };
 
-  graphContainer.call(zoomBehavior as any)
-    .on("wheel.zoom", handleZoom)
+    const resetButton = select('#reset-button')
+    resetButton.on('click', resetZoom);
+
+    graphContainerSelection.call(zoomBehavior as any)
+      .on("wheel.zoom", handleZoom)
+  })
 }

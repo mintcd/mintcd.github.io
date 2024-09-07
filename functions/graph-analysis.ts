@@ -191,7 +191,7 @@ export function breakLines(terms: Vertex[], maxWidth: number, fontSize: number, 
 }
 
 
-export function breakLinesForCircle(vertex: Vertex, radius: number, fontSize: number = radius / 20, fontFamily: string = "Arial"): string[] {
+export function breakLinesForCircle(vertex: Vertex, radius: number, fontSize: number = radius / 4, fontFamily: string = "Arial"): string[] {
   const lines: string[] = [];
   const words = vertex.name.split(' ');
   let currentLine = words[0];

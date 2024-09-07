@@ -101,7 +101,16 @@ text {
   font-size: 12px;
 }
 
+.node {
+  position: relative;
+  fill:blue
+}
 .node:focus,
 .node *:focus {
+  outline: none;
+}
+
+.node-container:focus,
+.node-container *:focus {
   outline: none;
 }

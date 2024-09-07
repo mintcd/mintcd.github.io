@@ -690,6 +690,13 @@ const graph = {
         key: "adapted-stochastic-process"
       }],
     },
+    {
+      name: "Line",
+      key: "line",
+      type: "definition",
+      content: "The line $(x,y)\\subset\\R^d$ is $$(x,y) = \\{(1-\\lambda)x + \\lambda y : \\lambda\\in\\R\\}.$$",
+      fields: ['convex-analysis']
+    },
   ],
   metadata: {
     edgesIncluded: false,

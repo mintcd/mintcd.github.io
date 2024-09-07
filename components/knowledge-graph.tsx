@@ -4,38 +4,48 @@ import { createRoot } from 'react-dom/client';
 
 import CenterFocusStrongRoundedIcon from '@mui/icons-material/CenterFocusStrongRounded';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import { select, selectAll } from 'd3-selection'
+
+import { select } from 'd3-selection'
 import { drag } from 'd3-drag'
-import { forceSimulation, forceLink, forceCenter, forceCollide, forceRadial, forceManyBody } from 'd3-force';
+import { forceSimulation, forceLink, forceCenter, forceCollide } from 'd3-force';
 
 import VertexContent from '@components/statement-content';
-import { getEdges, initiateLayout, getVerticesOfTopic } from '@functions/graph-analysis';
+import { getEdges, initiateLayout, computeNodeDepths, getVerticesOfTopic } from '@functions/graph-analysis';
 import { useZoomBehavior } from '@components/graph/behaviors';
 import GraphNode from '@components/graph/graph-node';
 
-import "@styles/global.css"
-
-export default function KnowledgeGraph(
-  { graphData }: { graphData: Graph }
-) {
-
+export default function KnowledgeGraph({ graphData }: { graphData: Graph }) {
   const contentRef = useRef(null);
   const containerRef = useRef<SVGSVGElement>(null);
   const dropdownRef = useRef(null);
   const environmentRef: RefObject<HTMLDivElement> = useRef(null);
-  const [adjustedGraphData, setAdjustedGraphData] = useState(graphData)
 
   const [graphRendered, setGraphRendered] = useState(false)
   const [selectedNode, setSelectedNode] = useState<Vertex | undefined>(undefined)
   const [isOpen, setIsOpen] = useState(false);
   const [selectedField, setSelectedField] = useState<Field | "all-fields">('all-fields');
 
-  const fields = [
-    { value: "all-fields", label: "All Fields" },
-    { value: "measure-theory", label: "Measure Theory" },
-    { value: "real-analysis", label: "Real Analysis" },
-    { value: "probability-theory", label: "Probability Theory" },
-  ];
+  function getFieldsWithAllOption(vertices: Vertex[]): { value: string; label: string }[] {
+    const fieldsSet = new Set<string>();
+
+    vertices.forEach(vertex => {
+      if (vertex.fields) {
+        vertex.fields.forEach(field => fieldsSet.add(field));
+      }
+    });
+
+    const uniqueFields = Array.from(fieldsSet);
+
+    return [
+      ...uniqueFields.map(field => ({
+        value: field,
+        label: field.split("-").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")
+      })),
+      { value: "all-fields", label: "All Fields" }
+    ];
+  }
+
+  const fields = getFieldsWithAllOption(graphData.vertices);
 
   const [params, setParams] = useState({
     width: 500,
@@ -44,17 +54,17 @@ export default function KnowledgeGraph(
     fontSize: 3
   })
 
+  const markerSize = params.fontSize;
+
   let vertices = graphData.vertices
   if (selectedField !== "all-fields") {
     vertices = getVerticesOfTopic(graphData.vertices, [selectedField])
   }
-
+  // vertices = computeNodeDepths(vertices)
   vertices = initiateLayout(vertices, 2 * params.radius, 2 * params.radius)
 
   let edges = getEdges(vertices);
 
-
-  // Get field and window size
   useEffect(() => {
     setSelectedField(window.localStorage.getItem('selectedField') as Field || 'all-fields')
     const updateSize = () => {
@@ -70,18 +80,19 @@ export default function KnowledgeGraph(
     return () => window.removeEventListener('resize', updateSize);
   }, []);
 
-
-  // Rendering
+  // Hook for SVG Graph Rendering
   useEffect(() => {
+    // Select the graph container
     const graphContainer = select(containerRef.current as SVGSVGElement)
       .attr('width', params.width)
       .attr('height', params.height)
 
+    // Add graph from container
     const graph = graphContainer.select(".graph")
 
     /////////////////////////////// Marker Styles /////////////////////////////////////////////////////////
     const markerStyles = graph.append("svg:defs")
-    const markerSize = params.fontSize;
+
 
     const defaultMarker = markerStyles.append("svg:marker")
       .attr("id", "arrow")
@@ -91,7 +102,7 @@ export default function KnowledgeGraph(
       .attr("markerHeight", markerSize)
       .attr("orient", "auto")
       .append("svg:path")
-      .attr("d", `M0,-${markerSize / 2}L${markerSize},0L0,${markerSize / 2}`)
+      .attr("d", `M0, -${markerSize / 2}L${markerSize}, 0L0, ${markerSize / 2}Z`)
       .style("fill", "#aaa");
 
     const specializesMarker = markerStyles.append("svg:marker")
@@ -102,24 +113,19 @@ export default function KnowledgeGraph(
       .attr("markerHeight", markerSize)
       .attr("orient", "auto")
       .append("svg:path")
-      .attr("d", `M0,0 L${markerSize / 2},-${markerSize / 2} L${markerSize},0 L${markerSize / 2},${markerSize / 2} Z`)
+      .attr("d", `M0,-${markerSize / 2}L${markerSize / 2},0L0,${markerSize / 2}L-${markerSize / 2},0Z`)
       .style("fill", "#aaa");
 
-    const links = graph
-      .selectAll(".link")
+    const links = graph.selectAll("line")
       .data(edges)
       .enter()
       .append("line")
-      .attr("class", "link")
-      .style("stroke", function (d) {
-        const edge = d as Edge;
-        return edge.relation && edge.relation === 'specializes' ? "#aaa" : "#aaa";
-      })
+      .style("stroke", "#aaa")  // Apply the gradient
+      .attr("stroke-width", 0.5)
       .attr("marker-end", function (d) {
         const edge = d as Edge;
         return edge.relation && edge.relation === 'specializes' ? "url(#arrow-specializes)" : "url(#arrow)";
       });
-
 
     const linkText = graph.append("g")
       .attr("class", "link-texts")
@@ -137,12 +143,24 @@ export default function KnowledgeGraph(
       });
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     const nodes = graph
       .selectAll(".node")
       .data(vertices)
       .enter()
       .append("g")
       .attr("class", "node-container")
+      .each(function (d: Vertex) {
+        createRoot(this as any).render(
+          <GraphNode
+            vertex={d}
+            radius={params.radius}
+            setSelectedNode={setSelectedNode}
+            selectedNode={selectedNode}
+          />
+        );
+      });
+
 
     const gradients = graph.append('defs')
       .append('linearGradient')
@@ -160,46 +178,20 @@ export default function KnowledgeGraph(
       .attr('offset', '100%')
       .style('stop-color', '#5bb561');
 
-    return () => {
-      graph.selectAll('*').remove();
-    };
-  }, [graphRendered, selectedField, selectedNode]);
-
-  useEffect(() => {
-    const nodes = selectAll(".node-container").data(vertices);
-
-    nodes.each(function (d: Vertex) {
-      createRoot(this as any).render(
-        <GraphNode
-          vertex={d}
-          radius={params.radius}
-          setSelectedNode={setSelectedNode}
-          selectedNode={selectedNode}
-        />
-      );
-    });
-
-    setGraphRendered(true)
-
-  }, [graphRendered, params, selectedNode]);
-
-
-
-  useEffect(() => {
     /////////////////////////// Simulation //////////////////////////////////////
     const simulation = forceSimulation(vertices)
-      .alphaDecay(0.5)
+    simulation.alphaDecay(0.5)
       .force('center', forceCenter(params.width / 2, params.height / 2))
-      .force(
-        'link',
-        forceLink(edges)
-          .distance(params.radius)
-          .id((node) => (node as Vertex).key || '')
-      )
-      .force('collide', forceCollide(1.5 * params.radius));
+      .force('link', forceLink(edges)
+        .distance(params.radius)
+        .id(function (node) {
+          const v = node as Vertex
+          return v.key ? v.key : ''
+        }))
+      .force('collide', forceCollide(1.5 * params.radius))
 
     simulation.on("tick", () => {
-      selectAll(".node-container").attr("transform", function (d) {
+      nodes.attr("transform", function (d) {
         const v = d as Vertex;
 
         // Ensure x is within bounds
@@ -209,7 +201,7 @@ export default function KnowledgeGraph(
         return `translate(${v.x},${v.y})`;
       });
 
-      selectAll(".link")
+      links
         .attr("x1", (d) => {
           const edge = d as any
           const angle = Math.atan2(edge.target.y - edge.source.y, edge.target.x - edge.source.x);
@@ -231,7 +223,7 @@ export default function KnowledgeGraph(
           return edge.target.y + params.radius * Math.sin(angle);
         });
 
-      selectAll(".link-text")
+      linkText
         .attr("x", function (d) {
           const edge = d as any
           return (edge.source.x + edge.target.x) / 2
@@ -240,30 +232,51 @@ export default function KnowledgeGraph(
           const edge = d as any
           return (edge.source.y + edge.target.y) / 2
         });
-    })
-    const applyDrag = () => {
-      const nodeDrag = drag()
-        .on("drag", (event, d) => {
-          const v = d as Vertex;
-          simulation.alphaTarget(0).restart();
-          v.fx = event.x;
-          v.fy = event.y;
-        })
-        .on("end", (event, d) => {
-          const v = d as Vertex;
-          if (!event.active) simulation.alphaTarget(0);
-          v.fx = undefined;
-          v.fy = undefined;
-        });
 
-      // Reapply drag behavior
-      selectAll(".node-container").call(nodeDrag as any);
+    })
+
+    //////////////// Drag behaviors ////////////////////////////////////////////////////
+
+    const nodeDrag = drag()
+      .on("start", function dragStartedHandler(event, d) {
+        const v = d as Vertex;
+        v.fx = v.x;
+        v.fy = v.y;
+      })
+      .on("drag", function draggingHandler(event, d) {
+        const v = d as Vertex;
+        v.fx = event.x;
+        v.fy = event.y;
+        simulation.alphaTarget(0).restart()
+      })
+      .on("end", function dragEndedHandler(event, d) {
+        const v = d as Vertex;
+        if (!event.active) simulation.alphaTarget(0);
+        v.fx = undefined;
+        v.fy = undefined;
+      });
+
+    nodes.call(nodeDrag as any)
+
+    return () => {
+      setGraphRendered(true)
+      graph.selectAll('*').remove();
+      simulation.stop();
     };
-    // Call applyDrag after the GraphNode components are rendered
-    applyDrag();
-  });
+  }, [graphRendered, selectedField]);
 
   useZoomBehavior(select(containerRef.current as SVGElement))
+
+  useEffect(() => {
+    if (graphRendered) {
+      const graphContainer = select(containerRef.current as SVGSVGElement);
+      graphContainer.selectAll(".shape").data(vertices)
+        .style("opacity", (d) => {
+          const v = d as Vertex
+          return selectedNode !== undefined && v.name === selectedNode.name ? 1 : 0.7;
+        });
+    }
+  }, [selectedNode, graphRendered]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -288,6 +301,7 @@ export default function KnowledgeGraph(
     };
 
   });
+
 
   return (
     <div className='sm:grid grid-cols-6 place-items-center'>
@@ -327,15 +341,7 @@ export default function KnowledgeGraph(
             <foreignObject id='reset-button' className='cursor-pointer w-[50px] h-[50px] translate-x-[25px] translate-y-[25px]'>
               <CenterFocusStrongRoundedIcon className={`w-${params.width / 20} h-${params.height / 20}`} />
             </foreignObject>
-            <g className='graph'>
-              <defs>
-                <linearGradient id='definition-theorem' x1='0%' y1='0%' x2='100%' y2='0%'>
-                  <stop offset='0%' style={{ stopColor: '#0288d1' }}></stop>
-                  <stop offset='100%' style={{ stopColor: '#5bb561' }}></stop>
-                </linearGradient>
-              </defs>
-
-            </g>
+            <g className='graph'></g>
           </svg>
         </div>
       </div>

@@ -10,6 +10,7 @@ export default function GraphLink({ edge, radius }: { edge: Edge, radius: number
 
   return (
     <line
+      className='link'
       x1={x1}
       y1={y1}
       x2={x2}

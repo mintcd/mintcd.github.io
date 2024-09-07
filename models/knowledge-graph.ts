@@ -694,7 +694,7 @@ const graph = {
       name: "Line",
       key: "line",
       type: "definition",
-      content: "The line $(x,y)\\subset\\R^d$ is $$(x,y) = \\{(1-\\lambda)x + \\lambda y : \\lambda\\in\\R\\}.$$",
+      content: "A line $(x,y)\\subset\\R^d$ has the equation $$(x,y) = \\{(1-\\lambda)x + \\lambda y : \\lambda\\in\\R\\}.$$",
       fields: ['convex-analysis']
     },
   ],

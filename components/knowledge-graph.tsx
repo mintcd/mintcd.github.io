@@ -5,7 +5,7 @@ import { createRoot } from 'react-dom/client';
 import CenterFocusStrongRoundedIcon from '@mui/icons-material/CenterFocusStrongRounded';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
-import { select } from 'd3-selection'
+import { select, selectAll } from 'd3-selection'
 import { drag } from 'd3-drag'
 import { forceSimulation, forceLink, forceCenter, forceCollide } from 'd3-force';
 
@@ -13,6 +13,7 @@ import VertexContent from '@components/statement-content';
 import { getEdges, initiateLayout, computeNodeDepths, getVerticesOfTopic } from '@functions/graph-analysis';
 import { useZoomBehavior } from '@components/graph/behaviors';
 import GraphNode from '@components/graph/graph-node';
+import GraphStyles from '@styles/graph';
 
 export default function KnowledgeGraph({ graphData }: { graphData: Graph }) {
   const contentRef = useRef(null);
@@ -20,8 +21,8 @@ export default function KnowledgeGraph({ graphData }: { graphData: Graph }) {
   const dropdownRef = useRef(null);
   const environmentRef: RefObject<HTMLDivElement> = useRef(null);
 
-  const [graphRendered, setGraphRendered] = useState(false)
-  const [selectedNode, setSelectedNode] = useState<Vertex | undefined>(undefined)
+  const [graphRendered, setGraphRendered] = useState(false);
+  const [selectedNode, setSelectedNode] = useState<Vertex | undefined>(undefined);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedField, setSelectedField] = useState<Field | "all-fields">('all-fields');
 
@@ -36,13 +37,14 @@ export default function KnowledgeGraph({ graphData }: { graphData: Graph }) {
 
     const uniqueFields = Array.from(fieldsSet);
 
-    return [
-      ...uniqueFields.map(field => ({
-        value: field,
-        label: field.split("-").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")
-      })),
-      { value: "all-fields", label: "All Fields" }
-    ];
+    // Sort the fields alphabetically
+    uniqueFields.sort();
+
+    return [{ value: "all-fields", label: "All Fields" },
+    ...uniqueFields.map(field => ({
+      value: field,
+      label: field.split("-").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")
+    })),];
   }
 
   const fields = getFieldsWithAllOption(graphData.vertices);
@@ -52,21 +54,19 @@ export default function KnowledgeGraph({ graphData }: { graphData: Graph }) {
     height: 500,
     radius: 10,
     fontSize: 3
-  })
+  });
 
-  const markerSize = params.fontSize;
-
-  let vertices = graphData.vertices
+  let vertices = graphData.vertices;
   if (selectedField !== "all-fields") {
-    vertices = getVerticesOfTopic(graphData.vertices, [selectedField])
+    vertices = getVerticesOfTopic(graphData.vertices, [selectedField]);
   }
-  // vertices = computeNodeDepths(vertices)
-  vertices = initiateLayout(vertices, 2 * params.radius, 2 * params.radius)
+  vertices = initiateLayout(vertices, 2 * params.radius, 2 * params.radius);
 
   let edges = getEdges(vertices);
 
+  // Get window size
   useEffect(() => {
-    setSelectedField(window.localStorage.getItem('selectedField') as Field || 'all-fields')
+    setSelectedField(window.localStorage.getItem('selectedField') as Field || 'all-fields');
     const updateSize = () => {
       if (environmentRef.current) {
         const { width, height } = environmentRef.current.getBoundingClientRect();
@@ -82,67 +82,24 @@ export default function KnowledgeGraph({ graphData }: { graphData: Graph }) {
 
   // Hook for SVG Graph Rendering
   useEffect(() => {
-    // Select the graph container
     const graphContainer = select(containerRef.current as SVGSVGElement)
       .attr('width', params.width)
-      .attr('height', params.height)
+      .attr('height', params.height);
 
-    // Add graph from container
-    const graph = graphContainer.select(".graph")
-
-    /////////////////////////////// Marker Styles /////////////////////////////////////////////////////////
-    const markerStyles = graph.append("svg:defs")
-
-
-    const defaultMarker = markerStyles.append("svg:marker")
-      .attr("id", "arrow")
-      .attr("viewBox", `0 -${markerSize / 2} ${markerSize} ${markerSize}`)
-      .attr("refX", markerSize)
-      .attr("markerWidth", markerSize)
-      .attr("markerHeight", markerSize)
-      .attr("orient", "auto")
-      .append("svg:path")
-      .attr("d", `M0, -${markerSize / 2}L${markerSize}, 0L0, ${markerSize / 2}Z`)
-      .style("fill", "#aaa");
-
-    const specializesMarker = markerStyles.append("svg:marker")
-      .attr("id", "arrow-specializes")
-      .attr("viewBox", `0 -${markerSize / 2} ${markerSize} ${markerSize}`)
-      .attr("refX", markerSize)
-      .attr("markerWidth", markerSize)
-      .attr("markerHeight", markerSize)
-      .attr("orient", "auto")
-      .append("svg:path")
-      .attr("d", `M0,-${markerSize / 2}L${markerSize / 2},0L0,${markerSize / 2}L-${markerSize / 2},0Z`)
-      .style("fill", "#aaa");
+    const graph = graphContainer.select(".graph");
 
     const links = graph.selectAll("line")
       .data(edges)
       .enter()
+      .append("g")
+      .attr("class", "link-container")
       .append("line")
-      .style("stroke", "#aaa")  // Apply the gradient
+      .style("stroke", "#aaa")
       .attr("stroke-width", 0.5)
       .attr("marker-end", function (d) {
         const edge = d as Edge;
         return edge.relation && edge.relation === 'specializes' ? "url(#arrow-specializes)" : "url(#arrow)";
       });
-
-    const linkText = graph.append("g")
-      .attr("class", "link-texts")
-      .selectAll("text")
-      .data(edges)
-      .enter()
-      .append("text")
-      .attr("class", "link-text")
-      .attr("dy", -5)
-      .attr("text-anchor", "middle")
-      .text(function (d) {
-        const edge = d as Edge;
-        // return edge.relation !== undefined ? edge.relation : '';
-        return ''
-      });
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     const nodes = graph
       .selectAll(".node")
@@ -161,34 +118,16 @@ export default function KnowledgeGraph({ graphData }: { graphData: Graph }) {
         );
       });
 
-
-    const gradients = graph.append('defs')
-      .append('linearGradient')
-      .attr('id', 'definition-theorem')
-      .attr('x1', '0%')
-      .attr('y1', '0%')
-      .attr('x2', '100%')
-      .attr('y2', '0%');
-
-    gradients.append('stop')
-      .attr('offset', '0%')
-      .style('stop-color', '#0288d1');
-
-    gradients.append('stop')
-      .attr('offset', '100%')
-      .style('stop-color', '#5bb561');
-
-    /////////////////////////// Simulation //////////////////////////////////////
     const simulation = forceSimulation(vertices)
-    simulation.alphaDecay(0.5)
+      .alphaDecay(0.5)
       .force('center', forceCenter(params.width / 2, params.height / 2))
       .force('link', forceLink(edges)
         .distance(params.radius)
         .id(function (node) {
-          const v = node as Vertex
-          return v.key ? v.key : ''
+          const v = node as Vertex;
+          return v.key ? v.key : '';
         }))
-      .force('collide', forceCollide(1.5 * params.radius))
+      .force('collide', forceCollide(1.5 * params.radius));
 
     simulation.on("tick", () => {
       nodes.attr("transform", function (d) {
@@ -222,20 +161,7 @@ export default function KnowledgeGraph({ graphData }: { graphData: Graph }) {
           const angle = Math.atan2(edge.source.y - edge.target.y, edge.source.x - edge.target.x);
           return edge.target.y + params.radius * Math.sin(angle);
         });
-
-      linkText
-        .attr("x", function (d) {
-          const edge = d as any
-          return (edge.source.x + edge.target.x) / 2
-        })
-        .attr("y", function (d) {
-          const edge = d as any
-          return (edge.source.y + edge.target.y) / 2
-        });
-
-    })
-
-    //////////////// Drag behaviors ////////////////////////////////////////////////////
+    });
 
     const nodeDrag = drag()
       .on("start", function dragStartedHandler(event, d) {
@@ -247,7 +173,7 @@ export default function KnowledgeGraph({ graphData }: { graphData: Graph }) {
         const v = d as Vertex;
         v.fx = event.x;
         v.fy = event.y;
-        simulation.alphaTarget(0).restart()
+        simulation.alphaTarget(0).restart();
       })
       .on("end", function dragEndedHandler(event, d) {
         const v = d as Vertex;
@@ -256,23 +182,23 @@ export default function KnowledgeGraph({ graphData }: { graphData: Graph }) {
         v.fy = undefined;
       });
 
-    nodes.call(nodeDrag as any)
+    nodes.call(nodeDrag as any);
 
     return () => {
-      setGraphRendered(true)
+      setGraphRendered(true);
       graph.selectAll('*').remove();
       simulation.stop();
     };
   }, [graphRendered, selectedField]);
 
-  useZoomBehavior(select(containerRef.current as SVGElement))
+  useZoomBehavior(select(containerRef.current as SVGElement));
 
   useEffect(() => {
     if (graphRendered) {
       const graphContainer = select(containerRef.current as SVGSVGElement);
       graphContainer.selectAll(".shape").data(vertices)
         .style("opacity", (d) => {
-          const v = d as Vertex
+          const v = d as Vertex;
           return selectedNode !== undefined && v.name === selectedNode.name ? 1 : 0.7;
         });
     }
@@ -293,15 +219,12 @@ export default function KnowledgeGraph({ graphData }: { graphData: Graph }) {
     document.addEventListener('mousedown', handleClickOutside);
     document.addEventListener('keydown', escHandler);
 
-    // Clean up
-
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', escHandler);
     };
 
   });
-
 
   return (
     <div className='sm:grid grid-cols-6 place-items-center'>
@@ -323,7 +246,7 @@ export default function KnowledgeGraph({ graphData }: { graphData: Graph }) {
                 className="p-2 hover:bg-gray-100 cursor-pointer"
                 onClick={() => {
                   setSelectedField(field.value as Field | "all-fields");
-                  localStorage.setItem('selectedField', field.value)
+                  localStorage.setItem('selectedField', field.value);
                   setIsOpen(false);
                 }}
               >
@@ -338,6 +261,7 @@ export default function KnowledgeGraph({ graphData }: { graphData: Graph }) {
                      overflow-hidden`}>
         <div className='bg-gray-200 rounded-3xl'>
           <svg ref={containerRef} className='graph-container'>
+            <GraphStyles />
             <foreignObject id='reset-button' className='cursor-pointer w-[50px] h-[50px] translate-x-[25px] translate-y-[25px]'>
               <CenterFocusStrongRoundedIcon className={`w-${params.width / 20} h-${params.height / 20}`} />
             </foreignObject>

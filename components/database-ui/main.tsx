@@ -4,29 +4,13 @@ import { supabase, getAttrTypes, update, fetchData, initiateAttrProps } from "@c
 import { useEffect, useState } from 'react';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
-
+import "./styles.css"
 import UndoRoundedIcon from '@mui/icons-material/UndoRounded';
 import RedoRoundedIcon from '@mui/icons-material/RedoRounded';
-import CloseIcon from '@mui/icons-material/Close';
 
 import { getTextWidth } from "@functions/text-analysis";
 import ArrayCell from "./array-cell";
 import TextCell from "./text-cell";
-
-const CustomCaret = ({ text }: { text: string }) => {
-  const left = getTextWidth(text)
-  return (<div
-    style={{
-      position: 'absolute',
-      left: `${left}px`, // Set the position of the caret
-      top: '3px',
-      width: '1px',
-      height: '1em',
-      backgroundColor: 'black',
-      pointerEvents: 'none',
-    }}
-  />)
-};
 
 type Cell = {
   id: number
@@ -54,15 +38,12 @@ export default function DatabaseUI({ table, columns }:
   const [authorized, setAuthorized] = useState(false);
   const [fetched, setFetched] = useState(false)
   const [loading, setLoading] = useState(true);
-  const [widthSet, setWidthSet] = useState(false)
 
   const [data, setData] = useState<DataItem[]>([]);
   const [attrProps, setAttrProps] = useState<AttrProps>({});
   const [tableChanged, setTableChanged] = useState(0);
 
   const [focusedItemId, setFocusedItemId] = useState<number | null>(null);
-
-
   const [error, setError] = useState<string | null>(null);
 
   // Undo and Redo
@@ -216,7 +197,7 @@ export default function DatabaseUI({ table, columns }:
                     <div className={`table-cell px-3 py-2 
                       border-2 border-l-0 border-t-0 ${index === Object.keys(data[0]).length - 1 && 'border-r-0'}  
                     bg-[#97C3DB] 
-                      w-[${attrProps[attr].width !== undefined ? attrProps[attr].width : "10%"}]`
+                      w-[${attrProps[attr].width}]`
                     }
                       key={index}
                     >
@@ -242,8 +223,8 @@ export default function DatabaseUI({ table, columns }:
                     </div>
                     {
                       Object.keys(item).map((attr, index) => (
-                        <div className={`table-cell
-                           w-[${attrProps[attr].width !== undefined ? attrProps[attr].width : "10%"}]`}
+                        <div className={`table-cell`
+                        }
                           key={index}>
                           {attrProps[attr].type === 'array'
                             ?
@@ -261,7 +242,6 @@ export default function DatabaseUI({ table, columns }:
 
                   </div>
                 ))}
-
                 <div className="table-row">
                   <div className="table-cell">
                     <AddRoundedIcon

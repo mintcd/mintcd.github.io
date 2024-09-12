@@ -1,4 +1,5 @@
 import Latex from "@components/latex"
+import { getTextWidth } from "@functions/text-analysis"
 import { useEffect, useRef, useState } from "react"
 
 
@@ -6,7 +7,7 @@ export default function TextCell({ itemId, attr, value, state, handleUpdate }:
   {
     itemId: number
     attr: string
-    value: string | number,
+    value: string,
     state: 'toEdit' | 'editing' | 'noEdit',
     handleUpdate: (itemId: number, attrs: JsonObject<any>) => Promise<void>
   }
@@ -26,10 +27,10 @@ export default function TextCell({ itemId, attr, value, state, handleUpdate }:
   }, [cellState]); // Depend on cellState so that effect runs when editing state changes
 
   return (
-    <div>
+    <div className="h-full flex items-end">
       {
         cellState === 'noEdit' &&
-        <div className="min-h-[1rem]"
+        <div className="w-full min-h-[1.1rem]"
           onClick={() => {
             setCellState("editing")
           }}
@@ -55,8 +56,9 @@ export default function TextCell({ itemId, attr, value, state, handleUpdate }:
       }
       {cellState === 'editing' &&
         <textarea
-          className="w-full h-fit focus:outline-none border-none resize-none"
-          rows={1}
+          style={{ width: `${getTextWidth(editingValue)}px` }}
+          className={`h-full p-0 m-0 focus:outline-none border-none resize-none`}
+          rows={Math.round(String(editingValue).length / 30) + 1}
           ref={textareaRef}
           name={attr}
           autoFocus={true}

@@ -37,7 +37,7 @@ export default function ArrayCell({ itemId, attr, values, state, handleUpdate, a
       ))}
       {
         cellState === 'noEdit' &&
-        <div className="min-h-[1rem] flex-grow"
+        <div className="min-h-[1.1rem] flex-grow"
           onClick={() => setCellState("toEdit")}
         >
         </div>

@@ -33,7 +33,7 @@ export async function fetchData({
     throw new Error("Table is empty");
   }
 
-  return data;
+  return data.sort((x: DataItem, y: DataItem) => x.id - y.id);
 }
 
 export async function getAttrTypes(table: string, attrs?: string[]) {
@@ -122,7 +122,7 @@ export function initiateAttrProps(data: DataItem[], attrOptions?: AttrProps) {
   Object.keys(attrProps).forEach((attr) => {
     attrProps[attr] = {
       ...attrProps[attr],
-      width: `${attrProps[attr].maxLength! / totalLength * 100}%`
+      width: `${Math.max(attrProps[attr].maxLength! / totalLength * 100, 4)}%`
     };
   });
 

@@ -1,7 +1,7 @@
 'use client'
 
 import data from '@models/computer-science/compiler-design-phases';
-import KnowledgeGraph from '@components/knowledge-graph';
+import KnowledgeGraph from '@components/graph/main';
 // import ast from '@models/computer-science/ast';
 import Latex from '@components/latex';
 import { useState } from 'react';

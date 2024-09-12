@@ -1,3 +1,20 @@
+type JsonObject<dataType> = {
+    [key: string]: dataType
+}
+
+type AttrProps = {
+    [key: string]: {
+        useLatex?: boolean,
+        display?: boolean,
+        type?: string,
+        maxLength?: number,
+        width?: string,
+        referencing?: string
+    }
+}
+
+type DataItem = JsonObject<any>
+
 type Chapter = {
     name: string,
     content?: string,
@@ -54,17 +71,11 @@ type Vertex = {
 
     // Knowledge properties
     notation?: string[],
-    short?: string,
     content?: string,
     examples?: string[]
     proof?: string,
     otherNames?: string[],
     href?: string,
-    implications?: {
-        type: StatementType
-        content: string,
-        proof?: string,
-    }[]
 
     // Taxonomy properties
     fields: Field[],
@@ -77,8 +88,6 @@ type Vertex = {
     fy?: number,
     x?: number,
     y?: number,
-    height?: number,
-    width?: number
 }
 
 type Edge = {

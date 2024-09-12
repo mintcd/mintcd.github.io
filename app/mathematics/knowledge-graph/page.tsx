@@ -1,4 +1,4 @@
-import KnowledgeGraph from '@components/knowledge-graph'
+import KnowledgeGraph from '@components/graph/main'
 import graph from '@models/knowledge-graph'
 
 import Terminology from '@components/terminology'

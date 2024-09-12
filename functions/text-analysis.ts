@@ -1,6 +1,6 @@
 import { createCanvas } from 'canvas';
 
-export function getTextWidth(text: string, fontSize: number, fontFamily: string) {
+export function getTextWidth(text: string, fontSize: number = 16, fontFamily: string = "Arial") {
   const canvas = createCanvas(200, 200); // Adjust dimensions as needed
   const context = canvas.getContext('2d');
   if (context) {

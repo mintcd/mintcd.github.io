@@ -5,14 +5,18 @@ import * as React from 'react';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import Paper from '@mui/material/Paper';
 import { useEffect, useState, useCallback, useMemo } from 'react';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
-import "./styles.css";
+
 import UndoRoundedIcon from '@mui/icons-material/UndoRounded';
 import RedoRoundedIcon from '@mui/icons-material/RedoRounded';
 
 import ArrayCell from "./array-cell";
 import TextCell from "./text-cell";
+
+import "./styles.css";
 
 type Cell = {
   id: number
@@ -79,7 +83,9 @@ export default function DatabaseUI({ table, columns }: { table: string; columns?
   return (
     <div>
       {Object.keys(attrProps).length === 0 ? (
-        <p>Loading...</p>
+        <Box sx={{ display: 'flex' }}>
+          <CircularProgress />
+        </Box>
       ) : (
         <Paper sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
           <DataGrid

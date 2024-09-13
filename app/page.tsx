@@ -25,14 +25,14 @@ export default function Home() {
             className="group flex flex-col items-center p-2 rounded-md transition duration-150 ease-in-out w-full hover:opacity-80"
           >
             <div className="bg-gray-300 w-full h-11 flex justify-center items-center text-balance">
-              Image soon...
+              {/* Image soon... */}
             </div>
             {/* <Image
               src={image}
               alt={title}
               className="transition-transform duration-300 group-hover:scale-105"
             /> */}
-            <div className="mt-2 h-20 flex justify-center items-center text-center font-bold text-transparent text-xl bg-clip-text bg-gradient-to-r from-green-200 via-blue-200 to-purple-200">
+            <div className="mt-2 h-20 flex justify-center items-center text-center font-bold text-xl">
               {title}
             </div>
           </Link>

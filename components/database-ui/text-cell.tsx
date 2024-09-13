@@ -72,8 +72,8 @@ export default function TextCell({ itemId, attr, value, state, handleUpdate }:
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               handleUpdate(itemId, { [attr]: editingValue })
+              setCellState("noEdit")
             }
-            setCellState("noEdit")
           }}
           onBlur={() => {
             handleUpdate(itemId, { [attr]: editingValue })

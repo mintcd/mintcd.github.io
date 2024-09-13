@@ -4,23 +4,21 @@ import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import { useState } from 'react';
 
-export default function ArrayCell({
-  itemId,
-  attr,
-  values,
-  state,
-  handleUpdate,
-  autocompleteItems
-}: {
-  itemId: number;
-  attr: string;
-  values: string[] | number[];
-  state: 'toEdit' | 'editing' | 'noEdit';
-  handleUpdate: (itemId: number, attrs: JsonObject<any>) => Promise<void>;
-  autocompleteItems: string[];
-}) {
-  const [cellState, setCellState] = useState(state);
-  const [editingValue, setEditingValue] = useState("");
+
+export default function ArrayCell({ itemId, attr, values, state, handleUpdate, autocompleteItems }:
+  {
+    itemId: number
+    attr: string
+    values: string[] | number[],
+    state: 'toEdit' | 'editing' | 'noEdit',
+    handleUpdate: (itemId: number, attrs: JsonObject<any>) => Promise<void>
+    autocompleteItems: string[]
+  }
+) {
+  const [cellState, setCellState] = useState(state)
+  const [editingValue, setEditingValue] = useState("")
+
+  // console.log(autocompleteItems)
 
   return (
     <div className="h-full flex">
@@ -42,7 +40,10 @@ export default function ArrayCell({
       ))}
       {
         cellState === 'noEdit' &&
-        <div className="h-full flex-grow" onClick={() => setCellState("toEdit")}></div>
+        <div className="h-full flex-grow"
+          onClick={() => setCellState("toEdit")}
+        >
+        </div>
       }
       {
         cellState === 'toEdit' &&
@@ -51,17 +52,13 @@ export default function ArrayCell({
           className="w-full h-fit focus:outline-none border-none m-1 pl-1 pr-2 py-1"
           name={attr}
           autoFocus={true}
-          value={editingValue}
+          value={""}
           onChange={(e) => {
-            setEditingValue(e.target.value);
-            setCellState('editing');
+            setEditingValue(e.target.value)
+            setCellState('editing')
           }}
           onBlur={() => {
-            if (!editingValue) {
-              setCellState("noEdit"); // Do nothing if the value is empty
-            } else {
-              // Optionally, you can handle the case where a non-empty value should be added
-            }
+            setCellState("noEdit")
           }}
         />
       }
@@ -84,9 +81,7 @@ export default function ArrayCell({
             }
           }}
           onBlur={() => {
-            if (editingValue) {
-              handleUpdate(itemId, { [attr]: [...values, editingValue] });
-            }
+            if (editingValue) handleUpdate(itemId, { [attr]: [...values, editingValue] });
             setCellState("noEdit");
           }}
           renderInput={(params) => (
@@ -110,6 +105,7 @@ export default function ArrayCell({
                 },
               }}
             />
+
           )}
         />
       }

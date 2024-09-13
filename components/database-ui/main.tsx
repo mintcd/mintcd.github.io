@@ -1,6 +1,6 @@
 'use client'
 
-import { update, fetchData, initiateAttrProps, createItem } from "@components/database-ui/functions";
+import { updateItem, fetchData, initiateAttrProps, createItem } from "@components/database-ui/functions";
 import * as React from 'react';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import Paper from '@mui/material/Paper';
@@ -34,11 +34,25 @@ export default function DatabaseUI({ table, columns }: { table: string; columns?
     })
   }
 
-  const handleUpdate = useCallback(async (itemId: number, attrProps: JsonObject<any>) => {
+  const handleUpdate = useCallback(async (itemId: number, attrValue: JsonObject<any>) => {
     if (!authorized) return;
-    await update(table, itemId, attrProps);
 
-  }, [authorized, table]);
+    await updateItem(table, itemId, attrValue).then(() => {
+      const attr = Object.keys(attrValue)[0];
+      const index = data.findIndex(item => item.id === itemId); // Find the correct index based on itemId
+
+      if (index !== -1) {
+        // Create a new array with the updated item
+        const updatedData = data.map((item, i) =>
+          i === index ? { ...item, [attr]: attrValue[attr] } : item
+        );
+        setData(updatedData); // Update the state with the new array
+      }
+    });
+
+  }, [authorized, data, table]);
+
+
 
   // Save column width to localStorage on resize
   const handleColumnResize = useCallback((newWidth: number | undefined, colId: string) => {
@@ -92,7 +106,13 @@ export default function DatabaseUI({ table, columns }: { table: string; columns?
                 const value = params.value;
 
                 return (
-                  <div className="hover:bg-blue-50 h-full w-full">
+                  <div className="hover:bg-blue-50 h-full w-full"
+                    onKeyDown={(e) => {
+                      if ([' ', "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)) {
+                        e.stopPropagation()
+                      }
+                    }
+                    }>
                     {
                       attrProps[attr].type === 'array' ?
                         <ArrayCell
@@ -101,8 +121,9 @@ export default function DatabaseUI({ table, columns }: { table: string; columns?
                           values={value}
                           state="noEdit"
                           autocompleteItems={
-                            attrProps[attr].referencing !== undefined
-                              ? [...new Set(data.map((item) => item[attrProps[attr].referencing as string]))]
+                            attrProps[attr].referencing
+                              ? [...new Set(data.map((item) => item[attrProps[attr].referencing as string])
+                                .filter((referenced) => referenced.length > 0))]
                               : [...new Set(data.flatMap((item) => item[attr]))]
                           }
                           handleUpdate={handleUpdate}

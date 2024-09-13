@@ -4,21 +4,23 @@ import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import { useState } from 'react';
 
-
-export default function ArrayCell({ itemId, attr, values, state, handleUpdate, autocompleteItems }:
-  {
-    itemId: number
-    attr: string
-    values: string[] | number[],
-    state: 'toEdit' | 'editing' | 'noEdit',
-    handleUpdate: (itemId: number, attrs: JsonObject<any>) => Promise<void>
-    autocompleteItems: string[]
-  }
-) {
-  const [cellState, setCellState] = useState(state)
-  const [editingValue, setEditingValue] = useState("")
-
-  // console.log(autocompleteItems)
+export default function ArrayCell({
+  itemId,
+  attr,
+  values,
+  state,
+  handleUpdate,
+  autocompleteItems
+}: {
+  itemId: number;
+  attr: string;
+  values: string[] | number[];
+  state: 'toEdit' | 'editing' | 'noEdit';
+  handleUpdate: (itemId: number, attrs: JsonObject<any>) => Promise<void>;
+  autocompleteItems: string[];
+}) {
+  const [cellState, setCellState] = useState(state);
+  const [editingValue, setEditingValue] = useState("");
 
   return (
     <div className="h-full flex">
@@ -40,31 +42,32 @@ export default function ArrayCell({ itemId, attr, values, state, handleUpdate, a
       ))}
       {
         cellState === 'noEdit' &&
-        <div className="h-full flex-grow"
-          onClick={() => setCellState("toEdit")}
-        >
-        </div>
+        <div className="h-full flex-grow" onClick={() => setCellState("toEdit")}></div>
       }
       {
         cellState === 'toEdit' &&
         <input
           type="text"
-          className="w-full h-full focus:outline-none border-none "
+          className="w-full h-fit focus:outline-none border-none m-1 pl-1 pr-2 py-1"
           name={attr}
           autoFocus={true}
-          value={""}
+          value={editingValue}
           onChange={(e) => {
-            setEditingValue(e.target.value)
-            setCellState('editing')
+            setEditingValue(e.target.value);
+            setCellState('editing');
           }}
           onBlur={() => {
-            setCellState("noEdit")
+            if (!editingValue) {
+              setCellState("noEdit"); // Do nothing if the value is empty
+            } else {
+              // Optionally, you can handle the case where a non-empty value should be added
+            }
           }}
         />
       }
       {cellState === 'editing' &&
         <Autocomplete
-          className='w-full'
+          className='w-full h-full'
           freeSolo
           options={autocompleteItems}
           inputValue={editingValue}
@@ -81,7 +84,9 @@ export default function ArrayCell({ itemId, attr, values, state, handleUpdate, a
             }
           }}
           onBlur={() => {
-            if (editingValue) handleUpdate(itemId, { [attr]: [...values, editingValue] });
+            if (editingValue) {
+              handleUpdate(itemId, { [attr]: [...values, editingValue] });
+            }
             setCellState("noEdit");
           }}
           renderInput={(params) => (
@@ -92,6 +97,7 @@ export default function ArrayCell({ itemId, attr, values, state, handleUpdate, a
                 '& .MuiOutlinedInput-root': {
                   padding: 0,
                   marginLeft: '2px',
+                  backgroundColor: 'inherit',
                   '& fieldset': {
                     border: 'none', // Removes the border/outline
                   },
@@ -104,7 +110,6 @@ export default function ArrayCell({ itemId, attr, values, state, handleUpdate, a
                 },
               }}
             />
-
           )}
         />
       }

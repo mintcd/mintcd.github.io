@@ -35,15 +35,16 @@ export async function fetchData({
   return data.sort((x: DataItem, y: DataItem) => x.id - y.id);
 }
 
-export async function update(table: string, itemId: number, attrs: JsonObject<any>) {
-  const { error } = await supabase
+export async function updateItem(table: string, itemId: number, attrValue: JsonObject<any>) {
+  const { data, error } = await supabase
     .from(table)
-    .update(attrs)
+    .update(attrValue)
     .match({ id: itemId })
     .select()
   if (error) {
     throw new Error(error.message);
   }
+  return data
 }
 
 export async function createItem(table: string, data: DataItem[], attrProps: AttrProps) {

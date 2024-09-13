@@ -13,7 +13,12 @@ type AttrProps = {
     }
 }
 
-type DataItem = JsonObject<any>
+type DataItem = GridValidRowModel & {
+    id: number;
+    attr: string;
+    content: number | string | string[];
+    [key: string]: any;
+};
 
 type Chapter = {
     name: string,

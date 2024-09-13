@@ -7,7 +7,6 @@ export const supabase =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhja2N2aWZwcmNiZHJzaXFzZW5oIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyNTcyMzQyOCwiZXhwIjoyMDQxMjk5NDI4fQ.SaYcPR7pya7dW8bXD_tQr_mpY6sWKg-FZ00y8laLlQc'
   )
 
-
 export async function fetchData({
   table,
   attrs,
@@ -36,48 +35,42 @@ export async function fetchData({
   return data.sort((x: DataItem, y: DataItem) => x.id - y.id);
 }
 
-export async function getAttrTypes(table: string, attrs?: string[]) {
-  const data = await fetchData({ table: table, attrs: attrs, limit: 1 }) as DataItem;
-
-  const columnTypes = attrs ? attrs : Object.keys(data[0] || {});
-
-  const typeDict: AttrProps = {};
-
-  columnTypes.forEach((attr) => {
-    let type: string;
-    if (Array.isArray(data[0][attr])) {
-      type = 'array';
-    } else {
-      type = typeof data[0][attr];
-    }
-
-    typeDict[attr] = { type: type, width: '10%' };
-  });
-
-  return typeDict;
-}
-
-
 export async function update(table: string, itemId: number, attrs: JsonObject<any>) {
-  await supabase.from(table).select().then(({ data }) => console.log(data))
-
-
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from(table)
     .update(attrs)
     .match({ id: itemId })
     .select()
-
-  console.log(data)
-
   if (error) {
     throw new Error(error.message);
   }
-
 }
 
-export function createItem(table: string) {
+export async function createItem(table: string, data: DataItem[], attrProps: AttrProps) {
+  // Find the smallest available ID
+  const currentIds = data.map(item => item.id).sort();
+  let newId = 1;
 
+  // Find the first gap or use the next sequential ID
+  for (let i = 0; i < data.map(item => item.id).sort().length; i++) {
+    if (currentIds[i] > newId) break
+    newId += 1
+  }
+
+  const createdItem: DataItem = { id: newId }
+  for (const attr of Object.keys(attrProps)) {
+    if (attr == 'id') continue
+    createdItem[attr] = attrProps[attr].type === 'array' ? [] : ''
+  }
+
+  // Insert the new item with the smallest available ID
+  const { error } = await supabase.from(table).insert(createdItem);
+
+  if (error) {
+    console.error('Error inserting item:', error);
+  }
+
+  return createdItem
 }
 
 export function initiateAttrProps(data: DataItem[], attrOptions?: AttrProps) {
@@ -95,36 +88,6 @@ export function initiateAttrProps(data: DataItem[], attrOptions?: AttrProps) {
     attrProps[attr].type = type;
   });
 
-  // Estimate width
-  let totalLength = 0;
-
-  Object.keys(attrProps).forEach((attr) => {
-    let maxContentLength = 0;
-
-    data.forEach((row) => {
-      const content = row[attr];
-      if (attrProps[attr].type === 'array') {
-        const contentLength = content.join(', ').length;
-        maxContentLength = Math.max(maxContentLength, contentLength);
-      } else if (typeof content === 'string' || typeof content === 'number') {
-        maxContentLength = Math.max(maxContentLength, String(content).length);
-      }
-    });
-
-    attrProps[attr] = {
-      ...attrProps[attr],
-      maxLength: maxContentLength
-    };
-
-    totalLength += maxContentLength;
-  });
-  console.log(totalLength)
-  Object.keys(attrProps).forEach((attr) => {
-    attrProps[attr] = {
-      ...attrProps[attr],
-      width: `${Math.max(attrProps[attr].maxLength! / totalLength * 100, 4)}%`
-    };
-  });
 
   return attrProps
 }

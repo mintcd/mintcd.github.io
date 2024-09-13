@@ -1,14 +1,16 @@
 'use client'
 
-import { supabase, getAttrTypes, update, fetchData, initiateAttrProps } from "@components/database-ui/functions";
-import { useEffect, useState } from 'react';
-import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
+import { update, fetchData, initiateAttrProps, createItem } from "@components/database-ui/functions";
+import * as React from 'react';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import Paper from '@mui/material/Paper';
+import { useEffect, useState, useCallback, useMemo } from 'react';
+
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
-import "./styles.css"
+import "./styles.css";
 import UndoRoundedIcon from '@mui/icons-material/UndoRounded';
 import RedoRoundedIcon from '@mui/icons-material/RedoRounded';
 
-import { getTextWidth } from "@functions/text-analysis";
 import ArrayCell from "./array-cell";
 import TextCell from "./text-cell";
 
@@ -19,243 +21,120 @@ type Cell = {
   [key: string]: any;
 }
 
-type StackItem = {
-  action: 'delete' | 'update',
-  item: DataItem
-}
-
-type EditAction = {
-  cell: Cell,
-  editing?: boolean
-}
-
-export default function DatabaseUI({ table, columns }:
-  {
-    table: string;
-    columns?: AttrProps
-  }) {
-
-  const [authorized, setAuthorized] = useState(false);
-  const [fetched, setFetched] = useState(false)
-  const [loading, setLoading] = useState(true);
-
+export default function DatabaseUI({ table, columns }: { table: string; columns?: AttrProps }) {
   const [data, setData] = useState<DataItem[]>([]);
   const [attrProps, setAttrProps] = useState<AttrProps>({});
-  const [tableChanged, setTableChanged] = useState(0);
-
-  const [focusedItemId, setFocusedItemId] = useState<number | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  // Undo and Redo
-  const [undoStack, setUndoStack] = useState<StackItem[]>([]);
-  const [redoStack, setRedoStack] = useState<StackItem[]>([]);
-
-  function handleItemFocus(id: number) {
-    setFocusedItemId(id)
-  }
+  const [columnWidths, setColumnWidths] = useState<{ [key: string]: number }>({});
+  const [authorized, setAuthorized] = useState(false);
 
   async function handleCreate() {
+    await createItem(table, data, attrProps).then((createdItem) => {
+      console.log([...data, createdItem])
+      setData([...data, createdItem])
+    })
+  }
+
+  const handleUpdate = useCallback(async (itemId: number, attrProps: JsonObject<any>) => {
     if (!authorized) return;
+    await update(table, itemId, attrProps);
 
-    let adjustedItem: DataItem = {}
+  }, [authorized, table]);
 
-    function getAvailableId() {
-      const existingIds = new Set(data.map((dataItem) => dataItem.id));
-
-      let smallestMissingId = 1;
-      while (existingIds.has(smallestMissingId)) {
-        smallestMissingId++;
-      }
-      return smallestMissingId;
-    }
-
-
-    for (const attr of Object.keys(attrProps)) {
-      // Array process
-      if (attrProps[attr].type === 'array') {
-        adjustedItem[attr] = []
-      }
-      else {
-        adjustedItem[attr] = attr === 'id' ? getAvailableId() : ""
-      }
-    }
-
-    console.log(adjustedItem);
-
-    const { data: insertData, error } = await supabase.from(table).insert([adjustedItem]);
-
-    if (error) {
-      setError('Error inserting data: ' + error.message);
-      return;
-    }
-
-    setTableChanged(tableChanged + 1);
-  };
-
-  async function handleUpdate(itemId: number, attrProps: JsonObject<any>) {
-    if (!authorized) return;
-
-    console.log(itemId, attrProps)
-    await update(table, itemId, attrProps)
-
-
-    // setUndoStack((prev) => [...prev, {
-    //   action: 'update',
-    //   item: editedItem
-    // }])
-    setTableChanged(tableChanged + 1);
-  };
-
-  async function handleDelete(id: number) {
-    if (!authorized) return;
-
-    const { data: deleteData, error } = await supabase
-      .from(table)
-      .delete()
-      .match({ id });
-
-    if (error) {
-      setError('Error deleting data: ' + error.message);
-      return;
-    }
-
-    const deletedItem = data.find((item) => item.id === id) as DataItem
-
-    setUndoStack((prev) => [...prev, {
-      action: 'delete',
-      item: deletedItem
-    }])
-    // Remove deleted item from state
-    setData(prevData => prevData.filter(item => item.id !== id));
-    setLoading(false);
-  };
-
-  async function handleUndo() {
-    if (undoStack.length === 0) return;
-    const undo = undoStack.pop() as StackItem
-
-    if (undo.action === 'delete') {
-      await supabase.from(table).insert([undo.item])
-    }
-
-    setUndoStack(undoStack)
-    setRedoStack([...redoStack, undo])
-    setTableChanged(tableChanged + 1)
-  };
-
-  async function handleRedo() {
-    if (redoStack.length === 0) return;
-    console.log(redoStack)
-
-    const redo = redoStack.pop() as StackItem
-
-    if (redo.action === 'delete') {
-      await supabase.from(table).delete().match({ id: redo.item.id });
-    }
-
-
-    setRedoStack(redoStack)
-    setUndoStack([...undoStack, redo])
-    setTableChanged(tableChanged + 1)
-  };
+  // Save column width to localStorage on resize
+  const handleColumnResize = useCallback((newWidth: number | undefined, colId: string) => {
+    const updatedWidths = { ...columnWidths, [colId]: newWidth || 150 };
+    setColumnWidths(updatedWidths);
+    localStorage.setItem(`${table}-columnWidths`, JSON.stringify(updatedWidths));
+  }, [columnWidths, table]);
 
   useEffect(() => {
     if (window.localStorage.getItem("timeKeyGot")) setAuthorized(true);
+    const savedColumnWidths = JSON.parse(localStorage.getItem(`${table}-columnWidths`) || '{}');
+    setColumnWidths(savedColumnWidths);
 
     fetchData({ table: table, attrs: columns ? Object.keys(columns) : undefined })
       .then((data) => {
-        setData(data)
-        setAttrProps(initiateAttrProps(data, columns))
-        setFetched(true);
-      })
-  }, [tableChanged]);
+        console.log(data)
+        const attrProps = initiateAttrProps(data, columns);
+        setData(data);
+        setAttrProps(attrProps);
+      });
+  }, [table, columns]);
 
   return (
     <div>
-      {
-        Object.keys(attrProps).length == 0
-          ?
-          <p>Loading...</p>
-          :
-          <div>
-            {error && <p className="text-red">{error}</p>}
-            <div className="flex justify-between mb-2">
-              <UndoRoundedIcon
-                onClick={handleUndo}
-                sx={{ fontSize: 30 }}
-                style={{ cursor: 'pointer' }} />
-              <RedoRoundedIcon
-                onClick={handleRedo}
-                sx={{ fontSize: 30 }}
-                style={{ cursor: 'pointer' }} />
-            </div>
-            <div className="table w-full border-collapse">
-              <div className="table-header-group">
-                <div className="table-row">
-                  <div></div>
-                  {data[0] && Object.keys(data[0]).map((attr, index) => (
-                    <div className={`table-cell px-3 py-2 
-                      border-2 border-l-0 border-t-0 ${index === Object.keys(data[0]).length - 1 && 'border-r-0'}  
-                    bg-[#97C3DB] 
-                      w-[${attrProps[attr].width}]`
-                    }
-                      key={index}
-                    >
-                      {attr.charAt(0).toUpperCase() + attr.slice(1)}
-                    </div>
-                  ))}
-                </div>
-              </div>
+      {Object.keys(attrProps).length === 0 ? (
+        <p>Loading...</p>
+      ) : (
+        <Paper sx={{ display: 'flex', flexDirection: 'column', width: 'auto' }}>
+          <DataGrid
+            sx={{
+              flex: 1,
+              border: 0,
+              '& .MuiDataGrid-row:hover': {
+                backgroundColor: 'inherit',
+              },
+              '& .MuiDataGrid-cell': {
+                paddingLeft: 0,
+                paddingRight: 0,
+                display: 'flex'
+              }
+            }}
+            rows={data}
+            getRowHeight={() => 'auto'}
+            columns={Object.keys(attrProps).map((col) => ({
+              field: col,
+              headerName: col[0].toUpperCase() + col.slice(1),
+              width: columnWidths[col],
+              renderCell: (params) => {
+                const attr = col;
+                const itemId = params.row.id;
+                const value = params.value;
 
-              <div className="table-row-group">
-                {data.map((item: JsonObject<any>) => (
-                  <div className="table-row" key={item.id}
-                    onMouseEnter={() => handleItemFocus(item.id)}>
-                    <div className="text-left w-min"
-                    >
-                      {focusedItemId && focusedItemId === item.id &&
-                        <DeleteRoundedIcon
-                          onClick={() => handleDelete(item.id)}
-                          style={{ cursor: 'pointer' }}
-                          sx={{ fontSize: 20 }}
-                        />
-                      }
-                    </div>
+                return (
+                  <div className="hover:bg-blue-50 h-full w-full">
                     {
-                      Object.keys(item).map((attr, index) => (
-                        <div className={`table-cell`
-                        }
-                          key={index}>
-                          {attrProps[attr].type === 'array'
-                            ?
-                            <ArrayCell itemId={item.id} attr={attr} values={item[attr]} state='noEdit'
-                              handleUpdate={handleUpdate}
-                              autocompleteItems={attrProps[attr].referencing !== undefined
-                                ? [...new Set(data.map((item) => item[attrProps[attr].referencing as string]))]
-                                : [...new Set(data.flatMap((item) => item[attr]))]}
-                            />
-                            : <TextCell itemId={item.id} attr={attr} value={item[attr]} state='noEdit'
-                              handleUpdate={handleUpdate} />}
-                        </div>
-                      ))
+                      attrProps[attr].type === 'array' ?
+                        <ArrayCell
+                          itemId={itemId}
+                          attr={attr}
+                          values={value}
+                          state="noEdit"
+                          autocompleteItems={
+                            attrProps[attr].referencing !== undefined
+                              ? [...new Set(data.map((item) => item[attrProps[attr].referencing as string]))]
+                              : [...new Set(data.flatMap((item) => item[attr]))]
+                          }
+                          handleUpdate={handleUpdate}
+                        />
+                        :
+                        <TextCell
+                          itemId={itemId}
+                          attr={attr}
+                          value={value}
+                          state="noEdit"
+                          handleUpdate={handleUpdate}
+                        />
                     }
+                  </div>
+                )
 
-                  </div>
-                ))}
-                <div className="table-row">
-                  <div className="table-cell">
-                    <AddRoundedIcon
-                      onClick={handleCreate}
-                      width={20}
-                      height={20}
-                      style={{ cursor: "pointer" }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-      }
-    </div >
+
+              },
+            }))}
+
+            disableRowSelectionOnClick
+            checkboxSelection={false}
+
+            initialState={{ pagination: { paginationModel: { page: 0, pageSize: 20 } } }}
+            onColumnWidthChange={(params) => {
+              const { field, width } = params.colDef;
+              handleColumnResize(width, field);
+            }}
+          />
+          <AddRoundedIcon sx={{ fontSize: 25, cursor: 'pointer' }} onClick={handleCreate} />
+        </Paper>
+      )}
+    </div>
   );
 }

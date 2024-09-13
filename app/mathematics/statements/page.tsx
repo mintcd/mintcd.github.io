@@ -12,7 +12,8 @@ export default function Test() {
       type: {},
       content: {},
       parents: {
-        useLatex: true
+        useLatex: true,
+        referencing: "name"
       }
     }}></DatabaseUI>
 }

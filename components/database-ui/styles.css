@@ -1,9 +1,9 @@
 .table-cell {
   /* Default styles */
-  transition: box-shadow 0.3s ease; /* Smooth transition for shadow effect */
+  transition: box-shadow 0.3s ease;
 }
 
 .table-cell:hover {
-  box-shadow: 0 0 0 1px #bfdbfe; /* Blue border effect without affecting layout */
+  box-shadow: 0 0 0 1px #bfdbfe;
 }
 

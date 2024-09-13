@@ -17,16 +17,19 @@ export default function ArrayCell({ itemId, attr, values, state, handleUpdate, a
 ) {
   const [cellState, setCellState] = useState(state)
   const [editingValue, setEditingValue] = useState("")
-  console.log(autocompleteItems)
+
+  // console.log(autocompleteItems)
 
   return (
-    <div className="flex">
+    <div className="h-full flex">
       {values.map((value, index) => (
         <div
           key={index}
-          className="bg-slate-300 m-1 pl-1 pr-2 py-1 w-fit rounded-sm flex items-center relative"
+          className="bg-slate-300 m-1 pl-1 pr-2 py-1 w-fit h-fit min-h-[1rem] rounded-sm flex items-center relative"
         >
-          <span className='mr-1'><Latex>{String(value)}</Latex></span>
+          <span className='mr-1'>
+            <Latex>{String(value)}</Latex>
+          </span>
           <CloseIcon
             onClick={() => handleUpdate(itemId, { [attr]: values.filter((_, i) => i !== index) as typeof values })}
             className="cursor-pointer absolute top-0 right-0"
@@ -37,77 +40,73 @@ export default function ArrayCell({ itemId, attr, values, state, handleUpdate, a
       ))}
       {
         cellState === 'noEdit' &&
-        <div className="min-h-[1.1rem] flex-grow"
+        <div className="h-full flex-grow"
           onClick={() => setCellState("toEdit")}
         >
         </div>
       }
       {
         cellState === 'toEdit' &&
-        <div className="flex">
-          <input
-            type="text"
-            className="w-full h-full focus:outline-none border-none "
-            name={attr}
-            autoFocus={true}
-            value={""}
-            onChange={(e) => {
-              setEditingValue(e.target.value)
-              setCellState('editing')
-            }}
-            onBlur={() => {
-              setCellState("noEdit")
-            }}
-          />
-        </div>
+        <input
+          type="text"
+          className="w-full h-full focus:outline-none border-none "
+          name={attr}
+          autoFocus={true}
+          value={""}
+          onChange={(e) => {
+            setEditingValue(e.target.value)
+            setCellState('editing')
+          }}
+          onBlur={() => {
+            setCellState("noEdit")
+          }}
+        />
       }
       {cellState === 'editing' &&
-        <div className="flex">
-          <Autocomplete
-            freeSolo
-            options={autocompleteItems}
-            inputValue={editingValue}
-            clearIcon={null}
-            onInputChange={(event, newInputValue) => {
-              if (event && event.type === 'change') {
-                setEditingValue(newInputValue);
-              }
-            }}
-            onChange={(event, newValue) => {
-              if (newValue) {
-                handleUpdate(itemId, { [attr]: [...values, newValue] });
-                setCellState("noEdit");
-              }
-            }}
-            onBlur={() => {
-              if (editingValue) handleUpdate(itemId, { [attr]: [...values, editingValue] });
+        <Autocomplete
+          className='w-full'
+          freeSolo
+          options={autocompleteItems}
+          inputValue={editingValue}
+          clearIcon={null}
+          onInputChange={(event, newInputValue) => {
+            if (event && event.type === 'change') {
+              setEditingValue(newInputValue);
+            }
+          }}
+          onChange={(event, newValue) => {
+            if (newValue) {
+              handleUpdate(itemId, { [attr]: [...values, newValue] });
               setCellState("noEdit");
-            }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                autoFocus
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    padding: 0,
-                    marginLeft: '2px',
-                    '& fieldset': {
-                      border: 'none', // Removes the border/outline
-                    },
-                    '&:hover fieldset': {
-                      border: 'none', // Removes the border/outline on hover
-                    },
-                    '&.Mui-focused fieldset': {
-                      border: 'none', // Removes the border/outline when focused
-                    },
+            }
+          }}
+          onBlur={() => {
+            if (editingValue) handleUpdate(itemId, { [attr]: [...values, editingValue] });
+            setCellState("noEdit");
+          }}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              autoFocus
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  padding: 0,
+                  marginLeft: '2px',
+                  '& fieldset': {
+                    border: 'none', // Removes the border/outline
                   },
-                }}
-              />
+                  '&:hover fieldset': {
+                    border: 'none', // Removes the border/outline on hover
+                  },
+                  '&.Mui-focused fieldset': {
+                    border: 'none', // Removes the border/outline when focused
+                  },
+                },
+              }}
+            />
 
-            )}
-          />
-
-        </div>
+          )}
+        />
       }
     </div>
   )

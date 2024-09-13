@@ -26,22 +26,26 @@ export default function TextCell({ itemId, attr, value, state, handleUpdate }:
     }
   }, [cellState]); // Depend on cellState so that effect runs when editing state changes
 
+  // console.log(itemId)
+
   return (
-    <div className="h-full flex items-end">
+    <div className={`h-full w-full`}>
       {
         cellState === 'noEdit' &&
-        <div className="w-full min-h-[1.1rem]"
+        <div className="h-full min-h-[2rem] flex items-center px-1"
           onClick={() => {
             setCellState("editing")
           }}
         >
-          <Latex>{String(value)}</Latex>
+          <Latex>
+            {String(value)}
+          </Latex>
         </div>
       }
       {
         cellState === 'toEdit' &&
         <textarea
-          className="focus:outline-none border-none resize-none"
+          className="min-h-fit h-full w-full focus:outline-none border-none resize-none"
           name={attr}
           autoFocus={true}
           value={editingValue}
@@ -56,8 +60,7 @@ export default function TextCell({ itemId, attr, value, state, handleUpdate }:
       }
       {cellState === 'editing' &&
         <textarea
-          style={{ width: `${getTextWidth(editingValue)}px` }}
-          className={`h-full p-0 m-0 focus:outline-none border-none resize-none`}
+          className={`h-full w-full p-0 m-0 focus:outline-none border-none resize-none`}
           rows={Math.round(String(editingValue).length / 30) + 1}
           ref={textareaRef}
           name={attr}
@@ -78,16 +81,6 @@ export default function TextCell({ itemId, attr, value, state, handleUpdate }:
           }}
         />
       }
-      {/* {
-        cellState === 'editing' &&
-        <div className="w-full h-full"
-          onClick={() => {
-            setCellState("editing")
-          }}
-        >
-          <Latex>{String(value)}</Latex>
-        </div>
-      } */}
     </div >
   )
 }

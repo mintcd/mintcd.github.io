@@ -71,15 +71,23 @@ export default function TextCell({ itemId, attr, value, state, handleUpdate }:
           }}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
-              handleUpdate(itemId, { [attr]: editingValue })
-              setCellState("noEdit")
+              if (e.shiftKey) {
+                // Shift+Enter: Insert a newline character
+                e.preventDefault(); // Prevent the default behavior (e.g., form submission)
+                setEditingValue(editingValue + '\n');
+              } else {
+                // Enter key without Shift: Handle update and exit editing mode
+                handleUpdate(itemId, { [attr]: editingValue });
+                setCellState("noEdit");
+              }
             }
           }}
           onBlur={() => {
-            handleUpdate(itemId, { [attr]: editingValue })
-            setCellState("noEdit")
+            handleUpdate(itemId, { [attr]: editingValue });
+            setCellState("noEdit");
           }}
         />
+
       }
     </div >
   )

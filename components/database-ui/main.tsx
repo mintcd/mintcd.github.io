@@ -53,7 +53,6 @@ export default function DatabaseUI({ table, columns }: { table: string; columns?
   }, [authorized, data, table]);
 
 
-
   // Save column width to localStorage on resize
   const handleColumnResize = useCallback((newWidth: number | undefined, colId: string) => {
     const updatedWidths = { ...columnWidths, [colId]: newWidth || 150 };
@@ -75,12 +74,14 @@ export default function DatabaseUI({ table, columns }: { table: string; columns?
       });
   }, [table, columns]);
 
+
+
   return (
     <div>
       {Object.keys(attrProps).length === 0 ? (
         <p>Loading...</p>
       ) : (
-        <Paper sx={{ display: 'flex', flexDirection: 'column', width: 'auto' }}>
+        <Paper sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
           <DataGrid
             sx={{
               flex: 1,
@@ -99,7 +100,7 @@ export default function DatabaseUI({ table, columns }: { table: string; columns?
             columns={Object.keys(attrProps).map((col) => ({
               field: col,
               headerName: col[0].toUpperCase() + col.slice(1),
-              width: columnWidths[col],
+              width: columnWidths[col] || 150,
               renderCell: (params) => {
                 const attr = col;
                 const itemId = params.row.id;
@@ -139,9 +140,7 @@ export default function DatabaseUI({ table, columns }: { table: string; columns?
                     }
                   </div>
                 )
-
-
-              },
+              }
             }))}
 
             disableRowSelectionOnClick

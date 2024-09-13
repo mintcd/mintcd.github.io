@@ -2,7 +2,7 @@ import DatabaseUI from "@components/database-ui/main";
 
 
 export default function Test() {
-  return <DatabaseUI table='Statement Dependency'
+  return <DatabaseUI table='statement_dependency'
     columns={{
       id: {},
       name: {

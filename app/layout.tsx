@@ -15,14 +15,12 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
-      <body className="bg-white min-h-screen sm:mx-5 mx-2">
-        <div className="flex flex-col min-h-screen">
-          <Nav />
-          <main className="flex-grow mt-4 container mx-auto px-4 text-gray-500">
-            {children}
-          </main>
-          <Footer />
-        </div>
+      <body className="bg-white">
+        <Nav />
+        <main className="mt-4 mx-5 sm:mx-10 text-gray-500">
+          {children}
+        </main>
+        <Footer />
       </body>
     </html>
   );

@@ -98,7 +98,7 @@ export default function DatabaseUI({ table, columns }: { table: string; columns?
               '& .MuiDataGrid-cell': {
                 paddingLeft: 0,
                 paddingRight: 0,
-                display: 'flex'
+                display: 'flex',
               }
             }}
             rows={data}

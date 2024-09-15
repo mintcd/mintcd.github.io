@@ -23,7 +23,7 @@ export default function GraphNode({ vertex, radius, fontSize = radius / 4, selec
         className="shape"
         r={radius}
         stroke="none"
-        fill={vertex.color || statementProps[vertex.type].color}
+        fill={vertex.color || statementProps[vertex.type] ? statementProps[vertex.type].color : ''}
       // opacity={vertex.name == selectedNode?.name ? 1 : 0.5}
       />
       <foreignObject

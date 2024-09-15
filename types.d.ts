@@ -47,7 +47,7 @@ type Section = {
 }
 
 type Graph = {
-    metadata: {
+    metadata?: {
         edgesIncluded: boolean,
         depthComputed: boolean,
         positionInitialized: boolean

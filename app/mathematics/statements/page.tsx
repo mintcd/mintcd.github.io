@@ -8,7 +8,7 @@ export default function Test() {
       name: {
         useLatex: true
       },
-      field: {},
+      fields: {},
       type: {},
       content: {},
       parents: {

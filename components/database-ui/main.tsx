@@ -2,7 +2,7 @@
 
 import { updateItem, fetchData, initiateAttrProps, createItem } from "@components/database-ui/functions";
 import * as React from 'react';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import Paper from '@mui/material/Paper';
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -33,7 +33,6 @@ export default function DatabaseUI({ table, columns }: { table: string; columns?
 
   async function handleCreate() {
     await createItem(table, data, attrProps).then((createdItem) => {
-      console.log([...data, createdItem])
       setData([...data, createdItem])
     })
   }
@@ -87,8 +86,9 @@ export default function DatabaseUI({ table, columns }: { table: string; columns?
           <CircularProgress />
         </Box>
       ) : (
-        <Paper sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+        <Paper sx={{ width: '100%' }}>
           <DataGrid
+            slots={{ toolbar: GridToolbar }}
             sx={{
               flex: 1,
               border: 0,
@@ -102,6 +102,7 @@ export default function DatabaseUI({ table, columns }: { table: string; columns?
               }
             }}
             rows={data}
+            scrollbarSize={0}
             getRowHeight={() => 'auto'}
             columns={Object.keys(attrProps).map((col) => ({
               field: col,

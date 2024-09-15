@@ -64,7 +64,7 @@ export default function ArrayCell({ itemId, attr, values, state, handleUpdate, a
       }
       {cellState === 'editing' &&
         <Autocomplete
-          className='w-full h-full'
+          className="w-full h-full"
           freeSolo
           options={autocompleteItems}
           inputValue={editingValue}
@@ -77,12 +77,12 @@ export default function ArrayCell({ itemId, attr, values, state, handleUpdate, a
           onChange={(event, newValue) => {
             if (newValue) {
               handleUpdate(itemId, { [attr]: [...values, newValue] });
-              setCellState("noEdit");
+              setCellState('noEdit');
             }
           }}
           onBlur={() => {
             if (editingValue) handleUpdate(itemId, { [attr]: [...values, editingValue] });
-            setCellState("noEdit");
+            setCellState('noEdit');
           }}
           renderInput={(params) => (
             <TextField
@@ -103,11 +103,15 @@ export default function ArrayCell({ itemId, attr, values, state, handleUpdate, a
                     border: 'none', // Removes the border/outline when focused
                   },
                 },
+                '& .MuiInputBase-input': {
+                  fontSize: 'inherit', // Inherit font size
+                  fontFamily: 'inherit', // Inherit font family
+                },
               }}
             />
-
           )}
         />
+
       }
     </div>
   )

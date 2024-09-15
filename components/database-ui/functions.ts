@@ -49,11 +49,11 @@ export async function updateItem(table: string, itemId: number, attrValue: JsonO
 
 export async function createItem(table: string, data: DataItem[], attrProps: AttrProps) {
   // Find the smallest available ID
-  const currentIds = data.map(item => item.id).sort();
+  const currentIds = data.map(item => item.id).sort((x: number, y: number) => x - y);
   let newId = 1;
 
   // Find the first gap or use the next sequential ID
-  for (let i = 0; i < data.map(item => item.id).sort().length; i++) {
+  for (let i = 0; i < currentIds.length; i++) {
     if (currentIds[i] > newId) break
     newId += 1
   }
@@ -63,6 +63,8 @@ export async function createItem(table: string, data: DataItem[], attrProps: Att
     if (attr == 'id') continue
     createdItem[attr] = attrProps[attr].type === 'array' ? [] : ''
   }
+
+  console.log(createdItem, currentIds)
 
   // Insert the new item with the smallest available ID
   const { error } = await supabase.from(table).insert(createdItem);

@@ -3,20 +3,15 @@ type JsonObject<dataType> = {
 }
 
 type AttrProps = {
-    [key: string]: {
-        useLatex?: boolean,
-        display?: boolean,
-        type?: string,
-        maxLength?: number,
-        width?: string,
-        referencing?: string
-    }
+    name: string,
+    useLatex?: boolean,
+    type?: string,
+    referencing?: string,
+    width?: number,
+    order?: number,
 }
 
-type DataItem = GridValidRowModel & {
-    id: number;
-    attr: string;
-    content: number | string | string[];
+type DataItem = {
     [key: string]: any;
 };
 

@@ -32,7 +32,9 @@ export async function fetchData({
     throw new Error("Table is empty");
   }
 
-  return data.sort((x: DataItem, y: DataItem) => x.id - y.id);
+  const adjustedData = data as DataItem[]
+
+  return adjustedData.sort((x: DataItem, y: DataItem) => x.id - y.id);
 }
 
 export async function updateItem(table: string, itemId: number, attrValue: JsonObject<any>) {
@@ -47,7 +49,7 @@ export async function updateItem(table: string, itemId: number, attrValue: JsonO
   return data
 }
 
-export async function createItem(table: string, data: DataItem[], attrProps: AttrProps) {
+export async function createItem(table: string, data: DataItem[], attrProps: AttrProps[]) {
   // Find the smallest available ID
   const currentIds = data.map(item => item.id).sort((x: number, y: number) => x - y);
   let newId = 1;
@@ -59,9 +61,9 @@ export async function createItem(table: string, data: DataItem[], attrProps: Att
   }
 
   const createdItem: DataItem = { id: newId }
-  for (const attr of Object.keys(attrProps)) {
-    if (attr == 'id') continue
-    createdItem[attr] = attrProps[attr].type === 'array' ? [] : ''
+  for (const attr of attrProps) {
+    if (attr.name == 'id') continue
+    createdItem[attr.name] = attr.type === 'multiselect' ? [] : ''
   }
 
   console.log(createdItem, currentIds)
@@ -76,21 +78,21 @@ export async function createItem(table: string, data: DataItem[], attrProps: Att
   return createdItem
 }
 
-export function initiateAttrProps(data: DataItem[], attrOptions?: AttrProps) {
-  // Get types
-  const attrProps: AttrProps = attrOptions ? attrOptions : {};
+// export function initiateAttrProps(data: DataItem[], attrOptions?: AttrProps) {
+//   // Get types
+//   const attrProps: AttrProps = attrOptions ? attrOptions : {};
 
-  Object.keys(data[0]).forEach((attr) => {
-    let type: string;
-    if (Array.isArray(data[0][attr])) {
-      type = 'array';
-    } else {
-      type = typeof data[0][attr];
-    }
+//   Object.keys(data[0]).forEach((attr) => {
+//     let type: string;
+//     if (Array.isArray(data[0][attr])) {
+//       type = 'array';
+//     } else {
+//       type = typeof data[0][attr];
+//     }
 
-    attrProps[attr].type = type;
-  });
+//     attrProps[attr].type = type;
+//   });
 
 
-  return attrProps
-}
+//   return attrProps
+// }

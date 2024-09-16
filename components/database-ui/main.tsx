@@ -25,9 +25,9 @@ type Cell = {
   [key: string]: any;
 }
 
-export default function DatabaseUI({ table, columns }: { table: string; columns?: AttrProps }) {
+export default function DatabaseUI({ table, columns }: { table: string; columns?: any }) {
   const [data, setData] = useState<DataItem[]>([]);
-  const [attrProps, setAttrProps] = useState<AttrProps>({});
+  const [attrProps, setAttrProps] = useState<any>({});
   const [columnWidths, setColumnWidths] = useState<{ [key: string]: number }>({});
   const [authorized, setAuthorized] = useState(false);
 
@@ -101,7 +101,7 @@ export default function DatabaseUI({ table, columns }: { table: string; columns?
                 display: 'flex',
               }
             }}
-            rows={data}
+            rows={data as any}
             scrollbarSize={0}
             getRowHeight={() => 'auto'}
             columns={Object.keys(attrProps).map((col) => ({

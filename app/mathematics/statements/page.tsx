@@ -2,7 +2,7 @@ import DatabaseUI from "@components/database-ui/main";
 
 
 export default function Test() {
-  return <DatabaseUI table='statements'
+  return <DatabaseUI table='statement'
     columns={{
       id: {},
       name: {
@@ -16,5 +16,7 @@ export default function Test() {
         referencing: "name"
       },
       proof: {}
-    }}></DatabaseUI>
+    }}>
+
+  </DatabaseUI>
 }

@@ -1,0 +1,35 @@
+
+.table-wrapper {
+  margin-bottom: 25px;
+  border-radius: 6px;
+  background: #fff;
+  overflow: hidden; /* Clips any scrollbars that appear */
+}
+
+table {
+  width: 100%;
+  overflow: auto; /* Allow scrolling within the table */
+}
+
+table th {
+  position: relative;
+  font-size: 18px;
+}
+
+table th,
+table td {
+  text-align: left;
+  padding: 16px 20px;
+}
+
+table th span,
+table td span {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  display: block;
+}
+
+table tr td {
+  border-top: 1px solid #ccc;
+}

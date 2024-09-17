@@ -9,7 +9,7 @@ export default function ColumnSeparator(props: React.SVGProps<SVGSVGElement>) {
       height="24"
       {...props}
     >
-      <rect width="0.5" height="24" x="5.75" rx="0.25" />  // Adjust the rect's size and position
+      <rect width="0.5" height="24" x="5.75" rx="0.25" />
     </svg>
   )
 }

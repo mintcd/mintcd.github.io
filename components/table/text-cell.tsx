@@ -9,7 +9,7 @@ export default function TextCell({ itemId, attr, value, state, handleUpdate }:
     attr: string
     value: string,
     state: 'toEdit' | 'editing' | 'noEdit',
-    handleUpdate: (itemId: number, attrs: JsonObject<any>) => Promise<void>
+    handleUpdate: (itemId: number, attrName: string, value: string) => Promise<void>
   }
 ) {
   const [cellState, setCellState] = useState(state)
@@ -29,10 +29,10 @@ export default function TextCell({ itemId, attr, value, state, handleUpdate }:
   // console.log(itemId)
 
   return (
-    <div className={`h-full w-full`}>
+    <div className={`h-full w-full overflow-hidden`}>
       {
         cellState === 'noEdit' &&
-        <div className="h-full min-h-[2rem] flex items-center px-1"
+        <div className="h-full min-h-[2rem] flex items-center"
           onClick={() => {
             setCellState("editing")
           }}
@@ -60,7 +60,7 @@ export default function TextCell({ itemId, attr, value, state, handleUpdate }:
       }
       {cellState === 'editing' &&
         <textarea
-          className={`h-full w-full p-0 m-0 focus:outline-none border-none resize-none`}
+          className={`h-full w-full focus:outline-none border-none resize-none`}
           rows={Math.round(String(editingValue).length / 30) + 1}
           ref={textareaRef}
           name={attr}
@@ -76,14 +76,13 @@ export default function TextCell({ itemId, attr, value, state, handleUpdate }:
                 e.preventDefault(); // Prevent the default behavior (e.g., form submission)
                 setEditingValue(editingValue + '\n');
               } else {
-                // Enter key without Shift: Handle update and exit editing mode
-                handleUpdate(itemId, { [attr]: editingValue });
+                handleUpdate(itemId, attr, editingValue);
                 setCellState("noEdit");
               }
             }
           }}
           onBlur={() => {
-            handleUpdate(itemId, { [attr]: editingValue });
+            // handleUpdate(itemId, { [attr]: editingValue });
             setCellState("noEdit");
           }}
         />

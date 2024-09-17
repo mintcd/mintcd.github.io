@@ -4,64 +4,49 @@ import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import { useState } from 'react';
 
-
 export default function ArrayCell({ itemId, attr, values, state, handleUpdate, autocompleteItems }:
   {
     itemId: number
     attr: string
-    values: string[] | number[],
+    values: string[],
     state: 'toEdit' | 'editing' | 'noEdit',
-    handleUpdate: (itemId: number, attrs: JsonObject<any>) => Promise<void>
+    handleUpdate: (itemId: number, attr: string, value: string[]) => Promise<void>
     autocompleteItems: string[]
   }
 ) {
   const [cellState, setCellState] = useState(state)
   const [editingValue, setEditingValue] = useState("")
 
-  // console.log(autocompleteItems)
-
   return (
-    <div className="h-full flex">
-      {values.map((value, index) => (
-        <div
-          key={index}
-          className="bg-slate-300 m-1 pl-1 pr-2 py-1 w-fit h-fit min-h-[1rem] rounded-sm flex items-center relative"
-        >
-          <span className='mr-1'>
-            <Latex>{String(value)}</Latex>
-          </span>
-          <CloseIcon
-            onClick={() => handleUpdate(itemId, { [attr]: values.filter((_, i) => i !== index) as typeof values })}
-            className="cursor-pointer absolute top-0 right-0"
-            width={5}
-            sx={{ fontSize: 13 }}
+    <div className="h-full w-full flex flex-col overflow-hidden items-center">
+      <div className="flex flex-wrap w-full relative">
+        {values.map((value, index) => (
+          <div
+            key={index}
+            className="bg-slate-300 m-1 pl-1 pr-2 py-1 rounded-sm flex items-center relative"
+            style={{ maxWidth: 'calc(100% - 2rem)' }} // Ensure tags don’t overflow
+          >
+            <span className='mr-1'>
+              <Latex>{String(value)}</Latex>
+            </span>
+            <CloseIcon
+              onClick={() => handleUpdate(itemId, attr, values.filter((_, i) => i !== index))}
+              className="cursor-pointer absolute top-0 right-0"
+              width={5}
+              sx={{ fontSize: 13 }}
+            />
+          </div>
+        ))}
+
+        {cellState === 'noEdit' && (
+          <div
+            className="absolute top-0 left-0 right-0 bottom-0 h-full min-h-[1rem] bg-transparent"
+            onClick={() => setCellState("editing")}
           />
-        </div>
-      ))}
-      {
-        cellState === 'noEdit' &&
-        <div className="h-full flex-grow"
-          onClick={() => setCellState("toEdit")}
-        >
-        </div>
-      }
-      {
-        cellState === 'toEdit' &&
-        <input
-          type="text"
-          className="w-full h-fit focus:outline-none border-none m-1 pl-1 pr-2 py-1"
-          name={attr}
-          autoFocus={true}
-          value={""}
-          onChange={(e) => {
-            setEditingValue(e.target.value)
-            setCellState('editing')
-          }}
-          onBlur={() => {
-            setCellState("noEdit")
-          }}
-        />
-      }
+        )}
+      </div>
+
+
       {cellState === 'editing' &&
         <Autocomplete
           className="w-full h-full"
@@ -75,13 +60,17 @@ export default function ArrayCell({ itemId, attr, values, state, handleUpdate, a
             }
           }}
           onChange={(event, newValue) => {
-            if (newValue) {
-              handleUpdate(itemId, { [attr]: [...values, newValue] });
+            if (newValue && cellState === 'editing') {
+              handleUpdate(itemId, attr, [...values, newValue]);
               setCellState('noEdit');
+              setEditingValue('');
             }
           }}
           onBlur={() => {
-            if (editingValue) handleUpdate(itemId, { [attr]: [...values, editingValue] });
+            if (cellState === 'editing' && editingValue) {
+              handleUpdate(itemId, attr, [...values, editingValue]);
+              setEditingValue('');
+            }
             setCellState('noEdit');
           }}
           renderInput={(params) => (
@@ -94,24 +83,23 @@ export default function ArrayCell({ itemId, attr, values, state, handleUpdate, a
                   marginLeft: '2px',
                   backgroundColor: 'inherit',
                   '& fieldset': {
-                    border: 'none', // Removes the border/outline
+                    border: 'none',
                   },
                   '&:hover fieldset': {
-                    border: 'none', // Removes the border/outline on hover
+                    border: 'none',
                   },
                   '&.Mui-focused fieldset': {
-                    border: 'none', // Removes the border/outline when focused
+                    border: 'none',
                   },
                 },
                 '& .MuiInputBase-input': {
-                  fontSize: 'inherit', // Inherit font size
-                  fontFamily: 'inherit', // Inherit font family
+                  fontSize: 'inherit',
+                  fontFamily: 'inherit',
                 },
               }}
             />
           )}
         />
-
       }
     </div>
   )

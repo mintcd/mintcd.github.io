@@ -1,35 +1,83 @@
-
-.table-wrapper {
-  margin-bottom: 25px;
-  border-radius: 6px;
-  background: #fff;
-  overflow: hidden; /* Clips any scrollbars that appear */
-}
-
-table {
-  width: 100%;
-  overflow: auto; /* Allow scrolling within the table */
-}
-
-table th {
-  position: relative;
-  font-size: 18px;
-}
-
-table th,
-table td {
-  text-align: left;
-  padding: 16px 20px;
-}
-
-table th span,
-table td span {
-  white-space: nowrap;
-  text-overflow: ellipsis;
+/* Table container */
+.table-container {
+  border-radius: 8px;
   overflow: hidden;
-  display: block;
+  background: #fff;
+  font-size: 14px;
 }
 
-table tr td {
-  border-top: 1px solid #ccc;
+.table-body::-webkit-scrollbar {
+  height: 10px; /* Scrollbar height */
+  width: 10px;
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Adjust as necessary */
+}
+
+/* Header cells */
+.table-header-cell {
+  font-weight: bold;
+  position: relative;
+}
+
+/* Header cell hover and focus states */
+/* .table-header-cell:hover {
+  background-color: #d0d0d0;
+} */
+
+.table-header-cell:focus {
+  outline: 2px solid #007bff;
+}
+
+/* Column separator */
+.column-separator {
+  background-color: #ddd;
+  width: 5px;
+}
+
+/* Body */
+.table-body {
+  max-height: 500px; /* Adjust based on needs */
+  overflow-y: auto;
+}
+
+/* Table items */
+.table-item {
+  border-bottom: 1px solid #ddd;
+}
+
+/* Cells */
+.cell-container {
+  padding: 10px;
+}
+
+
+.table-item:hover {
+  background-color: #f1f1f1;
+}
+/* .cell-container:focus{
+  background-color: #007bff;
+} */
+
+/* Pagination controls */
+.pagination-controls {
+  padding: 10px;
+  /* background-color: #f4f4f4; */
+  border-top: 1px solid #ddd;
+}
+
+
+.pagination-button:hover {
+  background-color: #0056b3;
+}
+
+.pagination-button:disabled {
+  background-color: #b0b0b0;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  line-height: 32px;
 }

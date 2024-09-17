@@ -1,6 +1,6 @@
 'use client'
 
-import { updateItem, fetchData, initiateAttrProps, createItem } from "@components/database-ui/functions";
+import { updateItem, fetchData, createItem } from "@components/database-ui/functions";
 import * as React from 'react';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import Paper from '@mui/material/Paper';
@@ -63,19 +63,19 @@ export default function DatabaseUI({ table, columns }: { table: string; columns?
     localStorage.setItem(`${table}-columnWidths`, JSON.stringify(updatedWidths));
   }, [columnWidths, table]);
 
-  useEffect(() => {
-    if (window.localStorage.getItem("timeKeyGot")) setAuthorized(true);
-    const savedColumnWidths = JSON.parse(localStorage.getItem(`${table}-columnWidths`) || '{}');
-    setColumnWidths(savedColumnWidths);
+  // useEffect(() => {
+  //   if (window.localStorage.getItem("timeKeyGot")) setAuthorized(true);
+  //   const savedColumnWidths = JSON.parse(localStorage.getItem(`${table}-columnWidths`) || '{}');
+  //   setColumnWidths(savedColumnWidths);
 
-    fetchData({ table: table, attrs: columns ? Object.keys(columns) : undefined })
-      .then((data) => {
-        console.log(data)
-        const attrProps = initiateAttrProps(data, columns);
-        setData(data);
-        setAttrProps(attrProps);
-      });
-  }, [table, columns]);
+  //   fetchData({ table: table, attrs: columns ? Object.keys(columns) : undefined })
+  //     .then((data) => {
+  //       console.log(data)
+  //       const attrProps = initiateAttrProps(data, columns);
+  //       setData(data);
+  //       setAttrProps(attrProps);
+  //     });
+  // }, [table, columns]);
 
 
 

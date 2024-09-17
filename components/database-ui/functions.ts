@@ -47,7 +47,7 @@ export async function updateItem(table: string, itemId: number, attrValue: JsonO
   return data
 }
 
-export async function createItem(table: string, data: DataItem[], attrProps: AttrProps) {
+export async function createItem(table: string, data: DataItem[], attrs: AttrProps[]) {
   // Find the smallest available ID
   const currentIds = data.map(item => item.id).sort((x: number, y: number) => x - y);
   let newId = 1;
@@ -59,9 +59,9 @@ export async function createItem(table: string, data: DataItem[], attrProps: Att
   }
 
   const createdItem: DataItem = { id: newId }
-  for (const attr of Object.keys(attrProps)) {
-    if (attr == 'id') continue
-    createdItem[attr] = attrProps[attr].type === 'array' ? [] : ''
+  for (const attr of attrs) {
+    if (attr.name == 'id') continue
+    createdItem[attr.name] = attr.type === 'array' ? [] : ''
   }
 
   console.log(createdItem, currentIds)
@@ -76,21 +76,21 @@ export async function createItem(table: string, data: DataItem[], attrProps: Att
   return createdItem
 }
 
-export function initiateAttrProps(data: DataItem[], attrOptions?: AttrProps) {
-  // Get types
-  const attrProps: AttrProps = attrOptions ? attrOptions : {};
+// export function initiateAttrProps(data: DataItem[], attrs: AttrProps[]) {
+//   // Get types
+//   const attrProps: AttrProps = attrs ? attrs : {};
 
-  Object.keys(data[0]).forEach((attr) => {
-    let type: string;
-    if (Array.isArray(data[0][attr])) {
-      type = 'array';
-    } else {
-      type = typeof data[0][attr];
-    }
+//   attrs.forEach((attr) => {
+//     let type: string;
+//     if (Array.isArray(data[0][attr])) {
+//       type = 'array';
+//     } else {
+//       type = typeof data[0][attr];
+//     }
 
-    attrProps[attr].type = type;
-  });
+//     attrProps[attr].type = type;
+//   });
 
 
-  return attrProps
-}
+//   return attrProps
+// }

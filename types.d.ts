@@ -9,6 +9,7 @@ type AttrProps = {
     referencing?: string,
     width?: number,
     order?: number,
+    newWindow?: boolean
 }
 
 type DataItem = {

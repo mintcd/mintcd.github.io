@@ -5,13 +5,16 @@ import ColumnSeparator from "./ColumnSeparator";
 import MenuIcon from "./MenuIcon";
 import { LiaSortAlphaDownSolid } from "react-icons/lia";
 import { CiFilter } from "react-icons/ci";
-import ArrayCell from "./array-cell";
-import TextCell from "./text-cell";
+import MultiselectCell from "./MultiSelectCell";
+import TextCell from "./TextCell";
 import { debounce } from 'lodash'
 import './table.css'
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import NavigateNextRoundedIcon from '@mui/icons-material/NavigateNextRounded';
 import NavigateBeforeRoundedIcon from '@mui/icons-material/NavigateBeforeRounded';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import SlideWindow from './SlideWindow';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 
 
 export default function Table({
@@ -39,15 +42,32 @@ export default function Table({
     return attrsByName;
   })
 
+  const newWindowsNeeded = attrs.some((attr) => attr.newWindow)
+
   const [menuOpen, setMenuOpen] = useState<number>(-1);
   const [focusedHeader, setFocusedHeader] = useState(-1);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [currentItem, setCurrentItem] = useState<DataItem | null>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   const animationFrameRef = useRef<number | null>(null);
-
   const resizingRef = useRef({ startX: 0, startWidth: 0, attrName: '' });
+
+
+  const handleOpenWindow = (itemId: number) => {
+    const selectedItem = data.find(item => item.id === itemId);
+    if (selectedItem) {
+      setCurrentItem(selectedItem);
+      setDrawerOpen(true);
+    }
+  };
+
+  const handleCloseDrawer = () => {
+    setDrawerOpen(false);
+  };
+
 
   const handleMouseDown = (e: React.MouseEvent, attrName: string) => {
     resizingRef.current.startX = e.clientX;
@@ -74,14 +94,15 @@ export default function Table({
     }
   };
 
-  const debounceSaveAttrs = debounce((attrsByName) => {
-    localStorage.setItem('attrsByName', JSON.stringify(attrsByName));
-  }, 200);
-
   const handleMouseUp = useCallback(() => {
     document.removeEventListener('mousemove', handleMouseMove);
     document.removeEventListener('mouseup', handleMouseUp);
     resizingRef.current.attrName = '';
+
+    const debounceSaveAttrs = debounce((attrsByName) => {
+      localStorage.setItem('attrsByName', JSON.stringify(attrsByName));
+    }, 200);
+
     debounceSaveAttrs(attrsByName)
   }, []);
 
@@ -161,113 +182,132 @@ export default function Table({
   };
 
   return (
-    <div className="table-container relative">
-      <div className="table-header grid"
-        style={{
-          gridTemplateColumns: orderedAttrs
-            .map((attr) => `${attr.width}px`)
-            .join(' ')
-        }}>
-        {
-          orderedAttrs.map((attr, index) =>
-            <div
-              key={index}
-              className="table-header-cell flex justify-between items-center relative"
-              style={{ width: `${Math.max(attr.width || 0, cellMinWidth)}px` }}
-              onMouseEnter={() => setFocusedHeader(index)}
-              onMouseLeave={() => setFocusedHeader(-1)}
-            >
-              <div className="flex-grow"
-                draggable
-                onDragStart={(e) => handleDragStart(e, attr.name)}
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, attr.name)}
-              >
-                {attr.name.charAt(0).toUpperCase() + attr.name.slice(1)}
-              </div>
-
-              <div className="icon-group flex items-center space-x-2 flex-nowrap">
-                {focusedHeader === index && (
-                  <>
-                    <MenuIcon
-                      onClick={() => setMenuOpen(index)}
-                      onMouseLeave={() => setMenuOpen(-1)}
-                    />
-                    {menuOpen === index && (
-                      <div className="absolute top-[10px] bg-white border shadow-md mt-2 z-10 w-[100px]"
-                        onMouseEnter={() => setMenuOpen(index)}
-                        onMouseLeave={() => setMenuOpen(-1)}
-                      >
-                        <div className="p-2 hover:bg-gray-200 w-full flex items-center justify-between">
-                          Sort
-                          <LiaSortAlphaDownSolid className="m-2" />
-                        </div>
-                        <div className="p-2 hover:bg-gray-200 w-full flex items-center justify-between">
-                          Filter
-                          <CiFilter className="m-2" />
-                        </div>
-                      </div>
-                    )}
-                  </>
-                )}
-                <ColumnSeparator
-                  className="hover:cursor-col-resize hover:font-bold hover:text-blue-300"
-                  onMouseDown={(e) => handleMouseDown(e, attr.name)}
-                />
-              </div>
-            </div>
-          )
-        }
-      </div>
-      <div className="table-body">
-        {paginatedData.map((item) =>
-          <div key={item.id} className="table-item grid" style={{
+    <div>
+      <div className="table-container relative">
+        <SlideWindow isOpen={drawerOpen} onClose={handleCloseDrawer}>
+          <h2>Details for Item ID: {currentItem?.id}</h2>
+          {/* You can render more details for the item here */}
+        </SlideWindow>
+        <div className="table-header grid"
+          style={{
             gridTemplateColumns: orderedAttrs
               .map((attr) => `${attr.width}px`)
               .join(' ')
           }}>
-            {
-              orderedAttrs.map((attr, cellIndex) =>
-                <div key={cellIndex} className="cell-container"
-                  style={{ width: `${Math.max(attr.width || 0, cellMinWidth)}px` }}>
-                  {attr.type === 'multiselect'
-                    ?
-                    <ArrayCell
-                      itemId={item.id}
-                      attr={attr.name}
-                      values={item[attr.name]}
-                      state="noEdit"
-                      autocompleteItems={Array.from(new Set(data.flatMap(item => attr.referencing ? item[attr.referencing] : item[attr.name])))}
-                      handleUpdate={handleUpdateCell}
-                    />
-                    : <TextCell
-                      itemId={item.id}
-                      attr={attr.name}
-                      value={item[attr.name]}
-                      state="noEdit"
-                      handleUpdate={handleUpdateCell}
-                    />
-                  }
+          {
+            orderedAttrs.map((attr, index) =>
+              <div
+                key={index}
+                className="table-header-cell flex justify-between items-center relative"
+                style={{ width: `${Math.max(attr.width || 0, cellMinWidth)}px` }}
+                onMouseEnter={() => setFocusedHeader(index)}
+                onMouseLeave={() => setFocusedHeader(-1)}
+              >
+                <div className="flex-grow"
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, attr.name)}
+                  onDragOver={handleDragOver}
+                  onDrop={(e) => handleDrop(e, attr.name)}
+                >
+                  {attr.name.charAt(0).toUpperCase() + attr.name.slice(1)}
                 </div>
-              )
-            }
-          </div>
-        )}
-        <AddRoundedIcon sx={{ fontSize: 25, cursor: 'pointer' }} onClick={handleCreateItem} />
-      </div>
-      <div className="pagination-controls flex items-center justify-end mt-4">
-        <NavigateBeforeRoundedIcon
-          onClick={() => handlePageChange(currentPage > 1 ? currentPage - 1 : currentPage)}
-        />
-        <span className="pagination-info">
-          {(currentPage - 1) * itemsPerPage + 1}-{currentPage * itemsPerPage} of {data.length}
-        </span>
+
+                <div className="icon-group flex items-center space-x-2 flex-nowrap">
+                  {focusedHeader === index && (
+                    <>
+                      <MenuIcon
+                        onClick={() => setMenuOpen(index)}
+                        onMouseLeave={() => setMenuOpen(-1)}
+                      />
+                      {menuOpen === index && (
+                        <div className="absolute top-[10px] bg-white border shadow-md mt-2 z-10 w-[100px]"
+                          onMouseEnter={() => setMenuOpen(index)}
+                          onMouseLeave={() => setMenuOpen(-1)}
+                        >
+                          <div className="p-2 hover:bg-gray-200 w-full flex items-center justify-between">
+                            Sort
+                            <LiaSortAlphaDownSolid className="m-2" />
+                          </div>
+                          <div className="p-2 hover:bg-gray-200 w-full flex items-center justify-between">
+                            Filter
+                            <CiFilter className="m-2" />
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
+                  <ColumnSeparator
+                    className="hover:cursor-col-resize hover:font-bold hover:text-blue-300"
+                    onMouseDown={(e) => handleMouseDown(e, attr.name)}
+                  />
+                </div>
+              </div>
+            )
+          }
+        </div>
+        <div className="table-body">
+          {paginatedData.map((item) =>
+            <div key={item.id} className="table-item grid" style={{
+              gridTemplateColumns: orderedAttrs
+                .map((attr) => `${attr.width}px`)
+                .join(' ')
+            }}>
+              {
+                orderedAttrs.map((attr, cellIndex) =>
+                  <div key={cellIndex} className="cell-container flex items-center justify-between"
+                    style={{ width: `${Math.max(attr.width || 0, cellMinWidth)}px` }}>
+                    {
+                      attr.name === 'id' && currentItem?.id == item.id &&
+                      <DragIndicatorIcon />
+                    }
+                    {attr.type === 'multiselect'
+                      ?
+                      <MultiselectCell
+                        itemId={item.id}
+                        attr={attr.name}
+                        values={item[attr.name]}
+                        state="noEdit"
+                        autocompleteItems={Array.from(new Set(data.flatMap(item => attr.referencing ? item[attr.referencing] : item[attr.name])))}
+                        handleUpdate={handleUpdateCell}
+                      />
+                      : <TextCell
+                        itemId={item.id}
+                        attr={attr.name}
+                        value={item[attr.name]}
+                        state="noEdit"
+                        handleUpdate={handleUpdateCell}
+                      />
+                    }
+                    {
+                      newWindowsNeeded && attr.name === 'id' &&
+                      <OpenInNewIcon
+                        style={{ fontSize: '16px' }}
+                        onClick={() => handleOpenWindow(item.id)}
+                      />
+                    }
+                  </div>
+                )
+              }
+
+            </div>
+          )}
+          <AddRoundedIcon sx={{ fontSize: 25, cursor: 'pointer' }} onClick={handleCreateItem} />
+        </div>
+        <div className="pagination-controls flex items-center justify-end mt-4">
+          <NavigateBeforeRoundedIcon
+            onClick={() => handlePageChange(currentPage > 1 ? currentPage - 1 : currentPage)}
+          />
+          <span className="pagination-info">
+            {(currentPage - 1) * itemsPerPage + 1}-{currentPage * itemsPerPage} of {data.length}
+          </span>
 
 
-        <NavigateNextRoundedIcon
-          onClick={() => handlePageChange(currentPage !== totalPages ? currentPage + 1 : currentPage)}
-        />
+          <NavigateNextRoundedIcon
+            onClick={() => handlePageChange(currentPage !== totalPages ? currentPage + 1 : currentPage)}
+          />
+        </div>
       </div>
     </div>
+
   );
 }

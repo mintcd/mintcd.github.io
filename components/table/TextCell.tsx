@@ -1,18 +1,16 @@
 import Latex from "@components/latex"
-import { getTextWidth } from "@functions/text-analysis"
 import { useEffect, useRef, useState } from "react"
 
 
-export default function TextCell({ itemId, attr, value, state, handleUpdate }:
+export default function TextCell({ itemId, attr, value, handleUpdate }:
   {
     itemId: number
     attr: string
     value: string,
-    state: 'toEdit' | 'editing' | 'noEdit',
-    handleUpdate: (itemId: number, attrName: string, value: string) => Promise<void>
+    handleUpdate: (itemId: number, attrName: string, value: string) => Promise<void>,
   }
 ) {
-  const [cellState, setCellState] = useState(state)
+  const [cellState, setCellState] = useState('noEdit')
   const [editingValue, setEditingValue] = useState(value)
 
   const textareaRef = useRef<any>(null);
@@ -29,12 +27,13 @@ export default function TextCell({ itemId, attr, value, state, handleUpdate }:
   // console.log(itemId)
 
   return (
-    <div className={`h-full overflow-hidden`}>
+    <div className={`text-cell h-full overflow-hidden`}>
       {
         cellState === 'noEdit' &&
-        <div className="h-full min-h-[2rem] flex items-center"
+        <div className="h-full min-h-[1.75rem] flex items-center"
           onClick={() => {
             setCellState("editing")
+            setEditingValue(value)
           }}
         >
           <Latex>
@@ -42,25 +41,9 @@ export default function TextCell({ itemId, attr, value, state, handleUpdate }:
           </Latex>
         </div>
       }
-      {
-        cellState === 'toEdit' &&
-        <textarea
-          className="min-h-fit h-full w-full focus:outline-none border-none resize-none"
-          name={attr}
-          autoFocus={true}
-          value={editingValue}
-          onChange={(e) => {
-            setEditingValue(e.target.value)
-            setCellState('editing')
-          }}
-          onBlur={() => {
-            setCellState("noEdit")
-          }}
-        />
-      }
       {cellState === 'editing' &&
         <textarea
-          className={`h-full w-full focus:outline-none border-none resize-none`}
+          className={`h-full w-full p-0 focus:outline-none border-none resize-none bg-inherit`}
           rows={Math.round(String(editingValue).length / 30) + 1}
           ref={textareaRef}
           name={attr}
@@ -76,8 +59,9 @@ export default function TextCell({ itemId, attr, value, state, handleUpdate }:
                 e.preventDefault(); // Prevent the default behavior (e.g., form submission)
                 setEditingValue(editingValue + '\n');
               } else {
-                handleUpdate(itemId, attr, editingValue);
+                handleUpdate(itemId, attr, editingValue)
                 setCellState("noEdit");
+                console.log(editingValue);
               }
             }
           }}
@@ -86,7 +70,6 @@ export default function TextCell({ itemId, attr, value, state, handleUpdate }:
             setCellState("noEdit");
           }}
         />
-
       }
     </div >
   )

@@ -4,26 +4,25 @@ import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import { useState } from 'react';
 
-export default function ArrayCell({ itemId, attr, values, state, handleUpdate, autocompleteItems }:
+export default function ArrayCell({ itemId, attr, values, handleUpdate, autocompleteItems }:
   {
     itemId: number
     attr: string
     values: string[],
-    state: 'toEdit' | 'editing' | 'noEdit',
     handleUpdate: (itemId: number, attr: string, value: string[]) => Promise<void>
     autocompleteItems: string[]
   }
 ) {
-  const [cellState, setCellState] = useState(state)
+  const [cellState, setCellState] = useState("noEdit")
   const [editingValue, setEditingValue] = useState("")
 
   return (
-    <div className="h-full w-full flex flex-col overflow-hidden items-center">
+    <div className="h-full w-full  overflow-hidden items-center">
       <div className="flex flex-wrap w-full relative">
         {values.map((value, index) => (
           <div
             key={index}
-            className="bg-slate-300 m-1 pl-1 pr-2 py-1 rounded-sm flex items-center relative"
+            className="bg-slate-300 m-1 pl-1 pr-2 rounded-sm flex items-center relative"
             style={{ maxWidth: 'calc(100% - 2rem)' }} // Ensure tags don’t overflow
           >
             <span className='mr-1'>
@@ -49,7 +48,7 @@ export default function ArrayCell({ itemId, attr, values, state, handleUpdate, a
 
       {cellState === 'editing' &&
         <Autocomplete
-          className="w-full h-full"
+          className=""
           freeSolo
           options={autocompleteItems}
           inputValue={editingValue}

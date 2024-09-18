@@ -135,7 +135,7 @@ export default function Table({
 
       if (draggedOrder < targetOrder) {
         Object.keys(newAttrsByName).forEach((key) => {
-          if (newAttrsByName[key].order
+          if (newAttrsByName[key] && newAttrsByName[key].order
             && newAttrsByName[key].order > draggedOrder
             && newAttrsByName[key].order <= targetOrder) {
             newAttrsByName[key].order -= 1;
@@ -143,7 +143,7 @@ export default function Table({
         });
       } else {
         Object.keys(newAttrsByName).forEach((key) => {
-          if (newAttrsByName[key].order
+          if (newAttrsByName[key] && newAttrsByName[key].order
             && newAttrsByName[key].order < draggedOrder
             && newAttrsByName[key].order >= targetOrder) {
             newAttrsByName[key].order += 1;

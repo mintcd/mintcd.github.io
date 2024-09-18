@@ -1,4 +1,5 @@
 import './table.css'; // Add styles for sliding drawer here
+import CloseFullscreenIcon from '@mui/icons-material/CloseFullscreen';
 
 export default function SlidingDrawer({
   isOpen,
@@ -11,8 +12,13 @@ export default function SlidingDrawer({
 }) {
   return (
     <div className={`sliding-drawer ${isOpen ? 'open' : ''}`}>
+
       <div className="drawer-content">
-        <button onClick={onClose} className="close-btn">X</button>
+        <CloseFullscreenIcon
+          style={{ transform: 'rotate(90deg)' }} // Updated rotation
+          onClick={onClose}
+          className="close-btn"
+        />
         {children}
       </div>
     </div>

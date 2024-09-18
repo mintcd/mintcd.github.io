@@ -135,15 +135,17 @@ export default function Table({
 
       if (draggedOrder < targetOrder) {
         Object.keys(newAttrsByName).forEach((key) => {
-          if (!newAttrsByName[key].order) return;
-          if (newAttrsByName[key].order > draggedOrder && newAttrsByName[key].order <= targetOrder) {
+          if (newAttrsByName[key].order
+            && newAttrsByName[key].order > draggedOrder
+            && newAttrsByName[key].order <= targetOrder) {
             newAttrsByName[key].order -= 1;
           }
         });
       } else {
         Object.keys(newAttrsByName).forEach((key) => {
-          if (!newAttrsByName[key].order) return;
-          if (newAttrsByName[key].order < draggedOrder && newAttrsByName[key].order >= targetOrder) {
+          if (newAttrsByName[key].order
+            && newAttrsByName[key].order < draggedOrder
+            && newAttrsByName[key].order >= targetOrder) {
             newAttrsByName[key].order += 1;
           }
         });

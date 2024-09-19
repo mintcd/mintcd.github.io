@@ -27,50 +27,42 @@ export default function TextCell({ itemId, attr, value, handleUpdate }:
   // console.log(itemId)
 
   return (
-    <div className={`text-cell h-full overflow-hidden`}>
+    <div className={`text-cell h-full ${attr !== 'id' && 'w-full'} overflow-hidden`}>
       {
         cellState === 'noEdit' &&
-        <div className="h-full min-h-[1.75rem] flex items-center"
+        <div
+          className="h-full min-h-[1.75rem] flex items-center cursor-pointer"
           onClick={() => {
             setCellState("editing")
             setEditingValue(value)
           }}
         >
-          <Latex>
-            {String(value)}
-          </Latex>
+          <Latex>{String(value)}</Latex>
         </div>
       }
-      {cellState === 'editing' &&
+      {
+        cellState === 'editing' &&
         <textarea
-          className={`h-full w-full p-0 focus:outline-none border-none resize-none bg-inherit`}
-          rows={Math.round(String(editingValue).length / 30) + 1}
+          className="h-full w-full p-0 focus:outline-none border-none resize-none bg-inherit"
           ref={textareaRef}
-          name={attr}
-          autoFocus={true}
           value={editingValue}
-          onChange={(e) => {
-            setEditingValue(e.target.value)
-          }}
+          onChange={(e) => setEditingValue(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               if (e.shiftKey) {
-                // Shift+Enter: Insert a newline character
-                e.preventDefault(); // Prevent the default behavior (e.g., form submission)
+                e.preventDefault();
                 setEditingValue(editingValue + '\n');
               } else {
-                handleUpdate(itemId, attr, editingValue)
+                handleUpdate(itemId, attr, editingValue);
                 setCellState("noEdit");
-                console.log(editingValue);
               }
             }
           }}
-          onBlur={() => {
-            // handleUpdate(itemId, { [attr]: editingValue });
-            setCellState("noEdit");
-          }}
+        // onBlur={() => {
+        //   setCellState("noEdit");
+        // }}
         />
       }
-    </div >
+    </div>
   )
 }

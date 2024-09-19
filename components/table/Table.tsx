@@ -30,7 +30,7 @@ export default function Table({
   handleUpdateCell: (itemId: number, attrName: string, value: number | string | string[]) => Promise<void>,
   handleCreateItem: () => Promise<void>
 }) {
-  const [tableHeight, setTableHeight] = useState('auto');
+
   const cellMinWidth = 150
   const [attrsByName, setAttrsByName] = useState(() => {
     const attrsByName: { [key: string]: AttrProps } = {}
@@ -42,6 +42,7 @@ export default function Table({
     return attrsByName;
   })
 
+  const [focusedCell, setFocusedCell] = useState({ itemId: -1, attrName: '' })
   const newWindowsNeeded = attrs.some((attr) => attr.newWindow)
   const [hoveredItem, setHoveredItem] = useState(-1)
 
@@ -55,6 +56,7 @@ export default function Table({
 
   const animationFrameRef = useRef<number | null>(null);
   const resizingRef = useRef({ startX: 0, startWidth: 0, attrName: '' });
+
 
 
   const handleOpenWindow = (itemId: number) => {
@@ -100,11 +102,8 @@ export default function Table({
     document.removeEventListener('mouseup', handleMouseUp);
     resizingRef.current.attrName = '';
 
-    const debounceSaveAttrs = debounce((attrsByName) => {
-      localStorage.setItem('attrsByName', JSON.stringify(attrsByName));
-    }, 200);
+    localStorage.setItem('attrsByName', JSON.stringify(attrsByName));
 
-    debounceSaveAttrs(attrsByName)
   }, []);
 
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>, draggedName: string) => {
@@ -291,8 +290,13 @@ export default function Table({
           >
             {
               orderedAttrs.map((attr, cellIndex) =>
-                <div key={cellIndex}
-                  className={`cell-container px-[10px] flex items-center justify-between w-${Math.max(attr.width || 0, cellMinWidth)}px`}
+                <div
+                  key={cellIndex}
+                  className={`cell-container px-3 flex items-center justify-between 
+                w-${Math.max(attr.width || 0, cellMinWidth)}px 
+                transition duration-200
+                ${focusedCell.itemId === item.id && focusedCell.attrName === attr.name ? 'border-2 border-blue-400 shadow-lg' : 'border border-transparent'}`}
+                  onClick={() => setFocusedCell({ itemId: item.id, attrName: attr.name })}
                 >
                   {attr.type === 'multiselect'
                     ?

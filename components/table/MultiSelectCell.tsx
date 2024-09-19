@@ -4,7 +4,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import { useState } from 'react';
 
-export default function ArrayCell({ itemId, attr, values, handleUpdate, autocompleteItems }:
+export default function MultiSelectCell({ itemId, attr, values, handleUpdate, autocompleteItems }:
   {
     itemId: number
     attr: string
@@ -13,23 +13,37 @@ export default function ArrayCell({ itemId, attr, values, handleUpdate, autocomp
     autocompleteItems: string[]
   }
 ) {
-  const [cellState, setCellState] = useState("noEdit")
-  const [editingValue, setEditingValue] = useState("")
+  const [cellState, setCellState] = useState("noEdit");
+  const [editingValue, setEditingValue] = useState("");
+
+  const handleTagClick = (event: React.MouseEvent) => {
+    event.stopPropagation(); // Prevent event from reaching the parent
+  };
 
   return (
-    <div className="h-full w-full  overflow-hidden items-center">
-      <div className="flex flex-wrap w-full relative">
+    <div className="h-full w-full overflow-hidden items-center">
+      <div className="flex flex-wrap w-full relative"
+        onClick={() => {
+          console.log("clicked")
+          if (cellState === "noEdit")
+            setCellState("editing")
+        }}
+      >
         {values.map((value, index) => (
           <div
             key={index}
             className="bg-slate-300 m-1 pl-1 pr-2 rounded-sm flex items-center relative"
             style={{ maxWidth: 'calc(100% - 2rem)' }} // Ensure tags don’t overflow
+            onClick={handleTagClick} // Prevent editing state change
           >
             <span className='mr-1'>
               <Latex>{String(value)}</Latex>
             </span>
             <CloseIcon
-              onClick={() => handleUpdate(itemId, attr, values.filter((_, i) => i !== index))}
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent event from reaching the parent
+                handleUpdate(itemId, attr, values.filter((_, i) => i !== index));
+              }}
               className="cursor-pointer absolute top-0 right-0"
               width={5}
               sx={{ fontSize: 13 }}
@@ -37,14 +51,12 @@ export default function ArrayCell({ itemId, attr, values, handleUpdate, autocomp
           </div>
         ))}
 
-        {cellState === 'noEdit' && (
+        {/* {cellState === 'noEdit' && (
           <div
             className="absolute top-0 left-0 right-0 bottom-0 h-full min-h-[1rem] bg-transparent"
-            onClick={() => setCellState("editing")}
           />
-        )}
+        )} */}
       </div>
-
 
       {cellState === 'editing' &&
         <Autocomplete

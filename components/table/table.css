@@ -25,9 +25,14 @@
   overflow-y: auto;
 }
 
+/* Cells */
+.cell-container {
+  padding: 10px;
+}
+
 
 .table-item:hover {
-  background-color: #f1f1f1;
+  background-color: #f8f8f8;
 }
 /* .cell-container:focus{
   background-color: #007bff;

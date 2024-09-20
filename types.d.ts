@@ -9,7 +9,9 @@ type AttrProps = {
     referencing?: string,
     width?: number,
     order?: number,
-    newWindow?: boolean
+    newWindow?: boolean,
+    hidden?: boolean,
+    display?: string
 }
 
 type DataItem = {

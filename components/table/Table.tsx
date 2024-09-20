@@ -1,63 +1,89 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import './table.css'
+
+import { getTextWidth } from "@functions/text-analysis";
+
 import ColumnSeparator from "./ColumnSeparator";
 import MenuIcon from "./MenuIcon";
-import { LiaSortAlphaDownSolid } from "react-icons/lia";
-import { CiFilter } from "react-icons/ci";
 import MultiselectCell from "./MultiSelectCell";
 import TextCell from "./TextCell";
-import { debounce, divide } from 'lodash'
-import './table.css'
+import SlideWindow from './SlideWindow';
+import DropDown from "@components/DropDown";
+
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import NavigateNextRoundedIcon from '@mui/icons-material/NavigateNextRounded';
 import NavigateBeforeRoundedIcon from '@mui/icons-material/NavigateBeforeRounded';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import SlideWindow from './SlideWindow';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
+import ViewColumnRoundedIcon from '@mui/icons-material/ViewColumnRounded';
+import { LiaSortAlphaDownSolid } from "react-icons/lia";
+import FilterAltRoundedIcon from '@mui/icons-material/FilterAltRounded';
 
 
-export default function Table({
-  name,
-  data,
-  attrs,
-  handleUpdateCell,
-  handleCreateItem
-}: {
-  name?: string,
-  data: DataItem[],
-  attrs: AttrProps[],
-  handleUpdateCell: (itemId: number, attrName: string, value: number | string | string[]) => Promise<void>,
-  handleCreateItem: () => Promise<void>
-}) {
+export default function Table({ name, data, attrs, handleUpdateCell, handleCreateItem }:
+  {
+    name?: string,
+    data: DataItem[],
+    attrs: AttrProps[],
+    handleUpdateCell: (itemId: number, attrName: string, value: number | string | string[]) => Promise<void>,
+    handleCreateItem: () => Promise<void>
+  }) {
 
-  const cellMinWidth = 150
+  // Constants
+  const cellMinWidth = 100
+  const newWindowsNeeded = attrs.some((attr) => attr.newWindow)
+  const itemsPerPage = 10;
+  const totalPages = useMemo(() => {
+    return Math.ceil(data.length / itemsPerPage);
+  }, [data]);
+
+
+  // States and Refs
   const [attrsByName, setAttrsByName] = useState(() => {
     const attrsByName: { [key: string]: AttrProps } = {}
+
     attrs.forEach((attr, index) => {
-      attrsByName[attr.name] = attr
-      attrsByName[attr.name].width = 150
-      attrsByName[attr.name].order = index
+      attrsByName[attr.name] = {
+        ...attr,
+        width: Math.min(Math.max(...data.map(item => getTextWidth(String(item[attr.name])))), 200),
+        order: index,
+        hidden: false,
+        display: attr.name.charAt(0).toUpperCase() + attr.name.slice(1)
+      };
     })
     return attrsByName;
   })
-
   const [focusedCell, setFocusedCell] = useState({ itemId: -1, attrName: '' })
-  const newWindowsNeeded = attrs.some((attr) => attr.newWindow)
   const [hoveredItem, setHoveredItem] = useState(-1)
-
-  const [menuOpen, setMenuOpen] = useState<number>(-1);
   const [focusedHeader, setFocusedHeader] = useState(-1);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState<DataItem | null>(null);
-
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
 
   const animationFrameRef = useRef<number | null>(null);
   const resizingRef = useRef({ startX: 0, startWidth: 0, attrName: '' });
 
+  // Derived values
+  const orderedAttrs = useMemo(() => {
+    return Object.keys(attrsByName)
+      .map((attrName) => attrsByName[attrName])
+      .filter(attr => !attr.hidden && attr.newWindow === false)
+      .sort((x, y) => (x.order && y.order ? x.order - y.order : 0));
+  }, [attrsByName]);
 
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedData = data.slice(startIndex, endIndex);
+
+  // Handlers
+  function handleColumnAppearance(columnName: string) {
+    const newAttrsByName = { ...attrsByName }
+    newAttrsByName[columnName] = { ...newAttrsByName[columnName], hidden: !attrsByName[columnName].hidden }
+    setAttrsByName(newAttrsByName)
+    localStorage.setItem('attrsByName', JSON.stringify(newAttrsByName))
+  }
 
   const handleOpenWindow = (itemId: number) => {
     const selectedItem = data.find(item => item.id === itemId);
@@ -159,27 +185,12 @@ export default function Table({
     }
   };
 
-
-  const orderedAttrs = useMemo(() => {
-    console.log(attrsByName)
-    return Object.keys(attrsByName)
-      .map((attrName) => attrsByName[attrName])
-      .filter(attr => attr.newWindow === false)
-      .sort((x, y) => (x.order && y.order ? x.order - y.order : 0));
-  }, [attrsByName]);
-
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedData = data.slice(startIndex, endIndex);
-
-  const totalPages = useMemo(() => {
-    return Math.ceil(data.length / itemsPerPage);
-  }, [data]);
-
   const handlePageChange = (page: number) => {
     if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
   };
+
+  // Effects
 
   useEffect(() => {
     const savedAttrsByName = localStorage.getItem('attrsByName');
@@ -202,10 +213,9 @@ export default function Table({
         {attrs.filter(attr => attr.newWindow === true).map((newWindowAttr, index) =>
           <div key={index}>
             {
-              currentItem
-              &&
-              <div className="bg-blue-200 my-3 rounded-md p-2">
-                <span className="text-[16px]">{newWindowAttr.name.charAt(0).toUpperCase() + newWindowAttr.name.slice(1)}</span>
+              currentItem &&
+              <div className="bg-[#7ec7d6] my-3 rounded-md p-2 text-gray-800">
+                <span className="text-[16px]">{attrsByName[newWindowAttr.name].display}</span>
                 <TextCell
                   itemId={currentItem.id}
                   attr={newWindowAttr.name}
@@ -213,11 +223,38 @@ export default function Table({
                   handleUpdate={handleUpdateCell}
                 />
               </div>
-
             }
           </div>
         )}
       </SlideWindow>
+
+      <div className="options-container">
+        <DropDown
+          toggleButton={<ViewColumnRoundedIcon className="text-[#023e8a]" />}
+          content={
+            <div className="p-4 w-48 bg-white border border-gray-300 shadow-lg space-y-2">
+              {attrs.map(attr => (
+                !attrsByName[attr.name].newWindow && (
+                  <div key={attr.name} className="flex justify-between items-center">
+                    <span className="text-gray-800">{attrsByName[attr.name].display}</span>
+                    <input
+                      id={`check-${attr.name}`}
+                      type="checkbox"
+                      checked={!attrsByName[attr.name].hidden}
+                      onClick={() => handleColumnAppearance(attr.name)}
+                      className={`ml-2 cursor-pointer appearance-none h-4 w-4 p-1
+                        bg-white border-2 rounded-sm checked:bg-[#0077b6] checked:border-transparent relative before:content-['✔'] before:absolute before:inset-0 before:flex before:items-center before:justify-center 
+                        before:text-gray-400 before:opacity-100 checked:before:text-white checked:before:opacity-100
+                        transition-colors duration-300 ease-in-out`}
+                    />
+
+                  </div>
+                )
+              ))}
+            </div>
+          }
+        />
+      </div>
 
       <div className="table-header grid text-[15px] p-1 border-b-[1px]"
         style={{
@@ -232,7 +269,6 @@ export default function Table({
               className="table-header-cell py-2 flex justify-between items-center relative"
               style={{ width: `${Math.max(attr.width || 0, cellMinWidth)}px` }}
               onMouseEnter={() => setFocusedHeader(index)}
-              onMouseLeave={() => setFocusedHeader(-1)}
             >
               <div className="flex-grow"
                 draggable
@@ -240,33 +276,26 @@ export default function Table({
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, attr.name)}
               >
-                {attr.name.charAt(0).toUpperCase() + attr.name.slice(1)}
+                {attr.display}
               </div>
 
               <div className="icon-group flex items-center space-x-2 flex-nowrap">
-                {focusedHeader === index && (
-                  <>
-                    <MenuIcon
-                      onClick={() => setMenuOpen(index)}
-                      onMouseLeave={() => setMenuOpen(-1)}
-                    />
-                    {menuOpen === index && (
-                      <div className="absolute top-[10px] bg-white border shadow-md mt-2 z-10 w-[100px]"
-                        onMouseEnter={() => setMenuOpen(index)}
-                        onMouseLeave={() => setMenuOpen(-1)}
-                      >
+                {focusedHeader === index &&
+                  <DropDown
+                    toggleButton={<MenuIcon />}
+                    content={
+                      <div className="absolute top-[10px] bg-white border shadow-md z-10 w-[100px]">
                         <div className="p-2 hover:bg-gray-200 w-full flex items-center justify-between">
                           Sort
                           <LiaSortAlphaDownSolid className="m-2" />
                         </div>
                         <div className="p-2 hover:bg-gray-200 w-full flex items-center justify-between">
                           Filter
-                          <CiFilter className="m-2" />
+                          <FilterAltRoundedIcon className="m-2" />
                         </div>
                       </div>
-                    )}
-                  </>
-                )}
+                    } />
+                }
                 <ColumnSeparator
                   className="hover:cursor-col-resize hover:font-bold hover:text-blue-400"
                   onMouseDown={(e) => handleMouseDown(e, attr.name)}
@@ -276,7 +305,8 @@ export default function Table({
           )
         }
       </div>
-      <div className="table-body text-[14px]">
+
+      <div className="table-body text-[14px] text-gray-800">
         {paginatedData.map((item) =>
           <div key={item.id}
             className={`table-item grid py-[10px]`}
@@ -298,22 +328,23 @@ export default function Table({
                 ${focusedCell.itemId === item.id && focusedCell.attrName === attr.name ? 'border-2 border-blue-400 shadow-lg' : 'border border-transparent'}`}
                   onClick={() => setFocusedCell({ itemId: item.id, attrName: attr.name })}
                 >
-                  {attr.type === 'multiselect'
-                    ?
-                    <MultiselectCell
-                      itemId={item.id}
-                      attr={attr.name}
-                      values={item[attr.name]}
-                      autocompleteItems={Array.from(new Set(data.flatMap(item => attr.referencing ? item[attr.referencing] : item[attr.name])))}
-                      handleUpdate={handleUpdateCell}
-                    />
-                    :
-                    <TextCell
-                      itemId={item.id}
-                      attr={attr.name}
-                      value={item[attr.name]}
-                      handleUpdate={handleUpdateCell}
-                    />
+                  {
+                    (attr.type === 'multiselect'
+                      ?
+                      <MultiselectCell
+                        itemId={item.id}
+                        attr={attr.name}
+                        values={item[attr.name]}
+                        autocompleteItems={Array.from(new Set(data.flatMap(item => attr.referencing ? item[attr.referencing] : item[attr.name])))}
+                        handleUpdate={handleUpdateCell}
+                      />
+                      :
+                      <TextCell
+                        itemId={item.id}
+                        attr={attr.name}
+                        value={item[attr.name]}
+                        handleUpdate={handleUpdateCell}
+                      />)
                   }
                   {
                     attr.name === 'id' && hoveredItem === item.id &&
@@ -329,12 +360,9 @@ export default function Table({
                       }
                     </span>
                   }
-
-
                 </div>
               )
             }
-
           </div>
         )}
         <AddRoundedIcon sx={{ fontSize: 25, cursor: 'pointer' }} onClick={handleCreateItem} />
@@ -346,7 +374,6 @@ export default function Table({
         <span className="pagination-info">
           {(currentPage - 1) * itemsPerPage + 1}-{currentPage * itemsPerPage} of {data.length}
         </span>
-
 
         <NavigateNextRoundedIcon
           onClick={() => handlePageChange(currentPage !== totalPages ? currentPage + 1 : currentPage)}

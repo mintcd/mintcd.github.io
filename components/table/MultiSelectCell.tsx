@@ -17,42 +17,39 @@ export default function MultiSelectCell({ itemId, attr, values, handleUpdate, au
   const [editingValue, setEditingValue] = useState("");
 
   const handleTagClick = (event: React.MouseEvent) => {
-    event.stopPropagation(); // Prevent event from reaching the parent
+    event.stopPropagation();
   };
 
   return (
-    <div className="h-full w-full overflow-hidden items-center">
-      <div className="flex flex-wrap w-full h-full relative"
-        onClick={() => {
-          console.log("clicked")
-          if (cellState === "noEdit")
-            setCellState("editing")
-        }}
-      >
-        {
-          values.map((value, index) => (
-            <div
-              key={index}
-              className="bg-slate-300 m-1 pl-1 pr-2 rounded-sm flex items-center relative h-fit"
-              style={{ maxWidth: 'calc(100% - 2rem)' }} // Ensure tags don’t overflow
-              onClick={handleTagClick} // Prevent editing state change
-            >
-              <span className='mr-1'>
-                <Latex>{String(value)}</Latex>
-              </span>
-              <CloseIcon
-                onClick={(e) => {
-                  e.stopPropagation(); // Prevent event from reaching the parent
-                  handleUpdate(itemId, attr, values.filter((_, i) => i !== index));
-                }}
-                className="cursor-pointer absolute top-0 right-0"
-                width={5}
-                sx={{ fontSize: 13 }}
-              />
-            </div>
-          ))}
-      </div>
-
+    <div className="flex flex-wrap w-full h-full overflow-hidden"
+      onClick={() => {
+        console.log("clicked")
+        if (cellState === "noEdit")
+          setCellState("editing")
+      }}
+    >
+      {
+        values.map((value, index) => (
+          <div
+            key={index}
+            className="tag-container bg-slate-300 m-1 pl-1 pr-2 rounded-sm flex items-center relative h-fit"
+            style={{ maxWidth: 'calc(100% - 2rem)' }} // Ensure tags don’t overflow
+            onClick={handleTagClick} // Prevent editing state change
+          >
+            <span className='mr-1'>
+              <Latex>{String(value)}</Latex>
+            </span>
+            <CloseIcon
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent event from reaching the parent
+                handleUpdate(itemId, attr, values.filter((_, i) => i !== index));
+              }}
+              className="cursor-pointer absolute top-0 right-0"
+              width={5}
+              sx={{ fontSize: 13 }}
+            />
+          </div>
+        ))}
       {
         cellState === 'editing' &&
         <Autocomplete
@@ -89,6 +86,7 @@ export default function MultiSelectCell({ itemId, attr, values, handleUpdate, au
                   padding: 0,
                   marginLeft: '2px',
                   backgroundColor: 'inherit',
+                  width: 'auto',
                   '& fieldset': {
                     border: 'none',
                   },

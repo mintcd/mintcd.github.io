@@ -29,7 +29,7 @@ export default function SlidingDrawer({
   return (
     <div
       ref={drawerRef}
-      className={`slide-window fixed ${isOpen ? 'right-0' : 'right-[-100%]'} min-w-[500px] max-w-[700px] min-h-[50vh] max-h-[100vh] 
+      className={`slide-window fixed ${isOpen ? 'right-0' : 'right-[-100%]'} min-w-[500px] max-w-[50vw] min-h-[50vh] max-h-[100vh] 
        duration-500 ease-in-out z-50 rounded-md `}
     >
       {/* <CloseFullscreenIcon

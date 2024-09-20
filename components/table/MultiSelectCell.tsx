@@ -22,43 +22,39 @@ export default function MultiSelectCell({ itemId, attr, values, handleUpdate, au
 
   return (
     <div className="h-full w-full overflow-hidden items-center">
-      <div className="flex flex-wrap w-full relative"
+      <div className="flex flex-wrap w-full h-full relative"
         onClick={() => {
           console.log("clicked")
           if (cellState === "noEdit")
             setCellState("editing")
         }}
       >
-        {values.map((value, index) => (
-          <div
-            key={index}
-            className="bg-slate-300 m-1 pl-1 pr-2 rounded-sm flex items-center relative"
-            style={{ maxWidth: 'calc(100% - 2rem)' }} // Ensure tags don’t overflow
-            onClick={handleTagClick} // Prevent editing state change
-          >
-            <span className='mr-1'>
-              <Latex>{String(value)}</Latex>
-            </span>
-            <CloseIcon
-              onClick={(e) => {
-                e.stopPropagation(); // Prevent event from reaching the parent
-                handleUpdate(itemId, attr, values.filter((_, i) => i !== index));
-              }}
-              className="cursor-pointer absolute top-0 right-0"
-              width={5}
-              sx={{ fontSize: 13 }}
-            />
-          </div>
-        ))}
-
-        {/* {cellState === 'noEdit' && (
-          <div
-            className="absolute top-0 left-0 right-0 bottom-0 h-full min-h-[1rem] bg-transparent"
-          />
-        )} */}
+        {
+          values.map((value, index) => (
+            <div
+              key={index}
+              className="bg-slate-300 m-1 pl-1 pr-2 rounded-sm flex items-center relative h-fit"
+              style={{ maxWidth: 'calc(100% - 2rem)' }} // Ensure tags don’t overflow
+              onClick={handleTagClick} // Prevent editing state change
+            >
+              <span className='mr-1'>
+                <Latex>{String(value)}</Latex>
+              </span>
+              <CloseIcon
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent event from reaching the parent
+                  handleUpdate(itemId, attr, values.filter((_, i) => i !== index));
+                }}
+                className="cursor-pointer absolute top-0 right-0"
+                width={5}
+                sx={{ fontSize: 13 }}
+              />
+            </div>
+          ))}
       </div>
 
-      {cellState === 'editing' &&
+      {
+        cellState === 'editing' &&
         <Autocomplete
           className=""
           freeSolo

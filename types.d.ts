@@ -11,7 +11,8 @@ type AttrProps = {
     order?: number,
     newWindow?: boolean,
     hidden?: boolean,
-    display?: string
+    display?: string,
+    sort?: 'none' | 'asc' | 'desc'
 }
 
 type DataItem = {

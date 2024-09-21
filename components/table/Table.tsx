@@ -18,8 +18,11 @@ import NavigateBeforeRoundedIcon from '@mui/icons-material/NavigateBeforeRounded
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import ViewColumnRoundedIcon from '@mui/icons-material/ViewColumnRounded';
-import { LiaSortAlphaDownSolid } from "react-icons/lia";
+import ArrowDownwardRoundedIcon from '@mui/icons-material/ArrowDownwardRounded';
 import FilterAltRoundedIcon from '@mui/icons-material/FilterAltRounded';
+import Download from "@mui/icons-material/DownLoad";
+import HorizontalRuleRoundedIcon from '@mui/icons-material/HorizontalRuleRounded';
+import ArrowUpwardRoundedIcon from '@mui/icons-material/ArrowUpwardRounded';
 
 
 export default function Table({ name, data, attrs, handleUpdateCell, handleCreateItem }:
@@ -43,14 +46,14 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
   // States and Refs
   const [attrsByName, setAttrsByName] = useState(() => {
     const attrsByName: { [key: string]: AttrProps } = {}
-
     attrs.forEach((attr, index) => {
       attrsByName[attr.name] = {
         ...attr,
-        width: Math.min(Math.max(...data.map(item => getTextWidth(String(item[attr.name])))), 200),
+        width: Math.min(Math.max(Math.max(...data.map(item => getTextWidth(String(item[attr.name])))), 100), 200),
         order: index,
         hidden: false,
-        display: attr.name.charAt(0).toUpperCase() + attr.name.slice(1)
+        display: attr.name.charAt(0).toUpperCase() + attr.name.slice(1),
+        sort: 'none',
       };
     })
     return attrsByName;
@@ -78,6 +81,41 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
   const paginatedData = data.slice(startIndex, endIndex);
 
   // Handlers
+  function handleSort(attrName: string, currentState: 'none' | 'asc' | 'desc' | undefined) {
+    let nextState: 'none' | 'asc' | 'desc' | undefined
+    if (currentState === 'none')
+      nextState = 'asc'
+    if (currentState === 'asc')
+      nextState = 'desc'
+    if (currentState === 'desc')
+      nextState = 'none'
+
+    setAttrsByName({ ...attrsByName, [attrName]: { ...attrsByName[attrName], sort: nextState } })
+  }
+
+  const exportToCSV = () => {
+    const headers = orderedAttrs.map(attr => attr.display).join(',');
+    const rows = data.map(item => orderedAttrs.map(attr => `"${item[attr.name] || ''}"`).join(',')).join('\n');
+    const csvContent = `data:text/csv;charset=utf-8,${headers}\n${rows}`;
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `${name || 'data'}.csv`);
+    document.body.appendChild(link);
+    link.click();
+  };
+
+  // Export data to JSON
+  const exportToJSON = () => {
+    const jsonContent = JSON.stringify(data, null, 2);
+    const blob = new Blob([jsonContent], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${name || 'data'}.json`;
+    link.click();
+  };
+
   function handleColumnAppearance(columnName: string) {
     const newAttrsByName = { ...attrsByName }
     newAttrsByName[columnName] = { ...newAttrsByName[columnName], hidden: !attrsByName[columnName].hidden }
@@ -96,7 +134,6 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
   const handleCloseDrawer = () => {
     setDrawerOpen(false);
   };
-
 
   const handleMouseDown = (e: React.MouseEvent, attrName: string) => {
     resizingRef.current.startX = e.clientX;
@@ -203,6 +240,10 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
     setCurrentItem(data.find(item => currentItem && item.id === currentItem.id) as DataItem)
   }, [data]);
 
+  // useEffect(() => {
+
+  // }, [attrsByName]);
+
 
   return (
     <div className="table-container flex flex-col h-auto shadow-md">
@@ -230,7 +271,7 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
 
       <div className="options-container">
         <DropDown
-          toggleButton={<ViewColumnRoundedIcon className="text-[#023e8a]" />}
+          toggleButton={<ViewColumnRoundedIcon className="text-[#023e8a] text-[20px]" />}
           content={
             <div className="p-4 w-48 bg-white border border-gray-300 shadow-lg space-y-2">
               {attrs.map(attr => (
@@ -254,6 +295,13 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
             </div>
           }
         />
+        <DropDown
+          toggleButton={<Download className="text-[#023e8a] text-[20px]" />}
+          content={<div className="p-4 w-48 bg-white border border-gray-300 shadow-lg space-y-2">
+            <button onClick={exportToCSV} >Export to CSV</button>
+            <button onClick={exportToJSON} >Export to JSON</button>
+          </div>} />
+
       </div>
 
       <div className="table-header grid text-[15px] p-1 border-b-[1px]"
@@ -279,22 +327,41 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
                 {attr.display}
               </div>
 
-              <div className="icon-group flex items-center space-x-2 flex-nowrap">
+              <div className="column-options flex items-center space-x-2 flex-nowrap">
                 {focusedHeader === index &&
+                  <div
+                    className="relative w-[20px] h-[20px] hover:bg-gray-100 hover:rounded-full"
+                    onClick={() => handleSort(attr.name, attr.sort)}
+                  >
+                    <HorizontalRuleRoundedIcon
+                      className={`absolute inset-0 m-auto text-[16px] 
+                        transition-transform duration-300 ease-in-out transform ${attr.sort === 'none' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'
+                        }`}
+                    />
+                    <ArrowDownwardRoundedIcon
+                      className={`absolute inset-0 m-auto text-[16px] 
+                        transition-transform duration-300 ease-in-out transform ${attr.sort === 'asc' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'
+                        }`}
+                    />
+                    <ArrowUpwardRoundedIcon
+                      className={`absolute inset-0 m-auto text-[16px] 
+                        transition-transform duration-300 ease-in-out transform ${attr.sort === 'desc' ? 'rotate-0 opacity-100' : '-rotate-90 opacity-0'
+                        }`}
+                    />
+                  </div>}
+                {
+                  focusedHeader === index &&
                   <DropDown
                     toggleButton={<MenuIcon />}
                     content={
-                      <div className="absolute top-[10px] bg-white border shadow-md z-10 w-[100px]">
-                        <div className="p-2 hover:bg-gray-200 w-full flex items-center justify-between">
-                          Sort
-                          <LiaSortAlphaDownSolid className="m-2" />
-                        </div>
+                      <div className="absolute top-[10px] bg-white border shadow-md z-10 w-[150px]">
                         <div className="p-2 hover:bg-gray-200 w-full flex items-center justify-between">
                           Filter
-                          <FilterAltRoundedIcon className="m-2" />
+                          <FilterAltRoundedIcon className="text-[16px]" />
                         </div>
                       </div>
-                    } />
+                    }
+                  />
                 }
                 <ColumnSeparator
                   className="hover:cursor-col-resize hover:font-bold hover:text-blue-400"
@@ -369,6 +436,7 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
       </div>
       <div className="pagination-controls flex items-center justify-end mt-4">
         <NavigateBeforeRoundedIcon
+          className="hover:cursor-pointer"
           onClick={() => handlePageChange(currentPage > 1 ? currentPage - 1 : currentPage)}
         />
         <span className="pagination-info">
@@ -376,6 +444,7 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
         </span>
 
         <NavigateNextRoundedIcon
+          className="hover:cursor-pointer"
           onClick={() => handlePageChange(currentPage !== totalPages ? currentPage + 1 : currentPage)}
         />
       </div>

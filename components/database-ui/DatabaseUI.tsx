@@ -72,6 +72,7 @@ export default function DatabaseUI({ table }: {
 
   return (
     <Table
+      name={table}
       data={data}
       attrs={attrs}
       handleUpdateCell={handleUpdate}

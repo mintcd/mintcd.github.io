@@ -20,7 +20,7 @@ import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import ViewColumnRoundedIcon from '@mui/icons-material/ViewColumnRounded';
 import ArrowDownwardRoundedIcon from '@mui/icons-material/ArrowDownwardRounded';
 import FilterAltRoundedIcon from '@mui/icons-material/FilterAltRounded';
-import Download from "@mui/icons-material/DownLoad";
+import Download from "@mui/icons-material/Download";
 import HorizontalRuleRoundedIcon from '@mui/icons-material/HorizontalRuleRounded';
 import ArrowUpwardRoundedIcon from '@mui/icons-material/ArrowUpwardRounded';
 

@@ -24,9 +24,6 @@ export default function DatabaseUI({ table }: {
 
   const handleUpdate = useCallback(async (itemId: number, attrName: string, value: number | string | string[]) => {
     if (!authorized) return;
-
-    console.log(itemId, value)
-
     await updateItem(table, itemId, { [attrName]: value }).then(() => {
       const index = data.findIndex(item => item.id === itemId); // Find the correct index based on itemId
 

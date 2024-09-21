@@ -86,7 +86,7 @@ export default function MultiSelectCell({ itemId, attr, values, handleUpdate, au
                   padding: 0,
                   marginLeft: '2px',
                   backgroundColor: 'inherit',
-                  width: 'auto',
+                  width: 'full',
                   '& fieldset': {
                     border: 'none',
                   },
@@ -105,6 +105,9 @@ export default function MultiSelectCell({ itemId, attr, values, handleUpdate, au
             />
           )}
         />
+        // <Autocomplete
+        //   suggestions={autocompleteItems}
+        // />
       }
     </div>
   )

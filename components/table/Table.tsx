@@ -64,6 +64,11 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState<DataItem | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [processedData, setProcessedData] = useState(data)
+  const [sorting, setSorting] = useState<{ attrName: string, direction: 'asc' | 'desc' | 'none' }>({
+    attrName: '',
+    direction: 'none',
+  });
 
   const animationFrameRef = useRef<number | null>(null);
   const resizingRef = useRef({ startX: 0, startWidth: 0, attrName: '' });
@@ -78,20 +83,48 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const paginatedData = data.slice(startIndex, endIndex);
+  const paginatedData = processedData.slice(startIndex, endIndex);
+
+  function sortData(data: DataItem[], attrName: string, direction: 'asc' | 'desc' | 'none') {
+    if (direction === 'none') {
+      setProcessedData([...data]); // Reset to unsorted data
+    } else {
+      const sortedData = [...data].sort((a: DataItem, b: DataItem) => {
+        const aValue = a[attrName];
+        const bValue = b[attrName];
+
+        if (direction === 'asc') {
+          return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
+        } else {
+          return aValue < bValue ? 1 : aValue > bValue ? -1 : 0;
+        }
+      });
+      setProcessedData(sortedData);
+    }
+  }
 
   // Handlers
   function handleSort(attrName: string, currentState: 'none' | 'asc' | 'desc' | undefined) {
-    let nextState: 'none' | 'asc' | 'desc' | undefined
-    if (currentState === 'none')
-      nextState = 'asc'
-    if (currentState === 'asc')
-      nextState = 'desc'
-    if (currentState === 'desc')
-      nextState = 'none'
+    let nextState: 'none' | 'asc' | 'desc' = 'none';
 
-    setAttrsByName({ ...attrsByName, [attrName]: { ...attrsByName[attrName], sort: nextState } })
+    if (currentState === 'none') nextState = 'asc';
+    else if (currentState === 'asc') nextState = 'desc';
+    else if (currentState === 'desc') nextState = 'none';
+
+    setAttrsByName({ ...attrsByName, [attrName]: { ...attrsByName[attrName], sort: nextState } });
+    setSorting({ attrName, direction: nextState });
+    setProcessedData(() => {
+      if (nextState === 'none') return [...data]
+      return data.sort((x, y) => {
+        if (nextState === 'asc')
+          return x[attrName] - y[attrName]
+        if (nextState === 'desc')
+          return y[attrName] - x[attrName]
+        return 0
+      })
+    })
   }
+
 
   const exportToCSV = () => {
     const headers = orderedAttrs.map(attr => attr.display).join(',');
@@ -230,19 +263,27 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
   // Effects
 
   useEffect(() => {
-    const savedAttrsByName = localStorage.getItem('attrsByName');
-    if (savedAttrsByName) {
-      setAttrsByName(JSON.parse(savedAttrsByName))
-    }
-  }, []);
+    setProcessedData(() => {
+      return data.sort((x, y) => {
+        if (sorting.direction === 'asc')
+          return x[sorting.attrName] - y[sorting.attrName]
+        else if (sorting.direction === 'desc')
+          return x[sorting.attrName] - y[sorting.attrName]
+        return 0
+      })
+    })
+    setCurrentItem(data.find(item => currentItem && item.id === currentItem.id) as DataItem);
+  }, [data, sorting]);
 
   useEffect(() => {
-    setCurrentItem(data.find(item => currentItem && item.id === currentItem.id) as DataItem)
-  }, [data]);
-
-  // useEffect(() => {
-
-  // }, [attrsByName]);
+    const sortedData = [...data];
+    if (sorting.direction === 'asc') {
+      sortedData.sort((a, b) => (a[sorting.attrName] > b[sorting.attrName] ? 1 : -1));
+    } else if (sorting.direction === 'desc') {
+      sortedData.sort((a, b) => (a[sorting.attrName] < b[sorting.attrName] ? 1 : -1));
+    }
+    setProcessedData(sortedData);
+  }, [data, sorting]);
 
 
   return (
@@ -255,7 +296,7 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
           <div key={index}>
             {
               currentItem &&
-              <div className="bg-[#7ec7d6] my-3 rounded-md p-2 text-gray-800">
+              <div className="bg-[#6ca0e5] my-3 rounded-md p-2 text-gray-800">
                 <span className="text-[16px]">{attrsByName[newWindowAttr.name].display}</span>
                 <TextCell
                   itemId={currentItem.id}
@@ -327,28 +368,29 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
                 {attr.display}
               </div>
 
-              <div className="column-options flex items-center space-x-2 flex-nowrap">
+              <div className="column-options flex items-center flex-nowrap">
                 {focusedHeader === index &&
                   <div
                     className="relative w-[20px] h-[20px] hover:bg-gray-100 hover:rounded-full"
                     onClick={() => handleSort(attr.name, attr.sort)}
                   >
                     <HorizontalRuleRoundedIcon
-                      className={`absolute inset-0 m-auto text-[16px] 
-                        transition-transform duration-300 ease-in-out transform ${attr.sort === 'none' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'
+                      className={`absolute inset-0 m-auto text-[16px]
+                     transition-transform duration-300 ease-in-out transform ${attr.sort === 'none' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'
                         }`}
                     />
                     <ArrowDownwardRoundedIcon
-                      className={`absolute inset-0 m-auto text-[16px] 
-                        transition-transform duration-300 ease-in-out transform ${attr.sort === 'asc' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'
+                      className={`absolute inset-0 m-auto text-[16px]
+                     transition-transform duration-300 ease-in-out transform ${attr.sort === 'asc' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'
                         }`}
                     />
                     <ArrowUpwardRoundedIcon
-                      className={`absolute inset-0 m-auto text-[16px] 
-                        transition-transform duration-300 ease-in-out transform ${attr.sort === 'desc' ? 'rotate-0 opacity-100' : '-rotate-90 opacity-0'
+                      className={`absolute inset-0 m-auto text-[16px]
+                     transition-transform duration-300 ease-in-out transform ${attr.sort === 'desc' ? 'rotate-0 opacity-100' : '-rotate-90 opacity-0'
                         }`}
                     />
-                  </div>}
+                  </div>
+                }
                 {
                   focusedHeader === index &&
                   <DropDown
@@ -432,22 +474,26 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
             }
           </div>
         )}
-        <AddRoundedIcon sx={{ fontSize: 25, cursor: 'pointer' }} onClick={handleCreateItem} />
       </div>
-      <div className="pagination-controls flex items-center justify-end mt-4">
-        <NavigateBeforeRoundedIcon
-          className="hover:cursor-pointer"
-          onClick={() => handlePageChange(currentPage > 1 ? currentPage - 1 : currentPage)}
-        />
-        <span className="pagination-info">
-          {(currentPage - 1) * itemsPerPage + 1}-{currentPage * itemsPerPage} of {data.length}
-        </span>
+      <div className="flex items-center justify-between text-[#023e8a]">
+        <AddRoundedIcon className={` cursor-pointer text-[20px]`}
+          onClick={handleCreateItem} />
+        <div className="pagination-controls flex items-center justify-end">
+          <NavigateBeforeRoundedIcon
+            className="hover:cursor-pointer"
+            onClick={() => handlePageChange(currentPage > 1 ? currentPage - 1 : currentPage)}
+          />
+          <span className="pagination-info">
+            {(currentPage - 1) * itemsPerPage + 1}-{currentPage * itemsPerPage} of {data.length}
+          </span>
 
-        <NavigateNextRoundedIcon
-          className="hover:cursor-pointer"
-          onClick={() => handlePageChange(currentPage !== totalPages ? currentPage + 1 : currentPage)}
-        />
+          <NavigateNextRoundedIcon
+            className="hover:cursor-pointer"
+            onClick={() => handlePageChange(currentPage !== totalPages ? currentPage + 1 : currentPage)}
+          />
+        </div>
       </div>
+
     </div>
 
   );

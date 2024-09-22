@@ -2,6 +2,7 @@ import Tag from '@components/atoms/Tag';
 import Latex from '@components/latex';
 import CloseIcon from '@mui/icons-material/Close';
 import Autocomplete from '@mui/material/Autocomplete';
+// import Autocomplete from '@components/autocomplete/Autocomplete';
 import TextField from '@mui/material/TextField';
 import { useState } from 'react';
 
@@ -44,7 +45,6 @@ export default function MultiSelectCell({ itemId, attr, values, handleUpdate, au
       {
         cellState === 'editing' &&
         <Autocomplete
-          className=""
           freeSolo
           options={autocompleteItems}
           inputValue={editingValue}

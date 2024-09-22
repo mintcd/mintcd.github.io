@@ -10,7 +10,7 @@ export default function Autocomplete({
   placeholder,
   value,
   freeSolo,
-  maxDisplay = 5, // Default maxDisplay set to 5
+  maxDisplay = 5,
   onSubmit
 }: {
   suggestions: string[],

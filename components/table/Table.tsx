@@ -281,7 +281,7 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
     filters.forEach((filter) => {
       if (!filter.applied) return
       const filteredAttr = filter.attrName as string
-      processedData = processedData.filter(item => item[filteredAttr].includes(filter.option))
+      processedData = processedData.filter(item => item[filteredAttr].includes(filter.option) || item[filteredAttr].length === 0)
     })
     setProcessedData(sortData(processedData, sorting.attrName, sorting.direction));
     setCurrentItem(data.find(item => currentItem && item.id === currentItem.id) as DataItem);
@@ -376,6 +376,7 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
                   </div>
                 </div>
               ))}
+
               <div className="flex justify-between items-center">
                 <div className="flex">
                   <Autocomplete
@@ -414,6 +415,7 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
                     }}
                   />
                 </div>
+
                 <AddRoundedIcon onClick={() => {
                   if (!addingFilter.attrName) {
                     setFilterError("Please add a filtered column");

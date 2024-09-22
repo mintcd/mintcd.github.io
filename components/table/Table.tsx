@@ -51,10 +51,6 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
   const cellMinWidth = 100
   const newWindowsNeeded = attrs.some((attr) => attr.newWindow)
   const itemsPerPage = 10;
-  const totalPages = useMemo(() => {
-    return Math.ceil(data.length / itemsPerPage);
-  }, [data]);
-
 
   // States and Refs
   const [attrsByName, setAttrsByName] = useState(() => {
@@ -100,8 +96,24 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedData = processedData.slice(startIndex, endIndex);
+  const totalPages = useMemo(() => {
+    return Math.ceil(processedData.length / itemsPerPage);
+  }, [data]);
 
   // Handlers
+  function handleModifyFilter(
+    filterIndex: number,
+    attr: { attrName?: string; option?: string; action?: string; applied?: boolean }
+  ) {
+    const newFilters = [...filters] as FilterProp[];
+    const key = Object.keys(attr)[0] as keyof FilterProp; // assert the type here
+    if (key) {
+      // Type assertion to ensure compatibility
+      newFilters[filterIndex][key] = attr[key] as any; // Use 'as any' to bypass strict type checking
+      setFilters(newFilters);
+    }
+  }
+
   function handleClearFilter(filterIndex: number) {
     const newFilters = filters.filter((_, index) => index !== filterIndex); // Remove the filter at filterIndex
     setFilters(newFilters); // Update state with the new filters array
@@ -337,21 +349,19 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
                       value={capitalizeFirstLetter(filter.attrName || '')}
                       suggestions={Object.keys(attrsByName).map(attrName => attrsByName[attrName].display)}
                       style={{ width: 150, marginLeft: 5 }}
-                      onSubmit={(value) => { }}
+                      onSubmit={(value) => handleModifyFilter(index, { attrName: value })}
                     />
                     <Autocomplete
                       value={filter.action}
                       suggestions={['contains']}
                       style={{ width: 150, marginLeft: 5 }}
-                      onSubmit={(value) => {
-                        setAddingFilter({ ...addingFilter, attrName: value.toLowerCase() })
-                      }}
+                      onSubmit={(value) => handleModifyFilter(index, { action: value })}
                     />
                     <Autocomplete
                       value={filter.option}
                       suggestions={[...new Set(data.flatMap(item => item[filter.attrName ? filter.attrName : 0]))]}
                       style={{ width: 150, marginLeft: 5 }}
-                      onSubmit={(value) => { }}
+                      onSubmit={(value) => handleModifyFilter(index, { option: value })}
                     />
                   </div>
                   <div>
@@ -420,7 +430,7 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
                     return;
                   }
 
-                  setFilters([...filters, addingFilter]);
+                  setFilters([...filters, { ...addingFilter, applied: true }]);
                   setAddingFilter({ attrName: '', action: '', option: '' });
                   setFilterError("");
                 }} />
@@ -584,7 +594,7 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
             onClick={() => handlePageChange(currentPage > 1 ? currentPage - 1 : currentPage)}
           />
           <span className="pagination-info">
-            {(currentPage - 1) * itemsPerPage + 1}-{Math.min(currentPage * itemsPerPage, processedData.length)} of {processedData.length}
+            {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, processedData.length)} of {processedData.length}
           </span>
 
           <NavigateNextRoundedIcon

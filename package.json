@@ -38,8 +38,7 @@
     "react-virtuoso": "^4.10.4",
     "sharp": "^0.33.2",
     "styled-components": "^6.1.13",
-    "usehooks-ts": "^3.1.0",
-    "uuid": "^9.0.1"
+    "usehooks-ts": "^3.1.0"
   },
   "devDependencies": {
     "@types/cytoscape": "^3.21.4",

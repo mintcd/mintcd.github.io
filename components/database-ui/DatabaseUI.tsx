@@ -17,7 +17,6 @@ export default function DatabaseUI({ table }: {
   async function handleCreate() {
     await createItem(table, data, attrs).then((createdItem) => {
       setData([...data, createdItem])
-      console.log([...data, createdItem])
     })
   }
 
@@ -37,9 +36,6 @@ export default function DatabaseUI({ table }: {
     });
 
   }, [authorized, data, table]);
-
-
-  console.log("Table called")
 
   useEffect(() => {
     if (window.localStorage.getItem("timeKeyGot")) setAuthorized(true);

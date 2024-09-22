@@ -1,6 +1,6 @@
 'use client';
 
-import { CSSProperties, ReactElement, useState, useRef, RefObject } from 'react';
+import { CSSProperties, ReactElement, useState, useEffect } from 'react';
 import { useClickAway } from "@uidotdev/usehooks";
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 
@@ -8,23 +8,29 @@ export default function Autocomplete({
   suggestions,
   style,
   placeholder,
+  value,
   freeSolo,
+  maxDisplay = 5, // Default maxDisplay set to 5
   onSubmit
 }: {
   suggestions: string[],
   placeholder?: string,
+  value?: string
   freeSolo?: boolean,
+  maxDisplay?: number,
   style?: CSSProperties,
   onSubmit: (selectedValue: string) => void
 }): ReactElement {
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState(value || '');
+  const [submittedValue, setSubmittedValue] = useState(value || '')
   const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
-  const [focused, setFocused] = useState(false)
+  const [focused, setFocused] = useState(false);
 
   const ref = useClickAway(() => {
-    setFocused(false)
-  }) as any
+    setFocused(false);
+  }) as any;
+
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -67,21 +73,29 @@ export default function Autocomplete({
 
   const handleSuggestionClick = (suggestion: string) => {
     setInputValue(suggestion);
+    setSubmittedValue(suggestion);
     setFilteredSuggestions([]);
     if (onSubmit) onSubmit(suggestion);
   };
+
+  useEffect(() => {
+    setInputValue(value || '');
+    setSubmittedValue(value || '');
+  }, [value])
 
   return (
     <div className="relative" style={style} ref={ref}>
       <div className={`flex ${focused && 'border border-blue-400'}`}>
         <input
           type="text"
-          autoFocus
+          style={{
+            caretColor: freeSolo ? 'auto' : "transparent"
+          }}
           onFocus={() => {
             if (!freeSolo) setFilteredSuggestions(suggestions);
-            setFocused(true)
+            setFocused(true);
           }}
-          value={inputValue}
+          value={freeSolo ? inputValue : submittedValue}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           className="w-full border-none focus:outline-none"
@@ -93,7 +107,12 @@ export default function Autocomplete({
       </div>
 
       {focused && (
-        <ul className="absolute z-10 bg-white border rounded mt-1 w-full">
+        <ul
+          className="absolute z-10 bg-white border rounded mt-1 w-full overflow-y-auto" // Enable scrolling
+          style={{
+            maxHeight: `${maxDisplay * 2.5}rem`, // Adjust height based on maxDisplay, assuming each item is ~2.5rem tall
+          }}
+        >
           {filteredSuggestions.map((suggestion, index) => (
             <li
               key={index}

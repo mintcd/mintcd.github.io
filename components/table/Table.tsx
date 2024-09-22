@@ -26,9 +26,17 @@ import HorizontalRuleRoundedIcon from '@mui/icons-material/HorizontalRuleRounded
 import ArrowUpwardRoundedIcon from '@mui/icons-material/ArrowUpwardRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import Autocomplete from "@components/autocomplete/Autocomplete";
-import { CheckRounded } from "@mui/icons-material";
+import Checkbox from "@components/checkbox/Checkbox";
+import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
+import ClearRoundedIcon from '@mui/icons-material/ClearRounded';
+import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
 
-// import Checkbox from "@components/checkbox/Checkbox";
+type FilterProp = {
+  attrName?: string,
+  action?: "contains" | '',
+  option?: string,
+  applied?: boolean
+}
 
 export default function Table({ name, data, attrs, handleUpdateCell, handleCreateItem }:
   {
@@ -74,11 +82,9 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
     attrName: '',
     direction: 'none',
   });
-  const [filtering, setFiltering] = useState<{ attrName: string, action: 'contains', options: string[] }>({
-    attrName: "",
-    action: "contains",
-    options: []
-  })
+  const [filters, setFilters] = useState<FilterProp[]>([])
+  const [addingFilter, setAddingFilter] = useState<FilterProp>({})
+  const [filterError, setFilterError] = useState("")
 
   const animationFrameRef = useRef<number | null>(null);
   const resizingRef = useRef({ startX: 0, startWidth: 0, attrName: '' });
@@ -96,6 +102,17 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
   const paginatedData = processedData.slice(startIndex, endIndex);
 
   // Handlers
+  function handleClearFilter(filterIndex: number) {
+    const newFilters = filters.filter((_, index) => index !== filterIndex); // Remove the filter at filterIndex
+    setFilters(newFilters); // Update state with the new filters array
+  }
+
+  function handleApplyFilter(filterIndex: number) {
+    const newFilters = [...filters]
+    newFilters[filterIndex].applied = !newFilters[filterIndex].applied
+    setFilters(newFilters);
+  }
+
   function handleSort(attrName: string, currentState: 'none' | 'asc' | 'desc' | undefined) {
 
     let nextState: 'none' | 'asc' | 'desc' = 'none';
@@ -248,10 +265,15 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
   // Effects
 
   useEffect(() => {
-    setProcessedData(sortData(data, sorting.attrName, sorting.direction));
+    let processedData = [...data]
+    filters.forEach((filter) => {
+      if (!filter.applied) return
+      const filteredAttr = filter.attrName as string
+      processedData = processedData.filter(item => item[filteredAttr].includes(filter.option))
+    })
+    setProcessedData(sortData(processedData, sorting.attrName, sorting.direction));
     setCurrentItem(data.find(item => currentItem && item.id === currentItem.id) as DataItem);
-  }, [data, sorting]);
-
+  }, [data, sorting, filters]);
 
   return (
     <div className="table-container flex flex-col h-auto shadow-md">
@@ -277,7 +299,7 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
         )}
       </SlideWindow>
 
-      <div className="options-container flex space-x-3">
+      <div className="option-container flex space-x-3">
         <DropDown
           toggleButton={<ViewColumnRoundedIcon className="text-[#023e8a] text-[20px]" />}
           content={
@@ -286,19 +308,10 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
                 !attrsByName[attr.name].newWindow && (
                   <div key={attr.name} className="flex justify-between items-center">
                     <span className="text-gray-800">{attrsByName[attr.name].display}</span>
-                    <div className="relative">
-                      <input
-                        id={`check-${attr.name}`}
-                        type="checkbox"
-                        checked={!attrsByName[attr.name].hidden}
-                        onChange={() => handleColumnAppearance(attr.name)}
-                        className={`cursor-pointer appearance-none h-4 w-4 p-1 
-                      bg-white border-2 border-gray-300 rounded-sm 
-                      checked:bg-[#0077b6] checked:border-transparent 
-                      transition-colors duration-300 ease-in-out`}
-                        style={{ appearance: 'none' }}
-                      />
-                    </div>
+                    <Checkbox
+                      value={!attrsByName[attr.name].hidden}
+                      onChange={() => handleColumnAppearance(attr.name)}
+                    />
                   </div>
                 )
               ))}
@@ -315,30 +328,108 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
         />
         <DropDown
           toggleButton={<FilterAltRoundedIcon className="text-[#023e8a] text-[20px]" />}
-          content={<div className="p-4 w-[500px] bg-white border border-gray-300 shadow-lg space-y-2">
-            <div className="flex justify-between items-center">
-              <span>Column</span>
-              <Autocomplete
-                suggestions={Object.keys(attrsByName).map(attrName => attrsByName[attrName].display)}
-                style={{ width: 100, marginLeft: 5 }}
-                onSubmit={(value) => {
-                  console.log("submitted")
-                  setFiltering({ ...filtering, attrName: value.toLowerCase() })
-                }}
-              />
-              <Autocomplete
-                suggestions={['contains']}
-                style={{ width: 100, marginLeft: 5 }}
-                onSubmit={(value) => setFiltering({ ...filtering, action: value as 'contains' })}
-              />
-              {/* <Autocomplete
-                suggestions={[...new Set(data.flatMap(item => item[filtering.attrName]))]}
-                style={{ width: 100, marginLeft: 5 }}
-                onSubmit={(value) => setFiltering({ ...filtering, options: value })}
-              /> */}
+          content={
+            <div className="p-4 w-[700px] bg-white border border-gray-300 shadow-lg space-y-2">
+              {filters.map((filter, index) => (
+                <div key={`filter-${index}`} className="flex justify-between items-center">
+                  <div className="flex space-x-3">
+                    <Autocomplete
+                      value={capitalizeFirstLetter(filter.attrName || '')}
+                      suggestions={Object.keys(attrsByName).map(attrName => attrsByName[attrName].display)}
+                      style={{ width: 150, marginLeft: 5 }}
+                      onSubmit={(value) => { }}
+                    />
+                    <Autocomplete
+                      value={filter.action}
+                      suggestions={['contains']}
+                      style={{ width: 150, marginLeft: 5 }}
+                      onSubmit={(value) => {
+                        setAddingFilter({ ...addingFilter, attrName: value.toLowerCase() })
+                      }}
+                    />
+                    <Autocomplete
+                      value={filter.option}
+                      suggestions={[...new Set(data.flatMap(item => item[filter.attrName ? filter.attrName : 0]))]}
+                      style={{ width: 150, marginLeft: 5 }}
+                      onSubmit={(value) => { }}
+                    />
+                  </div>
+                  <div>
+                  </div>
+                  <div >
+                    {
+                      filter.applied
+                        ? <PlayArrowRoundedIcon onClick={() => handleApplyFilter(index)} />
+                        : <PlayArrowOutlinedIcon onClick={() => handleApplyFilter(index)} />
+                    }
+                    <ClearRoundedIcon onClick={() => handleClearFilter(index)} />
+                  </div>
+                </div>
+              ))}
+              <div className="flex justify-between items-center">
+                <div className="flex">
+                  <Autocomplete
+                    placeholder="column"
+                    value={capitalizeFirstLetter(addingFilter.attrName || '')}
+                    suggestions={Object.keys(attrsByName).map(attrName => attrsByName[attrName].display)}
+                    style={{ width: 150, marginLeft: 5 }}
+                    onSubmit={(value) => {
+                      setAddingFilter({ ...addingFilter, attrName: value.toLowerCase() })
+                    }}
+                  />
+                  <Autocomplete
+                    placeholder="action"
+                    value={addingFilter.action}
+                    suggestions={['contains']}
+                    style={{ width: 150, marginLeft: 5 }}
+                    onSubmit={(value) => {
+                      setAddingFilter({ ...addingFilter, action: value as "contains" })
+                    }}
+                  />
+                  <Autocomplete
+                    placeholder="option"
+                    value={addingFilter.option}
+                    suggestions={
+                      addingFilter.attrName
+                        ? [...new Set(data.flatMap(item => {
+                          const attrName = addingFilter.attrName as string
+                          const key = item[attrName];
+                          return key !== undefined && key !== null ? key : [];
+                        }))]
+                        : []
+                    }
+                    style={{ width: 150, marginLeft: 5 }}
+                    onSubmit={(value) => {
+                      setAddingFilter({ ...addingFilter, option: value });
+                    }}
+                  />
+                </div>
+                <AddRoundedIcon onClick={() => {
+                  if (!addingFilter.attrName) {
+                    setFilterError("Please add a filtered column");
+                    return;
+                  }
+
+                  if (filters.find(filter => (
+                    filter.attrName === addingFilter.attrName &&
+                    filter.action === addingFilter.action &&
+                    filter.option === addingFilter.option
+                  ))) {
+
+                    setFilterError("Already added this filter");
+                    return;
+                  }
+
+                  setFilters([...filters, addingFilter]);
+                  setAddingFilter({ attrName: '', action: '', option: '' });
+                  setFilterError("");
+                }} />
+
+              </div>
+              <div className="filter-error text-red-500">
+                {filterError}
+              </div>
             </div>
-            <button onClick={exportToJSON} >Export to JSON</button>
-          </div>
           }
         />
 
@@ -377,7 +468,7 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
                 {attr.display}
               </div>
 
-              <div className="column-options flex items-center flex-nowrap">
+              <div className="column-option flex items-center flex-nowrap">
                 {focusedHeader === index &&
                   <div
                     className="relative w-[20px] h-[20px] hover:bg-gray-100 hover:rounded-full"
@@ -451,7 +542,7 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
                       ?
                       <MultiselectCell
                         itemId={item.id}
-                        attr={attr.name}
+                        attr={attr}
                         values={item[attr.name]}
                         autocompleteItems={Array.from(new Set(data.flatMap(item => attr.referencing ? item[attr.referencing] : item[attr.name])))}
                         handleUpdate={handleUpdateCell}
@@ -493,7 +584,7 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
             onClick={() => handlePageChange(currentPage > 1 ? currentPage - 1 : currentPage)}
           />
           <span className="pagination-info">
-            {(currentPage - 1) * itemsPerPage + 1}-{Math.min(currentPage * itemsPerPage, data.length)} of {data.length}
+            {(currentPage - 1) * itemsPerPage + 1}-{Math.min(currentPage * itemsPerPage, processedData.length)} of {processedData.length}
           </span>
 
           <NavigateNextRoundedIcon

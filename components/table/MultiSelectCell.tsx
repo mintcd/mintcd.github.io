@@ -1,3 +1,4 @@
+import Tag from '@components/atoms/Tag';
 import Latex from '@components/latex';
 import CloseIcon from '@mui/icons-material/Close';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -7,7 +8,7 @@ import { useState } from 'react';
 export default function MultiSelectCell({ itemId, attr, values, handleUpdate, autocompleteItems }:
   {
     itemId: number
-    attr: string
+    attr: AttrProps
     values: string[],
     handleUpdate: (itemId: number, attr: string, value: string[]) => Promise<void>
     autocompleteItems: string[]
@@ -23,33 +24,23 @@ export default function MultiSelectCell({ itemId, attr, values, handleUpdate, au
   return (
     <div className="flex flex-wrap w-full h-full overflow-hidden"
       onClick={() => {
-        console.log("clicked")
         if (cellState === "noEdit")
           setCellState("editing")
       }}
     >
       {
         values.map((value, index) => (
-          <div
+          <Tag
             key={index}
-            className="tag-container bg-slate-300 m-1 pl-1 pr-2 rounded-sm flex items-center relative h-fit"
-            style={{ maxWidth: 'calc(100% - 2rem)' }} // Ensure tags don’t overflow
-            onClick={handleTagClick} // Prevent editing state change
-          >
-            <span className='mr-1'>
-              <Latex>{String(value)}</Latex>
-            </span>
-            <CloseIcon
-              onClick={(e) => {
-                e.stopPropagation(); // Prevent event from reaching the parent
-                handleUpdate(itemId, attr, values.filter((_, i) => i !== index));
-              }}
-              className="cursor-pointer absolute top-0 right-0"
-              width={5}
-              sx={{ fontSize: 13 }}
-            />
-          </div>
-        ))}
+            value={attr.useLatex ? <Latex>{String(value)}</Latex> : <span> {value} </span>}
+            onClick={handleTagClick}
+            onClose={(e) => {
+              e.stopPropagation(); // Prevent event from reaching the parent
+              handleUpdate(itemId, attr.name, values.filter((_, i) => i !== index));
+            }}
+          />
+        ))
+      }
       {
         cellState === 'editing' &&
         <Autocomplete
@@ -65,14 +56,14 @@ export default function MultiSelectCell({ itemId, attr, values, handleUpdate, au
           }}
           onChange={(event, newValue) => {
             if (newValue && cellState === 'editing') {
-              handleUpdate(itemId, attr, [...values, newValue]);
+              handleUpdate(itemId, attr.name, [...values, newValue]);
               setCellState('noEdit');
               setEditingValue('');
             }
           }}
           onBlur={() => {
             if (cellState === 'editing' && editingValue) {
-              handleUpdate(itemId, attr, [...values, editingValue]);
+              handleUpdate(itemId, attr.name, [...values, editingValue]);
               setEditingValue('');
             }
             setCellState('noEdit');
@@ -109,6 +100,6 @@ export default function MultiSelectCell({ itemId, attr, values, handleUpdate, au
         //   suggestions={autocompleteItems}
         // />
       }
-    </div>
+    </div >
   )
 }

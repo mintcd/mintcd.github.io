@@ -1,7 +1,7 @@
 'use client';
 
 import { CSSProperties, ReactElement, useState, useRef, RefObject } from 'react';
-import { useClickAway, useKeyPress } from "@uidotdev/usehooks";
+import { useClickAway } from "@uidotdev/usehooks";
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 
 export default function Autocomplete({

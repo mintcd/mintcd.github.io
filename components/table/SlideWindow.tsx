@@ -12,31 +12,17 @@ export default function SlidingDrawer({
 }) {
   const drawerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (drawerRef.current && !drawerRef.current.contains(event.target as Node)) {
-        onClose();
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside);
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [onClose]);
-
   return (
     <div
       ref={drawerRef}
-      className={`slide-window fixed ${isOpen ? 'right-0' : 'right-[-100%]'} min-w-[500px] max-w-[50vw] min-h-[50vh] max-h-[100vh] 
-       duration-500 ease-in-out z-50 rounded-md `}
+      className={`slide-window fixed ${isOpen ? 'right-0' : 'right-[-100%]'} w-[40vw] h-[80vh] 
+       duration-500 ease-in-out z-50 rounded-md bg-slate-100`}
     >
-      {/* <CloseFullscreenIcon
+      <CloseFullscreenIcon
         style={{ transform: 'rotate(90deg)', fontSize: '16px' }}
         onClick={onClose}
         className="m-2 cursor-pointer"
-      /> */}
+      />
       <div className="m-2">
         {children}
       </div>

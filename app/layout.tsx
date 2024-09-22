@@ -15,9 +15,9 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
-      <body className="bg-white">
+      <body className="bg-white text-[14px] text-gray-700">
         <Nav />
-        <main className="mt-4 mx-5 sm:mx-10 text-gray-500">
+        <main className="mt-4 mx-5 sm:mx-10">
           {children}
         </main>
         <Footer />

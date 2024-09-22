@@ -3,7 +3,8 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import './table.css'
 
-import { getTextWidth } from "@functions/text-analysis";
+import { getTextWidth, capitalizeFirstLetter } from "@functions/text-analysis";
+import { sortData } from "@functions/database";
 
 import ColumnSeparator from "./ColumnSeparator";
 import MenuIcon from "./MenuIcon";
@@ -23,7 +24,11 @@ import FilterAltRoundedIcon from '@mui/icons-material/FilterAltRounded';
 import Download from "@mui/icons-material/Download";
 import HorizontalRuleRoundedIcon from '@mui/icons-material/HorizontalRuleRounded';
 import ArrowUpwardRoundedIcon from '@mui/icons-material/ArrowUpwardRounded';
+import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
+import Autocomplete from "@components/autocomplete/Autocomplete";
+import { CheckRounded } from "@mui/icons-material";
 
+// import Checkbox from "@components/checkbox/Checkbox";
 
 export default function Table({ name, data, attrs, handleUpdateCell, handleCreateItem }:
   {
@@ -52,7 +57,7 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
         width: Math.min(Math.max(Math.max(...data.map(item => getTextWidth(String(item[attr.name])))), 100), 200),
         order: index,
         hidden: false,
-        display: attr.name.charAt(0).toUpperCase() + attr.name.slice(1),
+        display: capitalizeFirstLetter(attr.name),
         sort: 'none',
       };
     })
@@ -69,6 +74,11 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
     attrName: '',
     direction: 'none',
   });
+  const [filtering, setFiltering] = useState<{ attrName: string, action: 'contains', options: string[] }>({
+    attrName: "",
+    action: "contains",
+    options: []
+  })
 
   const animationFrameRef = useRef<number | null>(null);
   const resizingRef = useRef({ startX: 0, startWidth: 0, attrName: '' });
@@ -85,26 +95,9 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
   const endIndex = startIndex + itemsPerPage;
   const paginatedData = processedData.slice(startIndex, endIndex);
 
-  function sortData(data: DataItem[], attrName: string, direction: 'asc' | 'desc' | 'none') {
-    if (direction === 'none') {
-      setProcessedData([...data]); // Reset to unsorted data
-    } else {
-      const sortedData = [...data].sort((a: DataItem, b: DataItem) => {
-        const aValue = a[attrName];
-        const bValue = b[attrName];
-
-        if (direction === 'asc') {
-          return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
-        } else {
-          return aValue < bValue ? 1 : aValue > bValue ? -1 : 0;
-        }
-      });
-      setProcessedData(sortedData);
-    }
-  }
-
   // Handlers
   function handleSort(attrName: string, currentState: 'none' | 'asc' | 'desc' | undefined) {
+
     let nextState: 'none' | 'asc' | 'desc' = 'none';
 
     if (currentState === 'none') nextState = 'asc';
@@ -113,16 +106,8 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
 
     setAttrsByName({ ...attrsByName, [attrName]: { ...attrsByName[attrName], sort: nextState } });
     setSorting({ attrName, direction: nextState });
-    setProcessedData(() => {
-      if (nextState === 'none') return [...data]
-      return data.sort((x, y) => {
-        if (nextState === 'asc')
-          return x[attrName] - y[attrName]
-        if (nextState === 'desc')
-          return y[attrName] - x[attrName]
-        return 0
-      })
-    })
+
+    setProcessedData(sortData(data, attrName, nextState));
   }
 
 
@@ -263,26 +248,8 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
   // Effects
 
   useEffect(() => {
-    setProcessedData(() => {
-      return data.sort((x, y) => {
-        if (sorting.direction === 'asc')
-          return x[sorting.attrName] - y[sorting.attrName]
-        else if (sorting.direction === 'desc')
-          return x[sorting.attrName] - y[sorting.attrName]
-        return 0
-      })
-    })
+    setProcessedData(sortData(data, sorting.attrName, sorting.direction));
     setCurrentItem(data.find(item => currentItem && item.id === currentItem.id) as DataItem);
-  }, [data, sorting]);
-
-  useEffect(() => {
-    const sortedData = [...data];
-    if (sorting.direction === 'asc') {
-      sortedData.sort((a, b) => (a[sorting.attrName] > b[sorting.attrName] ? 1 : -1));
-    } else if (sorting.direction === 'desc') {
-      sortedData.sort((a, b) => (a[sorting.attrName] < b[sorting.attrName] ? 1 : -1));
-    }
-    setProcessedData(sortedData);
   }, [data, sorting]);
 
 
@@ -310,7 +277,7 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
         )}
       </SlideWindow>
 
-      <div className="options-container">
+      <div className="options-container flex space-x-3">
         <DropDown
           toggleButton={<ViewColumnRoundedIcon className="text-[#023e8a] text-[20px]" />}
           content={
@@ -319,17 +286,19 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
                 !attrsByName[attr.name].newWindow && (
                   <div key={attr.name} className="flex justify-between items-center">
                     <span className="text-gray-800">{attrsByName[attr.name].display}</span>
-                    <input
-                      id={`check-${attr.name}`}
-                      type="checkbox"
-                      checked={!attrsByName[attr.name].hidden}
-                      onClick={() => handleColumnAppearance(attr.name)}
-                      className={`ml-2 cursor-pointer appearance-none h-4 w-4 p-1
-                        bg-white border-2 rounded-sm checked:bg-[#0077b6] checked:border-transparent relative before:content-['✔'] before:absolute before:inset-0 before:flex before:items-center before:justify-center 
-                        before:text-gray-400 before:opacity-100 checked:before:text-white checked:before:opacity-100
-                        transition-colors duration-300 ease-in-out`}
-                    />
-
+                    <div className="relative">
+                      <input
+                        id={`check-${attr.name}`}
+                        type="checkbox"
+                        checked={!attrsByName[attr.name].hidden}
+                        onChange={() => handleColumnAppearance(attr.name)}
+                        className={`cursor-pointer appearance-none h-4 w-4 p-1 
+                      bg-white border-2 border-gray-300 rounded-sm 
+                      checked:bg-[#0077b6] checked:border-transparent 
+                      transition-colors duration-300 ease-in-out`}
+                        style={{ appearance: 'none' }}
+                      />
+                    </div>
                   </div>
                 )
               ))}
@@ -341,11 +310,51 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
           content={<div className="p-4 w-48 bg-white border border-gray-300 shadow-lg space-y-2">
             <button onClick={exportToCSV} >Export to CSV</button>
             <button onClick={exportToJSON} >Export to JSON</button>
-          </div>} />
+          </div>
+          }
+        />
+        <DropDown
+          toggleButton={<FilterAltRoundedIcon className="text-[#023e8a] text-[20px]" />}
+          content={<div className="p-4 w-[500px] bg-white border border-gray-300 shadow-lg space-y-2">
+            <div className="flex justify-between items-center">
+              <span>Column</span>
+              <Autocomplete
+                suggestions={Object.keys(attrsByName).map(attrName => attrsByName[attrName].display)}
+                style={{ width: 100, marginLeft: 5 }}
+                onSubmit={(value) => {
+                  console.log("submitted")
+                  setFiltering({ ...filtering, attrName: value.toLowerCase() })
+                }}
+              />
+              <Autocomplete
+                suggestions={['contains']}
+                style={{ width: 100, marginLeft: 5 }}
+                onSubmit={(value) => setFiltering({ ...filtering, action: value as 'contains' })}
+              />
+              {/* <Autocomplete
+                suggestions={[...new Set(data.flatMap(item => item[filtering.attrName]))]}
+                style={{ width: 100, marginLeft: 5 }}
+                onSubmit={(value) => setFiltering({ ...filtering, options: value })}
+              /> */}
+            </div>
+            <button onClick={exportToJSON} >Export to JSON</button>
+          </div>
+          }
+        />
+
+        <DropDown
+          toggleButton={<SettingsRoundedIcon className="text-[#023e8a] text-[20px]" />}
+          content={<div className="p-4 w-48 bg-white border border-gray-300 shadow-lg space-y-2">
+            <button onClick={exportToCSV} >Export to CSV</button>
+            <button onClick={exportToJSON} >Export to JSON</button>
+          </div>
+          }
+        />
+
 
       </div>
 
-      <div className="table-header grid text-[15px] p-1 border-b-[1px]"
+      <div className="table-header grid text-[16px] p-1 border-b-[1px]"
         style={{
           gridTemplateColumns: orderedAttrs
             .map((attr) => `${attr.width}px`)
@@ -484,7 +493,7 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
             onClick={() => handlePageChange(currentPage > 1 ? currentPage - 1 : currentPage)}
           />
           <span className="pagination-info">
-            {(currentPage - 1) * itemsPerPage + 1}-{currentPage * itemsPerPage} of {data.length}
+            {(currentPage - 1) * itemsPerPage + 1}-{Math.min(currentPage * itemsPerPage, data.length)} of {data.length}
           </span>
 
           <NavigateNextRoundedIcon

@@ -78,21 +78,24 @@ export async function createItem(table: string, data: DataItem[], attrProps: Att
   return createdItem
 }
 
-// export function initiateAttrProps(data: DataItem[], attrOptions?: AttrProps) {
-//   // Get types
-//   const attrProps: AttrProps = attrOptions ? attrOptions : {};
+export function sortData(data: DataItem[], attrName: string, direction: 'asc' | 'desc' | 'none') {
+  if (direction === 'none') {
+    return data;
+  }
 
-//   Object.keys(data[0]).forEach((attr) => {
-//     let type: string;
-//     if (Array.isArray(data[0][attr])) {
-//       type = 'array';
-//     } else {
-//       type = typeof data[0][attr];
-//     }
+  const sortedData = [...data].sort((a: DataItem, b: DataItem) => {
+    const aValue = a[attrName];
+    const bValue = b[attrName];
+    const isEmptyOrNull = (val: any) => val === null || val === undefined || val === '' || (Array.isArray(val) && val.length === 0);
 
-//     attrProps[attr].type = type;
-//   });
+    if (direction === 'asc') {
+      if (isEmptyOrNull(aValue)) return 1;
+      return aValue > bValue ? 1 : -1;
+    } else {
+      if (isEmptyOrNull(bValue)) return 1;
+      return aValue < bValue ? 1 : -1;
+    }
+  });
 
-
-//   return attrProps
-// }
+  return sortedData;
+}

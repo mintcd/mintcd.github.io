@@ -7,11 +7,11 @@ type AttrProps = {
     useLatex?: boolean,
     type?: string,
     referencing?: string,
-    width?: number,
-    order?: number,
-    newWindow?: boolean,
+    width: number,
+    order: number,
+    newWindow: boolean,
     hidden?: boolean,
-    display?: string,
+    display: string,
     sort?: 'none' | 'asc' | 'desc'
 }
 

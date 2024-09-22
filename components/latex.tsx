@@ -35,7 +35,7 @@ const MyLatex: React.FC<MyLatexProps> = ({ children }) => {
   const childrenArray = Array.isArray(children) ? children : [children];
 
   return (
-    <div className='latex-container font-modern'>
+    <div className='latex-container font-modern text-[14px]'>
       {childrenArray.map((child, index) => (
         <Latex key={index} macros={macros}>{child}</Latex>
       ))}

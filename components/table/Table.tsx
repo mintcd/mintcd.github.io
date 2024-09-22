@@ -12,6 +12,8 @@ import MultiselectCell from "./MultiSelectCell";
 import TextCell from "./TextCell";
 import SlideWindow from './SlideWindow';
 import DropDown from "@components/DropDown";
+import Autocomplete from "@components/autocomplete/Autocomplete";
+import Checkbox from "@components/checkbox/Checkbox";
 
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import NavigateNextRoundedIcon from '@mui/icons-material/NavigateNextRounded';
@@ -25,8 +27,6 @@ import Download from "@mui/icons-material/Download";
 import HorizontalRuleRoundedIcon from '@mui/icons-material/HorizontalRuleRounded';
 import ArrowUpwardRoundedIcon from '@mui/icons-material/ArrowUpwardRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
-import Autocomplete from "@components/autocomplete/Autocomplete";
-import Checkbox from "@components/checkbox";
 import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
 import ClearRoundedIcon from '@mui/icons-material/ClearRounded';
 import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';

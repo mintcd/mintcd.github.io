@@ -389,8 +389,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
                         onSubmit={(value) => handleModifyFilter(index, { option: value })}
                       />
                     </div>
-                    <div>
-                    </div>
+
                     <div >
                       {
                         filter.applied
@@ -541,7 +540,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
                   <DropDown
                     toggleButton={<MenuIcon />}
                     content={
-                      <div className="absolute top-[10px] bg-white border shadow-md z-10 w-[150px]">
+                      <div className="absolute top-[10px] bg-white border shadow-md w-[150px]">
                         <div className="p-2 hover:bg-gray-200 w-full flex items-center justify-between">
                           Filter
                           <FilterAltRoundedIcon className="text-[16px]" />

@@ -1,22 +1,24 @@
-'use client';
-
-import { CSSProperties, ReactElement, useState, useEffect } from 'react';
+import { CSSProperties, ReactElement, useState, useEffect, useRef } from 'react';
 import { useClickAway } from "@uidotdev/usehooks";
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 
 export default function Autocomplete({
   suggestions,
+  autoFocus = false,
   style,
   placeholder,
   value,
   freeSolo,
-  maxDisplay = 5,
+  icon = true,
+  maxDisplay,
   onSubmit
 }: {
   suggestions: string[],
   placeholder?: string,
   value?: string
+  autoFocus?: boolean
   freeSolo?: boolean,
+  icon?: boolean,
   maxDisplay?: number,
   style?: CSSProperties,
   onSubmit: (selectedValue: string) => void
@@ -26,6 +28,8 @@ export default function Autocomplete({
   const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
   const [focused, setFocused] = useState(false);
+
+  const suggestionRefs = useRef<(HTMLLIElement | null)[]>([]); // Reference to each suggestion item
 
   const ref = useClickAway(() => {
     setFocused(false);
@@ -50,10 +54,12 @@ export default function Autocomplete({
     if (filteredSuggestions.length === 0) return;
 
     if (e.key === 'ArrowDown') {
+      e.preventDefault();
       setActiveSuggestionIndex(prevIndex =>
         prevIndex < filteredSuggestions.length - 1 ? prevIndex + 1 : 0
       );
     } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
       setActiveSuggestionIndex(prevIndex =>
         prevIndex > 0 ? prevIndex - 1 : filteredSuggestions.length - 1
       );
@@ -70,6 +76,15 @@ export default function Autocomplete({
     }
   };
 
+  useEffect(() => {
+    if (activeSuggestionIndex >= 0 && suggestionRefs.current[activeSuggestionIndex]) {
+      suggestionRefs.current[activeSuggestionIndex]?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      });
+    }
+  }, [activeSuggestionIndex]);
+
   const handleSuggestionClick = (suggestion: string) => {
     setInputValue(suggestion);
     setSubmittedValue(suggestion);
@@ -84,38 +99,34 @@ export default function Autocomplete({
 
   return (
     <div className="relative" style={style} ref={ref}>
-      <div className={`flex ${focused && 'border border-blue-400'}`}>
+      <div className={`flex border border-${style?.border ? style.border : focused && 'blue-400'} relative z-[1]`}>
         <input
           type="text"
-          style={{
-            caretColor: freeSolo ? 'auto' : "transparent"
-          }}
+          autoFocus={autoFocus}
+          className={`${!freeSolo && 'caret-transparent'} w-full focus:outline-none bg-inherit`}
           onFocus={() => {
             if (!freeSolo) setFilteredSuggestions(suggestions);
             setFocused(true);
           }}
           value={freeSolo ? inputValue : submittedValue}
-          onChange={freeSolo ? handleInputChange : undefined}  // Disable input change when freeSolo is false
+          onChange={freeSolo ? handleInputChange : undefined}
           onKeyDown={handleKeyDown}
-          className="w-full border-none focus:outline-none"
           placeholder={placeholder}
-          readOnly={!freeSolo} // Make the input read-only when freeSolo is false
+          readOnly={!freeSolo}
         />
-        <KeyboardArrowDownRoundedIcon
-          className={`transform transition-transform duration-300 ${focused ? 'rotate-180' : 'rotate-0'}`} // Animation added
-        />
+        {icon && <KeyboardArrowDownRoundedIcon
+          className={`transform transition-transform duration-300 ${focused ? 'rotate-180' : 'rotate-0'}`}
+        />}
       </div>
 
       {focused && (
         <ul
-          className="absolute z-10 bg-white border rounded mt-1 w-full overflow-y-auto" // Enable scrolling
-          style={{
-            maxHeight: `${maxDisplay * 2.5}rem`, // Adjust height based on maxDisplay, assuming each item is ~2.5rem tall
-          }}
+          className={`absolute z-[1000] bg-white border rounded mt-1 w-full max-h-[${maxDisplay ? maxDisplay : 10}rem] overflow-y-auto`}
         >
           {filteredSuggestions.map((suggestion, index) => (
             <li
               key={index}
+              ref={el => { suggestionRefs.current[index] = el }} // Set ref to each suggestion
               onClick={() => handleSuggestionClick(suggestion)}
               className={`p-2 cursor-pointer ${index === activeSuggestionIndex ? 'bg-gray-200' : 'hover:bg-gray-200'}`}
             >
@@ -125,5 +136,6 @@ export default function Autocomplete({
         </ul>
       )}
     </div>
+
   );
 };

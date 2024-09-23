@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import CloseFullscreenIcon from '@mui/icons-material/CloseFullscreen';
+import zIndices from '@styles/z-indices';
 
 export default function SlidingDrawer({
   onClose,
@@ -16,7 +17,7 @@ export default function SlidingDrawer({
     <div
       ref={drawerRef}
       className={`slide-window fixed ${isOpen ? 'right-0' : 'right-[-100%]'} w-[40vw] h-[80vh] 
-       duration-500 ease-in-out z-50 rounded-md bg-slate-100`}
+       duration-500 ease-in-out rounded-md bg-slate-100 z-[${zIndices.tableSideWindow}]`}
     >
       <CloseFullscreenIcon
         style={{ transform: 'rotate(90deg)', fontSize: '16px' }}

@@ -1,10 +1,8 @@
 import Tag from '@components/atoms/Tag';
 import Latex from '@components/latex';
-import CloseIcon from '@mui/icons-material/Close';
-import Autocomplete from '@mui/material/Autocomplete';
-// import Autocomplete from '@components/autocomplete/Autocomplete';
-import TextField from '@mui/material/TextField';
+import Autocomplete from '@components/autocomplete/Autocomplete';
 import { useState } from 'react';
+import { useClickAway } from "@uidotdev/usehooks";
 
 export default function MultiSelectCell({ itemId, attr, values, handleUpdate, autocompleteItems }:
   {
@@ -18,12 +16,17 @@ export default function MultiSelectCell({ itemId, attr, values, handleUpdate, au
   const [cellState, setCellState] = useState("noEdit");
   const [editingValue, setEditingValue] = useState("");
 
+  const ref = useClickAway(() => {
+    setCellState('noEdit');
+  }) as any;
+
   const handleTagClick = (event: React.MouseEvent) => {
     event.stopPropagation();
   };
 
   return (
-    <div className="flex flex-wrap w-full h-full overflow-hidden"
+    <div className="multiselect-cell flex flex-wrap w-full h-full"
+      ref={ref}
       onClick={() => {
         if (cellState === "noEdit")
           setCellState("editing")
@@ -45,60 +48,19 @@ export default function MultiSelectCell({ itemId, attr, values, handleUpdate, au
       {
         cellState === 'editing' &&
         <Autocomplete
+          icon={false}
+          autoFocus
+          style={{ border: 'none' }}
           freeSolo
-          options={autocompleteItems}
-          inputValue={editingValue}
-          clearIcon={null}
-          onInputChange={(event, newInputValue) => {
-            if (event && event.type === 'change') {
-              setEditingValue(newInputValue);
-            }
-          }}
-          onChange={(event, newValue) => {
+          suggestions={autocompleteItems}
+          onSubmit={(newValue) => {
             if (newValue && cellState === 'editing') {
               handleUpdate(itemId, attr.name, [...values, newValue]);
               setCellState('noEdit');
               setEditingValue('');
             }
           }}
-          onBlur={() => {
-            if (cellState === 'editing' && editingValue) {
-              handleUpdate(itemId, attr.name, [...values, editingValue]);
-              setEditingValue('');
-            }
-            setCellState('noEdit');
-          }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              autoFocus
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  padding: 0,
-                  marginLeft: '2px',
-                  backgroundColor: 'inherit',
-                  width: 'full',
-                  '& fieldset': {
-                    border: 'none',
-                  },
-                  '&:hover fieldset': {
-                    border: 'none',
-                  },
-                  '&.Mui-focused fieldset': {
-                    border: 'none',
-                  },
-                },
-                '& .MuiInputBase-input': {
-                  fontSize: 'inherit',
-                  fontFamily: 'inherit',
-                },
-              }}
-            />
-          )}
         />
-        // <Autocomplete
-        //   suggestions={autocompleteItems}
-        // />
       }
     </div >
   )

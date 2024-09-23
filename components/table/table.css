@@ -58,23 +58,3 @@
 .pagination-info {
   line-height: 32px;
 }
-
-
-.sliding-drawer {
-  position: fixed;
-  top: 100;
-  right: -100%;
-  min-width: 500px;
-  background-color: white;
-  box-shadow: -1px 0 2px rgba(0, 0, 0, 0.5);
-  transition: right 0.3s ease;
-  z-index: 100;
-}
-
-/* .sliding-drawer.open {
-  right: 0;
-} */
-
-/* .drawer-content {
-  padding: 20px;
-} */

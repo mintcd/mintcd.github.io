@@ -38,13 +38,14 @@ type FilterProp = {
   applied?: boolean
 }
 
-export default function Table({ name, data, attrs, handleUpdateCell, handleCreateItem }:
+export default function Table({ name, data, attrs, onUpdateCell, onCreateItem, onExchangeItems }:
   {
     name?: string,
     data: DataItem[],
     attrs: AttrProps[],
-    handleUpdateCell: (itemId: number, attrName: string, value: number | string | string[]) => Promise<void>,
-    handleCreateItem: () => Promise<void>
+    onUpdateCell: (itemId: number, attrName: string, value: number | string | string[]) => Promise<void>,
+    onCreateItem: () => Promise<void>,
+    onExchangeItems: (id1: number, id2: number) => Promise<void>
   }) {
 
   // Constants
@@ -54,6 +55,9 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
 
   // States and Refs
   const [attrsByName, setAttrsByName] = useState(() => {
+    const storedAttrsByName = localStorage.getItem('attrsByName')
+    if (storedAttrsByName) return JSON.parse(storedAttrsByName)
+
     const attrsByName: { [key: string]: AttrProps } = {}
     attrs.forEach((attr, index) => {
       attrsByName[attr.name] = {
@@ -67,6 +71,7 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
     })
     return attrsByName;
   })
+
   const [focusedCell, setFocusedCell] = useState({ itemId: -1, attrName: '' })
   const [hoveredItem, setHoveredItem] = useState(-1)
   const [focusedHeader, setFocusedHeader] = useState(-1);
@@ -78,7 +83,12 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
     attrName: '',
     direction: 'none',
   });
-  const [filters, setFilters] = useState<FilterProp[]>([])
+
+  const [filters, setFilters] = useState<FilterProp[]>(() => {
+    const storedFilters = localStorage.getItem('filters')
+    if (storedFilters) return JSON.parse(storedFilters)
+    return []
+  })
   const [addingFilter, setAddingFilter] = useState<FilterProp>({})
   const [filterError, setFilterError] = useState("")
 
@@ -101,6 +111,26 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
   }, [data]);
 
   // Handlers
+  const [draggedItemId, setDraggedItemId] = useState(-1);
+
+  const handleDragStart = (id: number) => {
+    setDraggedItemId(id);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault(); // Prevent default to allow dropping
+  };
+
+  const handleDrop = (targetId: number) => {
+    if (draggedItemId !== null && draggedItemId !== targetId) {
+      // console.log(`Reordering from ${draggedItemId} to ${targetId}`);
+
+      onExchangeItems(draggedItemId, targetId)
+      setDraggedItemId(-1); // Reset dragged item
+    }
+  };
+
+
   function handleModifyFilter(
     filterIndex: number,
     attr: { attrName?: string; option?: string; action?: string; applied?: boolean }
@@ -112,18 +142,22 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
       newFilters[filterIndex][key] = attr[key] as any; // Use 'as any' to bypass strict type checking
       setFilters(newFilters);
     }
+    localStorage.setItem('filters', JSON.stringify(newFilters))
   }
 
   function handleClearFilter(filterIndex: number) {
     const newFilters = filters.filter((_, index) => index !== filterIndex); // Remove the filter at filterIndex
     setFilters(newFilters); // Update state with the new filters array
+    localStorage.setItem('filters', JSON.stringify(newFilters))
   }
 
   function handleApplyFilter(filterIndex: number) {
     const newFilters = [...filters]
     newFilters[filterIndex].applied = !newFilters[filterIndex].applied
     setFilters(newFilters);
+    localStorage.setItem('filters', JSON.stringify(newFilters))
   }
+
 
   function handleSort(attrName: string, currentState: 'none' | 'asc' | 'desc' | undefined) {
 
@@ -216,23 +250,15 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
 
   }, []);
 
-  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, draggedName: string) => {
+  const handleColumnDragStart = (e: React.DragEvent<HTMLDivElement>, draggedName: string) => {
     e.dataTransfer.setData('text/plain', draggedName);
-
-    const img = document.createElement('img');
-    img.src = 'path/to/custom-image.png';
-    img.style.width = '100px';
-    e.dataTransfer.setDragImage(img, 50, 50);
-
-    e.currentTarget.classList.add('dragging');
   };
 
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleColumnDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    e.currentTarget.classList.remove('dragging');
   };
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetName: string) => {
+  const handleColumnDrop = (e: React.DragEvent<HTMLDivElement>, targetName: string) => {
     e.preventDefault();
     const draggedName = e.dataTransfer.getData('text/plain');
 
@@ -262,7 +288,6 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
           }
         });
       }
-
       newAttrsByName[draggedName].order = targetOrder;
       setAttrsByName(newAttrsByName);
       localStorage.setItem('attrsByName', JSON.stringify(newAttrsByName));
@@ -275,7 +300,6 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
   };
 
   // Effects
-
   useEffect(() => {
     let processedData = [...data]
     filters.forEach((filter) => {
@@ -303,7 +327,7 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
                   itemId={currentItem.id}
                   attr={newWindowAttr.name}
                   value={currentItem[newWindowAttr.name]}
-                  handleUpdate={handleUpdateCell}
+                  handleUpdate={onUpdateCell}
                 />
               </div>
             }
@@ -311,7 +335,7 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
         )}
       </SlideWindow>
 
-      <div className="option-container flex space-x-3">
+      <div className="table-option-container flex space-x-3">
         <DropDown
           toggleButton={<ViewColumnRoundedIcon className="text-[#023e8a] text-[20px]" />}
           content={
@@ -432,7 +456,9 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
                     return;
                   }
 
-                  setFilters([...filters, { ...addingFilter, applied: true }]);
+                  const newFilters = [...filters, { ...addingFilter, applied: true }]
+                  setFilters(newFilters);
+                  localStorage.setItem('filters', JSON.stringify(newFilters))
                   setAddingFilter({ attrName: '', action: '', option: '' });
                   setFilterError("");
                 }} />
@@ -473,9 +499,9 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
             >
               <div className="flex-grow"
                 draggable
-                onDragStart={(e) => handleDragStart(e, attr.name)}
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, attr.name)}
+                onDragStart={(e) => handleColumnDragStart(e, attr.name)}
+                onDragOver={handleColumnDragOver}
+                onDrop={(e) => handleColumnDrop(e, attr.name)}
               >
                 {attr.display}
               </div>
@@ -528,68 +554,72 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
       </div>
 
       <div className="table-body text-[14px] text-gray-800">
-        {paginatedData.map((item) =>
-          <div key={item.id}
+        {paginatedData.map((item) => (
+          <div
+            key={item.id}
             className={`table-item grid py-[10px]`}
             style={{
-              gridTemplateColumns: orderedAttrs
-                .map((attr) => `${attr.width}px`)
-                .join(' ')
+              gridTemplateColumns: orderedAttrs.map((attr) => `${attr.width}px`).join(' '),
             }}
             onMouseEnter={() => setHoveredItem(item.id)}
             onMouseLeave={() => setHoveredItem(-1)}
           >
-            {
-              orderedAttrs.map((attr, cellIndex) =>
-                <div
-                  key={cellIndex}
-                  className={`cell-container px-3 flex items-center justify-between 
-                w-${Math.max(attr.width || 0, cellMinWidth)}px 
-                transition duration-200
-                ${focusedCell.itemId === item.id && focusedCell.attrName === attr.name ? 'border-2 border-blue-400 shadow-lg' : 'border border-transparent'}`}
-                  onClick={() => setFocusedCell({ itemId: item.id, attrName: attr.name })}
-                >
-                  {
-                    (attr.type === 'multiselect'
-                      ?
-                      <MultiselectCell
-                        itemId={item.id}
-                        attr={attr}
-                        values={item[attr.name]}
-                        autocompleteItems={Array.from(new Set(data.flatMap(item => attr.referencing ? item[attr.referencing] : item[attr.name])))}
-                        handleUpdate={handleUpdateCell}
-                      />
-                      :
-                      <TextCell
-                        itemId={item.id}
-                        attr={attr.name}
-                        value={item[attr.name]}
-                        handleUpdate={handleUpdateCell}
-                      />)
-                  }
-                  {
-                    attr.name === 'id' && hoveredItem === item.id &&
-                    <span>
-                      <DragIndicatorIcon
+            {orderedAttrs.map((attr, cellIndex) => (
+              <div
+                key={cellIndex}
+                className={`cell-container px-3 flex items-center justify-between 
+                  w-${Math.max(attr.width || 0, cellMinWidth)}px 
+                  transition duration-200
+                  ${focusedCell.itemId === item.id && focusedCell.attrName === attr.name ? 'border-2 border-blue-400 shadow-lg' : 'border border-transparent'}`}
+                onClick={() => setFocusedCell({ itemId: item.id, attrName: attr.name })}
+                draggable
+                onDragOver={handleDragOver}
+                onDrop={() => handleDrop(item.id)}
+                onDragStart={() => handleDragStart(item.id)}
+              >
+                {attr.type === 'multiselect' ? (
+                  <MultiselectCell
+                    itemId={item.id}
+                    attr={attr}
+                    values={item[attr.name]}
+                    autocompleteItems={Array.from(new Set(data.flatMap(item => attr.referencing ? item[attr.referencing] : item[attr.name])))}
+                    handleUpdate={onUpdateCell}
+                  />
+                ) : (
+                  <TextCell
+                    itemId={item.id}
+                    attr={attr.name}
+                    value={item[attr.name]}
+                    handleUpdate={onUpdateCell}
+                  />
+                )}
+                {attr.name === 'id' && hoveredItem === item.id && (
+                  <span>
+                    <DragIndicatorIcon
+                      className="text-[18px] hover:cursor-grab"
+                      onMouseDown={(e) => {
+                        e.preventDefault(); // Prevent text selection
+                        handleDragStart(item.id); // Start drag on mouse down
+                      }}
+                    />
+                    {newWindowsNeeded && (
+                      <OpenInNewIcon
                         className="text-[18px] hover:cursor-pointer"
+                        onClick={() => handleOpenWindow(item.id)}
                       />
-                      {newWindowsNeeded &&
-                        <OpenInNewIcon
-                          className="text-[18px] hover:cursor-pointer"
-                          onClick={() => handleOpenWindow(item.id)}
-                        />
-                      }
-                    </span>
-                  }
-                </div>
-              )
-            }
+                    )}
+                  </span>
+                )}
+              </div>
+            ))}
           </div>
-        )}
+        ))}
       </div>
-      <div className="flex items-center justify-between text-[#023e8a]">
+
+
+      <div className="table-footer flex items-center justify-between text-[#023e8a]">
         <AddRoundedIcon className={` cursor-pointer text-[20px]`}
-          onClick={handleCreateItem} />
+          onClick={onCreateItem} />
         <div className="pagination-controls flex items-center justify-end">
           <NavigateBeforeRoundedIcon
             className="hover:cursor-pointer"
@@ -605,8 +635,6 @@ export default function Table({ name, data, attrs, handleUpdateCell, handleCreat
           />
         </div>
       </div>
-
     </div>
-
   );
 }

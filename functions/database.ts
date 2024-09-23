@@ -37,6 +37,18 @@ export async function fetchData({
   return adjustedData.sort((x: DataItem, y: DataItem) => x.id - y.id);
 }
 
+export async function exchangeItems(table: string, id1: number, id2: number) {
+  // Assign a temporary ID
+  await updateItem(table, id1, { id: 9999 });
+
+  // Update the second item with the first item's ID
+  await updateItem(table, id2, { id: id1 });
+
+  // Finally, update the temporary ID item with the second item's ID
+  await updateItem(table, 9999, { id: id2 });
+}
+
+
 export async function updateItem(table: string, itemId: number, attrValue: JsonObject<any>) {
   const { data, error } = await supabase
     .from(table)

@@ -31,7 +31,6 @@ export default function Autocomplete({
     setFocused(false);
   }) as any;
 
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setInputValue(value);
@@ -96,10 +95,11 @@ export default function Autocomplete({
             setFocused(true);
           }}
           value={freeSolo ? inputValue : submittedValue}
-          onChange={handleInputChange}
+          onChange={freeSolo ? handleInputChange : undefined}  // Disable input change when freeSolo is false
           onKeyDown={handleKeyDown}
           className="w-full border-none focus:outline-none"
           placeholder={placeholder}
+          readOnly={!freeSolo} // Make the input read-only when freeSolo is false
         />
         <KeyboardArrowDownRoundedIcon
           className={`transform transition-transform duration-300 ${focused ? 'rotate-180' : 'rotate-0'}`} // Animation added

@@ -1,7 +1,7 @@
 'use client'
 
 import Table from '@components/table'
-import { createItem, fetchData, updateItem } from '@functions/database';
+import { createItem, exchangeItems, fetchData, updateItem } from '@functions/database';
 import { useCallback, useEffect, useState } from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
 
@@ -20,7 +20,6 @@ export default function DatabaseUI({ table }: {
     })
   }
 
-
   const handleUpdate = useCallback(async (itemId: number, attrName: string, value: number | string | string[]) => {
     if (!authorized) return;
     await updateItem(table, itemId, { [attrName]: value }).then(() => {
@@ -36,6 +35,25 @@ export default function DatabaseUI({ table }: {
     });
 
   }, [authorized, data, table]);
+
+  async function handleExchange(id1: number, id2: number) {
+    if (!authorized) return;
+
+    await exchangeItems(table, id1, id2).then(() => {
+      setData(prevData => {
+        const newData = prevData.map(item => {
+          if (item.id === id1) {
+            return { ...item, id: id2 }; // Update item with id1 to have id2
+          }
+          if (item.id === id2) {
+            return { ...item, id: id1 }; // Update item with id2 to have id1
+          }
+          return item; // Return item unchanged if neither id matches
+        });
+        return newData.sort((x, y) => x.id - y.id);
+      });
+    });
+  }
 
   useEffect(() => {
     if (window.localStorage.getItem("timeKeyGot")) setAuthorized(true);
@@ -68,7 +86,8 @@ export default function DatabaseUI({ table }: {
       name={table}
       data={data}
       attrs={attrs}
-      handleUpdateCell={handleUpdate}
-      handleCreateItem={handleCreate} />
+      onUpdateCell={handleUpdate}
+      onCreateItem={handleCreate}
+      onExchangeItems={handleExchange} />
   );
 }

@@ -9,18 +9,23 @@ import CircularProgress from '@mui/material/CircularProgress';
 export default function DatabaseUI({ table }: {
   table: string
 }) {
+
+  const [upToDate, setUpToDate] = useState(true)
   const [data, setData] = useState<DataItem[]>([]);
   const [attrs, setAttrs] = useState<AttrProps[]>([]);
   const [loading, setLoading] = useState(true);
   const [authorized, setAuthorized] = useState(false);
 
   async function handleCreate() {
+    setUpToDate(false)
     await createItem(table, data, attrs).then((createdItem) => {
       setData([...data, createdItem])
+      setUpToDate(true)
     })
   }
 
   const handleUpdate = useCallback(async (itemId: number, attrName: string, value: number | string | string[]) => {
+    setUpToDate(false)
     if (!authorized) return;
     await updateItem(table, itemId, { [attrName]: value }).then(() => {
       const index = data.findIndex(item => item.id === itemId); // Find the correct index based on itemId
@@ -32,11 +37,13 @@ export default function DatabaseUI({ table }: {
         );
         setData(updatedData); // Update the state with the new array
       }
+      setUpToDate(true)
     });
 
   }, [authorized, data, table]);
 
   async function handleExchange(id1: number, id2: number) {
+    setUpToDate(false)
     if (!authorized) return;
 
     await exchangeItems(table, id1, id2).then(() => {
@@ -52,12 +59,12 @@ export default function DatabaseUI({ table }: {
         });
         return newData.sort((x, y) => x.id - y.id);
       });
+      setUpToDate(true)
     });
   }
 
   useEffect(() => {
     if (window.localStorage.getItem("timeKeyGot")) setAuthorized(true);
-
     Promise.all([
       fetchData({ table: table }),
       fetchData({ table: `${table}_attr` })
@@ -85,6 +92,7 @@ export default function DatabaseUI({ table }: {
     <Table
       name={table}
       data={data}
+      upToDate={upToDate}
       attrs={attrs}
       onUpdateCell={handleUpdate}
       onCreateItem={handleCreate}

@@ -38,9 +38,10 @@ type FilterProp = {
   applied?: boolean
 }
 
-export default function Table({ name, data, attrs, onUpdateCell, onCreateItem, onExchangeItems }:
+export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCreateItem, onExchangeItems }:
   {
     name?: string,
+    upToDate?: boolean,
     data: DataItem[],
     attrs: AttrProps[],
     onUpdateCell: (itemId: number, attrName: string, value: number | string | string[]) => Promise<void>,
@@ -73,6 +74,7 @@ export default function Table({ name, data, attrs, onUpdateCell, onCreateItem, o
   })
 
   const [focusedCell, setFocusedCell] = useState({ itemId: -1, attrName: '' })
+  const [draggedItemId, setDraggedItemId] = useState(-1);
   const [hoveredItem, setHoveredItem] = useState(-1)
   const [focusedHeader, setFocusedHeader] = useState(-1);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -111,8 +113,6 @@ export default function Table({ name, data, attrs, onUpdateCell, onCreateItem, o
   }, [data]);
 
   // Handlers
-  const [draggedItemId, setDraggedItemId] = useState(-1);
-
   const handleDragStart = (id: number) => {
     setDraggedItemId(id);
   };
@@ -335,153 +335,160 @@ export default function Table({ name, data, attrs, onUpdateCell, onCreateItem, o
         )}
       </SlideWindow>
 
-      <div className="table-option-container flex space-x-3">
-        <DropDown
-          toggleButton={<ViewColumnRoundedIcon className="text-[#023e8a] text-[20px]" />}
-          content={
-            <div className="p-4 w-48 bg-white border border-gray-300 shadow-lg space-y-2">
-              {attrs.map(attr => (
-                !attrsByName[attr.name].newWindow && (
-                  <div key={attr.name} className="flex justify-between items-center">
-                    <span className="text-gray-800">{attrsByName[attr.name].display}</span>
-                    <Checkbox
-                      value={!attrsByName[attr.name].hidden}
-                      onChange={() => handleColumnAppearance(attr.name)}
-                    />
-                  </div>
-                )
-              ))}
+      <div className="table-meta-header flex justify-between">
+        <div className="table-option-container flex space-x-3">
+          <DropDown
+            toggleButton={<ViewColumnRoundedIcon className="text-[#023e8a] text-[20px]" />}
+            content={
+              <div className="p-4 w-48 bg-white border border-gray-300 shadow-lg space-y-2">
+                {attrs.map(attr => (
+                  !attrsByName[attr.name].newWindow && (
+                    <div key={attr.name} className="flex justify-between items-center">
+                      <span className="text-gray-800">{attrsByName[attr.name].display}</span>
+                      <Checkbox
+                        value={!attrsByName[attr.name].hidden}
+                        onChange={() => handleColumnAppearance(attr.name)}
+                      />
+                    </div>
+                  )
+                ))}
+              </div>
+            }
+          />
+          <DropDown
+            toggleButton={<Download className="text-[#023e8a] text-[20px]" />}
+            content={<div className="p-4 w-48 bg-white border border-gray-300 shadow-lg space-y-2">
+              <button onClick={exportToCSV} >Export to CSV</button>
+              <button onClick={exportToJSON} >Export to JSON</button>
             </div>
-          }
-        />
-        <DropDown
-          toggleButton={<Download className="text-[#023e8a] text-[20px]" />}
-          content={<div className="p-4 w-48 bg-white border border-gray-300 shadow-lg space-y-2">
-            <button onClick={exportToCSV} >Export to CSV</button>
-            <button onClick={exportToJSON} >Export to JSON</button>
-          </div>
-          }
-        />
-        <DropDown
-          toggleButton={<FilterAltRoundedIcon className="text-[#023e8a] text-[20px]" />}
-          content={
-            <div className="p-4 w-[700px] bg-white border border-gray-300 shadow-lg space-y-2">
-              {filters.map((filter, index) => (
-                <div key={`filter-${index}`} className="flex justify-between items-center">
-                  <div className="flex space-x-3">
+            }
+          />
+          <DropDown
+            toggleButton={<FilterAltRoundedIcon className="text-[#023e8a] text-[20px]" />}
+            content={
+              <div className="p-4 w-[700px] bg-white border border-gray-300 shadow-lg space-y-2">
+                {filters.map((filter, index) => (
+                  <div key={`filter-${index}`} className="flex justify-between items-center">
+                    <div className="flex space-x-3">
+                      <Autocomplete
+                        value={capitalizeFirstLetter(filter.attrName || '')}
+                        suggestions={Object.keys(attrsByName).map(attrName => attrsByName[attrName].display)}
+                        style={{ width: 150, marginLeft: 5 }}
+                        onSubmit={(value) => handleModifyFilter(index, { attrName: value })}
+                      />
+                      <Autocomplete
+                        value={filter.action}
+                        suggestions={['contains']}
+                        style={{ width: 150, marginLeft: 5 }}
+                        onSubmit={(value) => handleModifyFilter(index, { action: value })}
+                      />
+                      <Autocomplete
+                        value={filter.option}
+                        suggestions={[...new Set(data.flatMap(item => item[filter.attrName ? filter.attrName : 0]))]}
+                        style={{ width: 150, marginLeft: 5 }}
+                        onSubmit={(value) => handleModifyFilter(index, { option: value })}
+                      />
+                    </div>
+                    <div>
+                    </div>
+                    <div >
+                      {
+                        filter.applied
+                          ? <PlayArrowRoundedIcon onClick={() => handleApplyFilter(index)} />
+                          : <PlayArrowOutlinedIcon onClick={() => handleApplyFilter(index)} />
+                      }
+                      <ClearRoundedIcon onClick={() => handleClearFilter(index)} />
+                    </div>
+                  </div>
+                ))}
+
+                <div className="flex justify-between items-center">
+                  <div className="flex">
                     <Autocomplete
-                      value={capitalizeFirstLetter(filter.attrName || '')}
+                      placeholder="column"
+                      value={capitalizeFirstLetter(addingFilter.attrName || '')}
                       suggestions={Object.keys(attrsByName).map(attrName => attrsByName[attrName].display)}
                       style={{ width: 150, marginLeft: 5 }}
-                      onSubmit={(value) => handleModifyFilter(index, { attrName: value })}
+                      onSubmit={(value) => {
+                        setAddingFilter({ ...addingFilter, attrName: value.toLowerCase() })
+                      }}
                     />
                     <Autocomplete
-                      value={filter.action}
+                      placeholder="action"
+                      value={addingFilter.action}
                       suggestions={['contains']}
                       style={{ width: 150, marginLeft: 5 }}
-                      onSubmit={(value) => handleModifyFilter(index, { action: value })}
+                      onSubmit={(value) => {
+                        setAddingFilter({ ...addingFilter, action: value as "contains" })
+                      }}
                     />
                     <Autocomplete
-                      value={filter.option}
-                      suggestions={[...new Set(data.flatMap(item => item[filter.attrName ? filter.attrName : 0]))]}
+                      placeholder="option"
+                      value={addingFilter.option}
+                      suggestions={
+                        addingFilter.attrName
+                          ? [...new Set(data.flatMap(item => {
+                            const attrName = addingFilter.attrName as string
+                            const key = item[attrName];
+                            return key !== undefined && key !== null ? key : [];
+                          }))]
+                          : []
+                      }
                       style={{ width: 150, marginLeft: 5 }}
-                      onSubmit={(value) => handleModifyFilter(index, { option: value })}
+                      onSubmit={(value) => {
+                        setAddingFilter({ ...addingFilter, option: value });
+                      }}
                     />
                   </div>
-                  <div>
-                  </div>
-                  <div >
-                    {
-                      filter.applied
-                        ? <PlayArrowRoundedIcon onClick={() => handleApplyFilter(index)} />
-                        : <PlayArrowOutlinedIcon onClick={() => handleApplyFilter(index)} />
+
+                  <AddRoundedIcon onClick={() => {
+                    if (!addingFilter.attrName) {
+                      setFilterError("Please add a filtered column");
+                      return;
                     }
-                    <ClearRoundedIcon onClick={() => handleClearFilter(index)} />
-                  </div>
-                </div>
-              ))}
 
-              <div className="flex justify-between items-center">
-                <div className="flex">
-                  <Autocomplete
-                    placeholder="column"
-                    value={capitalizeFirstLetter(addingFilter.attrName || '')}
-                    suggestions={Object.keys(attrsByName).map(attrName => attrsByName[attrName].display)}
-                    style={{ width: 150, marginLeft: 5 }}
-                    onSubmit={(value) => {
-                      setAddingFilter({ ...addingFilter, attrName: value.toLowerCase() })
-                    }}
-                  />
-                  <Autocomplete
-                    placeholder="action"
-                    value={addingFilter.action}
-                    suggestions={['contains']}
-                    style={{ width: 150, marginLeft: 5 }}
-                    onSubmit={(value) => {
-                      setAddingFilter({ ...addingFilter, action: value as "contains" })
-                    }}
-                  />
-                  <Autocomplete
-                    placeholder="option"
-                    value={addingFilter.option}
-                    suggestions={
-                      addingFilter.attrName
-                        ? [...new Set(data.flatMap(item => {
-                          const attrName = addingFilter.attrName as string
-                          const key = item[attrName];
-                          return key !== undefined && key !== null ? key : [];
-                        }))]
-                        : []
+                    if (filters.find(filter => (
+                      filter.attrName === addingFilter.attrName &&
+                      filter.action === addingFilter.action &&
+                      filter.option === addingFilter.option
+                    ))) {
+
+                      setFilterError("Already added this filter");
+                      return;
                     }
-                    style={{ width: 150, marginLeft: 5 }}
-                    onSubmit={(value) => {
-                      setAddingFilter({ ...addingFilter, option: value });
-                    }}
-                  />
+
+                    const newFilters = [...filters, { ...addingFilter, applied: true }]
+                    setFilters(newFilters);
+                    localStorage.setItem('filters', JSON.stringify(newFilters))
+                    setAddingFilter({ attrName: '', action: '', option: '' });
+                    setFilterError("");
+                  }} />
+
                 </div>
-
-                <AddRoundedIcon onClick={() => {
-                  if (!addingFilter.attrName) {
-                    setFilterError("Please add a filtered column");
-                    return;
-                  }
-
-                  if (filters.find(filter => (
-                    filter.attrName === addingFilter.attrName &&
-                    filter.action === addingFilter.action &&
-                    filter.option === addingFilter.option
-                  ))) {
-
-                    setFilterError("Already added this filter");
-                    return;
-                  }
-
-                  const newFilters = [...filters, { ...addingFilter, applied: true }]
-                  setFilters(newFilters);
-                  localStorage.setItem('filters', JSON.stringify(newFilters))
-                  setAddingFilter({ attrName: '', action: '', option: '' });
-                  setFilterError("");
-                }} />
-
+                <div className="filter-error text-red-500">
+                  {filterError}
+                </div>
               </div>
-              <div className="filter-error text-red-500">
-                {filterError}
-              </div>
+            }
+          />
+
+          <DropDown
+            toggleButton={<SettingsRoundedIcon className="text-[#023e8a] text-[20px]" />}
+            content={<div className="p-4 w-48 bg-white border border-gray-300 shadow-lg space-y-2">
+              <button onClick={exportToCSV} >Export to CSV</button>
+              <button onClick={exportToJSON} >Export to JSON</button>
             </div>
-          }
-        />
-
-        <DropDown
-          toggleButton={<SettingsRoundedIcon className="text-[#023e8a] text-[20px]" />}
-          content={<div className="p-4 w-48 bg-white border border-gray-300 shadow-lg space-y-2">
-            <button onClick={exportToCSV} >Export to CSV</button>
-            <button onClick={exportToJSON} >Export to JSON</button>
-          </div>
-          }
-        />
+            }
+          />
 
 
+        </div>
+        <div className="mx-[20px] italic">
+          {upToDate ? "All changes saved." : "Processing..."}
+        </div>
       </div>
+
+
 
       <div className="table-header grid text-[16px] p-1 border-b-[1px]"
         style={{

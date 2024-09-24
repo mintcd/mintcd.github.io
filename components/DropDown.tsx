@@ -26,7 +26,7 @@ export default function DropDown({
       </div>
 
       <div
-        className={`absolute z-[${zIndices.dropDown}] max-w-[100px] mt-2 w-full bg-white border border-gray-200 shadow-lg transition-all duration-300 ease-out 
+        className={`absolute z-[10] max-w-[100px] mt-2 w-full bg-white border border-gray-200 shadow-lg transition-all duration-300 ease-out 
           ${isOpen ? 'translate-y-0 opacity-100' : 'translate-y-[-10px] opacity-0 pointer-events-none'}`}
       >
         {content}

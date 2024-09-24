@@ -51,8 +51,6 @@ export default function Autocomplete({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (filteredSuggestions.length === 0) return;
-
     if (e.key === 'ArrowDown') {
       e.preventDefault();
       setActiveSuggestionIndex(prevIndex =>
@@ -64,14 +62,15 @@ export default function Autocomplete({
         prevIndex > 0 ? prevIndex - 1 : filteredSuggestions.length - 1
       );
     } else if (e.key === 'Enter') {
-      if (activeSuggestionIndex >= 0) {
+      e.preventDefault()
+      if (activeSuggestionIndex !== -1) {
         const selectedSuggestion = filteredSuggestions[activeSuggestionIndex];
         setInputValue(selectedSuggestion);
         setFilteredSuggestions([]);
         setActiveSuggestionIndex(-1);
-        if (onSubmit) onSubmit(selectedSuggestion); // Call onSubmit with the selected value
-      } else if (freeSolo && inputValue) {
-        if (onSubmit) onSubmit(inputValue); // Submit even if it's a free text input
+        onSubmit(selectedSuggestion)
+      } else if (freeSolo) {
+        if (inputValue && inputValue.length !== 0) onSubmit(inputValue);
       }
     }
   };
@@ -121,7 +120,7 @@ export default function Autocomplete({
 
       {focused && (
         <ul
-          className={`absolute z-[1000] bg-white border rounded mt-1 w-full max-h-[${maxDisplay ? maxDisplay : 10}rem] overflow-y-auto`}
+          className={`absolute z-[1000] bg-white rounded mt-1 min-w-[150px] max-h-[${maxDisplay ? maxDisplay : 10}rem] overflow-y-auto`}
         >
           {filteredSuggestions.map((suggestion, index) => (
             <li

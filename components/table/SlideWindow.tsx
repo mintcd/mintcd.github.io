@@ -17,7 +17,7 @@ export default function SlidingDrawer({
     <div
       ref={drawerRef}
       className={`slide-window fixed ${isOpen ? 'right-0' : 'right-[-100%]'} w-[40vw] h-[80vh] 
-       duration-500 ease-in-out rounded-md bg-slate-100 z-[${zIndices.tableSideWindow}]`}
+       duration-500 ease-in-out rounded-md bg-slate-100 z-[100]`}
     >
       <CloseFullscreenIcon
         style={{ transform: 'rotate(90deg)', fontSize: '16px' }}

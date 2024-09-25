@@ -2,11 +2,9 @@ import React from 'react';
 import Latex from 'react-latex-next';
 import 'katex/dist/katex.min.css';
 
-interface MyLatexProps {
-  children: string | string[];
-}
-
-const MyLatex: React.FC<MyLatexProps> = ({ children }) => {
+const MyLatex = ({ children }: {
+  children: string
+}) => {
   const macros: { [key: string]: string } = {
     "\\EE": "\\mathbb{E}",
     "\\NN": "\\mathbb{N}",
@@ -25,20 +23,17 @@ const MyLatex: React.FC<MyLatexProps> = ({ children }) => {
     "\\L": "\\mathcal{L}",
     "\\P": "\\mathcal{P}",
     "\\T": "\\mathcal{T}",
+    "\\X": "\\mathcal{X}",
+    "\\Y": "\\mathcal{Y}",
 
     "\\d": "\\mathrm{d}",
 
     "\\1": "\\mathbf{1}"
   };
 
-  // Ensure children is an array
-  const childrenArray = Array.isArray(children) ? children : [children];
-
   return (
     <div className='latex-container font-modern text-[14px]'>
-      {childrenArray.map((child, index) => (
-        <Latex key={index} macros={macros}>{child}</Latex>
-      ))}
+      <Latex macros={macros}>{children}</Latex>
     </div>
   );
 };

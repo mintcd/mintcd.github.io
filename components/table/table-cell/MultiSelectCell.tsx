@@ -4,13 +4,13 @@ import Autocomplete from '@components/autocomplete/Autocomplete';
 import { useState } from 'react';
 import { useClickAway } from "@uidotdev/usehooks";
 
-export default function MultiSelectCell({ itemId, attr, values, handleUpdate, autocompleteItems }:
+export default function MultiSelectCell({ itemId, attr, values, onUpdate, suggestions }:
   {
     itemId: number
     attr: AttrProps
     values: string[],
-    handleUpdate: (itemId: number, attr: string, value: string[]) => Promise<void>
-    autocompleteItems: string[]
+    onUpdate: (itemId: number, attr: string, value: string[]) => void
+    suggestions: string[]
   }
 ) {
   const [cellState, setCellState] = useState("noEdit");
@@ -40,7 +40,7 @@ export default function MultiSelectCell({ itemId, attr, values, handleUpdate, au
             onClick={handleTagClick}
             onClose={(e) => {
               e.stopPropagation(); // Prevent event from reaching the parent
-              handleUpdate(itemId, attr.name, values.filter((_, i) => i !== index));
+              onUpdate(itemId, attr.name, values.filter((_, i) => i !== index));
             }}
           />
         ))
@@ -52,10 +52,10 @@ export default function MultiSelectCell({ itemId, attr, values, handleUpdate, au
           autoFocus
           style={{ border: 'none' }}
           freeSolo
-          suggestions={autocompleteItems}
+          suggestions={suggestions}
           onSubmit={(newValue) => {
             if (newValue && cellState === 'editing') {
-              handleUpdate(itemId, attr.name, [...values, newValue]);
+              onUpdate(itemId, attr.name, [...values, newValue]);
               setCellState('noEdit');
               setEditingValue('');
             }

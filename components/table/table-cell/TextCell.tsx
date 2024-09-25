@@ -1,21 +1,29 @@
 import Latex from "@components/latex";
+import { useClickAway } from "@uidotdev/usehooks";
 import { useEffect, useRef, useState } from "react";
 
 export default function TextCell({
   itemId,
   attr,
   value,
-  handleUpdate,
+  onUpdate,
 }: {
   itemId: number;
-  attr: string;
+  attr: AttrProps;
   value: string;
-  handleUpdate: (itemId: number, attrName: string, value: string) => Promise<void>;
+  onUpdate: (itemId: number, attrName: string, value: string) => void;
 }) {
   const [cellState, setCellState] = useState('noEdit');
   const [editingValue, setEditingValue] = useState(value);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const ref = useClickAway(() => {
+    if (cellState === 'editing') {
+      setCellState('noEdit');
+      if (editingValue.length > 0) onUpdate(itemId, attr.name, editingValue);
+    }
+  }) as any;
 
   useEffect(() => {
     if (cellState === 'editing' && textareaRef.current) {
@@ -33,7 +41,7 @@ export default function TextCell({
   }, [editingValue]);
 
   return (
-    <div className={`text-cell h-full ${attr !== 'id' && 'w-full'} overflow-hidden`}>
+    <div className={`text-cell h-full ${attr.name !== 'id' && 'w-full'} overflow-hidden`} ref={ref}>
       {cellState === 'noEdit' && (
         <div
           className="h-full min-h-[1.75rem] flex items-center cursor-pointer"
@@ -57,12 +65,11 @@ export default function TextCell({
                 e.preventDefault();
                 setEditingValue(editingValue + '\n');
               } else {
-                handleUpdate(itemId, attr, editingValue);
+                onUpdate(itemId, attr.name, editingValue);
                 setCellState("noEdit");
               }
             }
           }}
-          onBlur={() => setCellState('noEdit')}
         />
       )}
     </div>

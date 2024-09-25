@@ -18,8 +18,23 @@ export default function DatabaseUI({ table }: {
 
   async function handleCreate() {
     setUpToDate(false)
-    await createItem(table, data, attrs).then((createdItem) => {
-      setData([...data, createdItem])
+    const currentIds = data.map(item => item.id).sort((x: number, y: number) => x - y);
+    let newId = 1;
+
+    // Find the first gap or use the next sequential ID
+    for (let i = 0; i < currentIds.length; i++) {
+      if (currentIds[i] > newId) break
+      newId += 1
+    }
+
+    const createdItem: DataItem = { id: newId }
+    for (const attr of attrs) {
+      if (attr.name == 'id') continue
+      createdItem[attr.name] = attr.type === 'multiselect' ? [] : ''
+    }
+    setData([...data, createdItem])
+
+    await createItem(table, data, attrs).then(() => {
       setUpToDate(true)
     })
   }
@@ -27,16 +42,16 @@ export default function DatabaseUI({ table }: {
   const handleUpdate = useCallback(async (itemId: number, attrName: string, value: number | string | string[]) => {
     setUpToDate(false)
     if (!authorized) return;
-    await updateItem(table, itemId, { [attrName]: value }).then(() => {
-      const index = data.findIndex(item => item.id === itemId); // Find the correct index based on itemId
+    const index = data.findIndex(item => item.id === itemId); // Find the correct index based on itemId
 
-      if (index !== -1) {
-        // Create a new array with the updated item
-        const updatedData = data.map((item, i) =>
-          i === index ? { ...item, [attrName]: value } : item
-        );
-        setData(updatedData); // Update the state with the new array
-      }
+    if (index !== -1) {
+      // Create a new array with the updated item
+      const updatedData = data.map((item, i) =>
+        i === index ? { ...item, [attrName]: value } : item
+      );
+      setData(updatedData); // Update the state with the new array
+    }
+    await updateItem(table, itemId, { [attrName]: value }).then(() => {
       setUpToDate(true)
     });
 
@@ -45,20 +60,20 @@ export default function DatabaseUI({ table }: {
   async function handleExchange(id1: number, id2: number) {
     setUpToDate(false)
     if (!authorized) return;
+    setData(prevData => {
+      const newData = prevData.map(item => {
+        if (item.id === id1) {
+          return { ...item, id: id2 };
+        }
+        if (item.id === id2) {
+          return { ...item, id: id1 };
+        }
+        return item;
+      });
+      return newData.sort((x, y) => x.id - y.id);
+    });
 
     await exchangeItems(table, id1, id2).then(() => {
-      setData(prevData => {
-        const newData = prevData.map(item => {
-          if (item.id === id1) {
-            return { ...item, id: id2 }; // Update item with id1 to have id2
-          }
-          if (item.id === id2) {
-            return { ...item, id: id1 }; // Update item with id2 to have id1
-          }
-          return item; // Return item unchanged if neither id matches
-        });
-        return newData.sort((x, y) => x.id - y.id);
-      });
       setUpToDate(true)
     });
   }

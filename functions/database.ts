@@ -78,16 +78,12 @@ export async function createItem(table: string, data: DataItem[], attrProps: Att
     createdItem[attr.name] = attr.type === 'multiselect' ? [] : ''
   }
 
-  console.log(createdItem, currentIds)
-
   // Insert the new item with the smallest available ID
   const { error } = await supabase.from(table).insert(createdItem);
 
   if (error) {
     console.error('Error inserting item:', error);
   }
-
-  return createdItem
 }
 
 export function sortData(data: DataItem[], attrName: string, direction: 'asc' | 'desc' | 'none') {

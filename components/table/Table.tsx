@@ -5,12 +5,10 @@ import './table.css'
 
 import { getTextWidth, capitalizeFirstLetter } from "@functions/text-analysis";
 import { sortData } from "@functions/database";
+import { exportToCSV, exportToJSON } from "@functions/document"
 
 import ColumnSeparator from "./ColumnSeparator";
 import MenuIcon from "./MenuIcon";
-import MultiselectCell from "./MultiSelectCell";
-import TextCell from "./TextCell";
-import SlideWindow from './SlideWindow';
 import DropDown from "@components/DropDown";
 import Autocomplete from "@components/autocomplete/Autocomplete";
 import Checkbox from "@components/checkbox/Checkbox";
@@ -18,8 +16,6 @@ import Checkbox from "@components/checkbox/Checkbox";
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import NavigateNextRoundedIcon from '@mui/icons-material/NavigateNextRounded';
 import NavigateBeforeRoundedIcon from '@mui/icons-material/NavigateBeforeRounded';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import ViewColumnRoundedIcon from '@mui/icons-material/ViewColumnRounded';
 import ArrowDownwardRoundedIcon from '@mui/icons-material/ArrowDownwardRounded';
 import FilterAltRoundedIcon from '@mui/icons-material/FilterAltRounded';
@@ -30,6 +26,7 @@ import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
 import ClearRoundedIcon from '@mui/icons-material/ClearRounded';
 import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
+import TableRow from "./table-row/TableRow";
 
 type FilterProp = {
   attrName?: string,
@@ -44,14 +41,13 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     upToDate?: boolean,
     data: DataItem[],
     attrs: AttrProps[],
-    onUpdateCell: (itemId: number, attrName: string, value: number | string | string[]) => Promise<void>,
-    onCreateItem: () => Promise<void>,
-    onExchangeItems: (id1: number, id2: number) => Promise<void>
+    onUpdateCell: (itemId: number, attrName: string, value: number | string | string[]) => void,
+    onCreateItem: () => void,
+    onExchangeItems: (id1: number, id2: number) => void
   }) {
 
   // Constants
   const cellMinWidth = 100
-  const newWindowsNeeded = attrs.some((attr) => attr.newWindow)
   const itemsPerPage = 10;
 
   // States and Refs
@@ -68,14 +64,16 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
         hidden: false,
         display: capitalizeFirstLetter(attr.name),
         sort: 'none',
-      };
+        suggestions: Array.from(new Set(data.flatMap(item => attr.referencing
+          ? item[attr.referencing]
+          : item[attr.name])))
+          .sort()
+      }
     })
     return attrsByName;
   })
 
-  const [focusedCell, setFocusedCell] = useState({ itemId: -1, attrName: '' })
   const [draggedItemId, setDraggedItemId] = useState(-1);
-  const [hoveredItem, setHoveredItem] = useState(-1)
   const [focusedHeader, setFocusedHeader] = useState(-1);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState<DataItem | null>(null);
@@ -101,7 +99,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
   const orderedAttrs = useMemo(() => {
     return Object.keys(attrsByName)
       .map((attrName) => attrsByName[attrName])
-      .filter(attr => !attr.hidden && attr.newWindow === false)
+      .filter(attr => !attr.hidden)
       .sort((x, y) => (x.order && y.order ? x.order - y.order : 0));
   }, [attrsByName]);
 
@@ -110,27 +108,9 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
   const paginatedData = processedData.slice(startIndex, endIndex);
   const totalPages = useMemo(() => {
     return Math.ceil(processedData.length / itemsPerPage);
-  }, [data]);
+  }, [processedData]);
 
   // Handlers
-  const handleDragStart = (id: number) => {
-    setDraggedItemId(id);
-  };
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault(); // Prevent default to allow dropping
-  };
-
-  const handleDrop = (targetId: number) => {
-    if (draggedItemId !== null && draggedItemId !== targetId) {
-      // console.log(`Reordering from ${draggedItemId} to ${targetId}`);
-
-      onExchangeItems(draggedItemId, targetId)
-      setDraggedItemId(-1); // Reset dragged item
-    }
-  };
-
-
   function handleModifyFilter(
     filterIndex: number,
     attr: { attrName?: string; option?: string; action?: string; applied?: boolean }
@@ -172,30 +152,6 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
 
     setProcessedData(sortData(data, attrName, nextState));
   }
-
-
-  const exportToCSV = () => {
-    const headers = orderedAttrs.map(attr => attr.display).join(',');
-    const rows = data.map(item => orderedAttrs.map(attr => `"${item[attr.name] || ''}"`).join(',')).join('\n');
-    const csvContent = `data:text/csv;charset=utf-8,${headers}\n${rows}`;
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `${name || 'data'}.csv`);
-    document.body.appendChild(link);
-    link.click();
-  };
-
-  // Export data to JSON
-  const exportToJSON = () => {
-    const jsonContent = JSON.stringify(data, null, 2);
-    const blob = new Blob([jsonContent], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${name || 'data'}.json`;
-    link.click();
-  };
 
   function handleColumnAppearance(columnName: string) {
     const newAttrsByName = { ...attrsByName }
@@ -313,28 +269,6 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
 
   return (
     <div className="table-container flex flex-col h-auto shadow-md">
-      <SlideWindow
-        onClose={handleCloseDrawer}
-        isOpen={drawerOpen}
-      >
-        {attrs.filter(attr => attr.newWindow === true).map((newWindowAttr, index) =>
-          <div key={index}>
-            {
-              currentItem &&
-              <div className="bg-[#6ca0e5] my-3 rounded-md p-2 text-gray-800">
-                <span className="text-[16px]">{attrsByName[newWindowAttr.name].display}</span>
-                <TextCell
-                  itemId={currentItem.id}
-                  attr={newWindowAttr.name}
-                  value={currentItem[newWindowAttr.name]}
-                  handleUpdate={onUpdateCell}
-                />
-              </div>
-            }
-          </div>
-        )}
-      </SlideWindow>
-
       <div className="table-meta-header flex justify-between">
         <div className="table-option-container flex space-x-3">
           <DropDown
@@ -358,8 +292,8 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
           <DropDown
             toggleButton={<Download className="text-[#023e8a] text-[20px]" />}
             content={<div className="p-4 w-48 bg-white border border-gray-300 shadow-lg space-y-2">
-              <button onClick={exportToCSV} >Export to CSV</button>
-              <button onClick={exportToJSON} >Export to JSON</button>
+              <button onClick={() => exportToCSV(Object.keys(orderedAttrs), data, name)} >Export to CSV</button>
+              <button onClick={() => exportToJSON(data, name)} >Export to JSON</button>
             </div>
             }
           />
@@ -384,7 +318,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
                       />
                       <Autocomplete
                         value={filter.option}
-                        suggestions={[...new Set(data.flatMap(item => item[filter.attrName ? filter.attrName : 0]))]}
+                        suggestions={[...new Set(data.flatMap(item => item[filter.attrName ? filter.attrName : 0]))].sort()}
                         style={{ width: 150, marginLeft: 5 }}
                         onSubmit={(value) => handleModifyFilter(index, { option: value })}
                       />
@@ -474,8 +408,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
           <DropDown
             toggleButton={<SettingsRoundedIcon className="text-[#023e8a] text-[20px]" />}
             content={<div className="p-4 w-48 bg-white border border-gray-300 shadow-lg space-y-2">
-              <button onClick={exportToCSV} >Export to CSV</button>
-              <button onClick={exportToJSON} >Export to JSON</button>
+
             </div>
             }
           />
@@ -487,16 +420,15 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
         </div>
       </div>
 
-
-
       <div className="table-header grid text-[16px] p-1 border-b-[1px]"
         style={{
-          gridTemplateColumns: orderedAttrs
-            .map((attr) => `${attr.width}px`)
+          gridTemplateColumns: ['100px', ...orderedAttrs
+            .map((attr) => `${attr.width}px`)]
             .join(' ')
         }}>
+        <div></div>
         {
-          orderedAttrs.map((attr, index) =>
+          orderedAttrs.filter(attr => attr.newWindow === false).map((attr, index) =>
             <div
               key={index}
               className="table-header-cell py-2 flex justify-between items-center relative"
@@ -561,67 +493,9 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
 
       <div className="table-body text-[14px] text-gray-800">
         {paginatedData.map((item) => (
-          <div
-            key={item.id}
-            className={`table-item grid py-[10px]`}
-            style={{
-              gridTemplateColumns: orderedAttrs.map((attr) => `${attr.width}px`).join(' '),
-            }}
-            onMouseEnter={() => setHoveredItem(item.id)}
-            onMouseLeave={() => setHoveredItem(-1)}
-          >
-            {orderedAttrs.map((attr, cellIndex) => (
-              <div
-                key={cellIndex}
-                className={`cell-container px-3 flex items-center justify-between 
-                  w-${Math.max(attr.width || 0, cellMinWidth)}px 
-                  transition duration-200
-                  ${focusedCell.itemId === item.id && focusedCell.attrName === attr.name ? 'border-2 border-blue-400 shadow-lg' : 'border border-transparent'}`}
-                onClick={() => setFocusedCell({ itemId: item.id, attrName: attr.name })}
-                draggable
-                onDragOver={handleDragOver}
-                onDrop={() => handleDrop(item.id)}
-                onDragStart={() => handleDragStart(item.id)}
-              >
-                {attr.type === 'multiselect' ? (
-                  <MultiselectCell
-                    itemId={item.id}
-                    attr={attr}
-                    values={item[attr.name]}
-                    autocompleteItems={Array.from(new Set(data.flatMap(item => attr.referencing ? item[attr.referencing] : item[attr.name])))}
-                    handleUpdate={onUpdateCell}
-                  />
-                ) : (
-                  <TextCell
-                    itemId={item.id}
-                    attr={attr.name}
-                    value={item[attr.name]}
-                    handleUpdate={onUpdateCell}
-                  />
-                )}
-                {attr.name === 'id' && hoveredItem === item.id && (
-                  <span>
-                    <DragIndicatorIcon
-                      className="text-[18px] hover:cursor-grab"
-                      onMouseDown={(e) => {
-                        e.preventDefault(); // Prevent text selection
-                        handleDragStart(item.id); // Start drag on mouse down
-                      }}
-                    />
-                    {newWindowsNeeded && (
-                      <OpenInNewIcon
-                        className="text-[18px] hover:cursor-pointer"
-                        onClick={() => handleOpenWindow(item.id)}
-                      />
-                    )}
-                  </span>
-                )}
-              </div>
-            ))}
-          </div>
+          <TableRow item={item} attrs={orderedAttrs} onUpdate={onUpdateCell} onExchangeItems={onExchangeItems} />
         ))}
       </div>
-
 
       <div className="table-footer flex items-center justify-between text-[#023e8a]">
         <AddRoundedIcon className={` cursor-pointer text-[20px]`}

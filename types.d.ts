@@ -4,15 +4,16 @@ type JsonObject<dataType> = {
 
 type AttrProps = {
     name: string,
-    useLatex?: boolean,
-    type?: string,
-    referencing?: string,
-    width: number,
-    order: number,
-    newWindow: boolean,
-    hidden?: boolean,
+    type: 'text' | 'multiselect',
     display: string,
-    sort?: 'none' | 'asc' | 'desc'
+    useLatex?: boolean,
+    referencing?: string,
+    width?: number,
+    order?: number,
+    newWindow?: boolean,
+    hidden?: boolean,
+    sort?: 'none' | 'asc' | 'desc',
+    suggestions?: string[]
 }
 
 type DataItem = {

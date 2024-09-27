@@ -13,7 +13,7 @@ import DropDown from "@components/DropDown";
 import Autocomplete from "@components/autocomplete/Autocomplete";
 import Checkbox from "@components/checkbox/Checkbox";
 
-import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import { AddRounded } from '@mui/icons-material';
 import NavigateNextRoundedIcon from '@mui/icons-material/NavigateNextRounded';
 import NavigateBeforeRoundedIcon from '@mui/icons-material/NavigateBeforeRounded';
 import ViewColumnRoundedIcon from '@mui/icons-material/ViewColumnRounded';
@@ -73,9 +73,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     return attrsByName;
   })
 
-  const [draggedItemId, setDraggedItemId] = useState(-1);
   const [focusedHeader, setFocusedHeader] = useState(-1);
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState<DataItem | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [processedData, setProcessedData] = useState(data)
@@ -160,18 +158,6 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     localStorage.setItem('attrsByName', JSON.stringify(newAttrsByName))
   }
 
-  const handleOpenWindow = (itemId: number) => {
-    const selectedItem = data.find(item => item.id === itemId);
-    if (selectedItem) {
-      setCurrentItem(selectedItem);
-      setDrawerOpen(true);
-    }
-  };
-
-  const handleCloseDrawer = () => {
-    setDrawerOpen(false);
-  };
-
   const handleMouseDown = (e: React.MouseEvent, attrName: string) => {
     resizingRef.current.startX = e.clientX;
     resizingRef.current.startWidth = attrsByName[attrName].width || 150;
@@ -181,7 +167,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     document.addEventListener('mouseup', handleMouseUp);
   };
 
-  const handleMouseMove = (e: MouseEvent) => {
+  const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!animationFrameRef.current) {
       animationFrameRef.current = requestAnimationFrame(() => {
         const { startX, startWidth, attrName } = resizingRef.current;
@@ -195,7 +181,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
         animationFrameRef.current = null;
       });
     }
-  };
+  }, [attrsByName]);
 
   const handleMouseUp = useCallback(() => {
     document.removeEventListener('mousemove', handleMouseMove);
@@ -204,7 +190,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
 
     localStorage.setItem('attrsByName', JSON.stringify(attrsByName));
 
-  }, []);
+  }, [attrsByName, handleMouseMove]);
 
   const handleColumnDragStart = (e: React.DragEvent<HTMLDivElement>, draggedName: string) => {
     e.dataTransfer.setData('text/plain', draggedName);
@@ -265,7 +251,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     })
     setProcessedData(sortData(processedData, sorting.attrName, sorting.direction));
     setCurrentItem(data.find(item => currentItem && item.id === currentItem.id) as DataItem);
-  }, [data, sorting, filters]);
+  }, [data, currentItem, sorting, filters]);
 
   return (
     <div className="table-container flex flex-col h-auto shadow-md">
@@ -374,7 +360,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
                     />
                   </div>
 
-                  <AddRoundedIcon onClick={() => {
+                  <AddRounded onClick={() => {
                     if (!addingFilter.attrName) {
                       setFilterError("Please add a filtered column");
                       return;
@@ -432,7 +418,6 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
             <div
               key={index}
               className="table-header-cell py-2 flex justify-between items-center relative"
-              style={{ width: `${Math.max(attr.width || 0, cellMinWidth)}px` }}
               onMouseEnter={() => setFocusedHeader(index)}
             >
               <div className="flex-grow"
@@ -493,12 +478,12 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
 
       <div className="table-body text-[14px] text-gray-800">
         {paginatedData.map((item) => (
-          <TableRow item={item} attrs={orderedAttrs} onUpdate={onUpdateCell} onExchangeItems={onExchangeItems} />
+          <TableRow key={item.id} item={item} attrs={orderedAttrs} onUpdate={onUpdateCell} onExchangeItems={onExchangeItems} />
         ))}
       </div>
 
       <div className="table-footer flex items-center justify-between text-[#023e8a]">
-        <AddRoundedIcon className={` cursor-pointer text-[20px]`}
+        <AddRounded className={` cursor-pointer text-[20px]`}
           onClick={onCreateItem} />
         <div className="pagination-controls flex items-center justify-end">
           <NavigateBeforeRoundedIcon

@@ -189,7 +189,7 @@ export default function KnowledgeGraph({ graphData }: { graphData: Graph }) {
       graph.selectAll('*').remove();
       simulation.stop();
     };
-  }, [graphRendered, selectedField]);
+  }, [edges, vertices, selectedNode, params, graphRendered, selectedField]);
 
   useZoomBehavior(select(containerRef.current as SVGElement));
 
@@ -202,7 +202,7 @@ export default function KnowledgeGraph({ graphData }: { graphData: Graph }) {
           return selectedNode !== undefined && v.name === selectedNode.name ? 1 : 0.7;
         });
     }
-  }, [selectedNode, graphRendered]);
+  }, [vertices, selectedNode, graphRendered]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

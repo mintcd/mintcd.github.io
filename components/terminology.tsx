@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import { GoSearch } from 'react-icons/go';
 import Fuse from 'fuse.js';
@@ -75,17 +75,17 @@ export default function Terminology({ data, field }: { data: Term[], field?: Fie
     setFilteredTerms(filtered)
   }
 
-  function filterOnTopic() {
+  const filterOnTopic = useCallback(() => {
     if (selectedField === 'all-fields') {
       setFilteredTerms(data);
     } else {
       setFilteredTerms(data.filter(term => term.fields.includes(selectedField)));
     }
-  }
+  }, [data, selectedField])
 
   useEffect(() => {
     filterOnTopic()
-  }, [selectedField, data]);
+  }, [filterOnTopic]);
 
   return (
     <div className='max-w-6xl mx-auto px-4 py-8'>

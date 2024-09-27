@@ -97,7 +97,7 @@ export default function DatabaseUI({ table }: {
       setLoading(false)
 
     })
-  }, []);
+  }, [table]);
 
   if (loading) {
     return <CircularProgress />;

@@ -3,12 +3,12 @@ import { useState } from "react";
 import { useClickAway } from "@uidotdev/usehooks";
 import { DragIndicatorOutlined, UnfoldMoreRounded, UnfoldLessRounded } from "@mui/icons-material";
 import TextCell from "../table-cell/TextCell";
+import { Divider } from "@mui/material";
 
-export default function TableRow({ item, attrs, cellMinWidth = 150, onUpdate, onExchangeItems }:
+export default function TableRow({ item, attrs, onUpdate, onExchangeItems }:
   {
     item: DataItem,
     attrs: AttrProps[],
-    cellMinWidth?: number,
     onUpdate: (itemId: number, attr: string, value: string | string[]) => void,
     onExchangeItems: (id1: number, id2: number) => void,
   }
@@ -20,6 +20,7 @@ export default function TableRow({ item, attrs, cellMinWidth = 150, onUpdate, on
   const [draggingItemId, setDraggingItemId] = useState<number | null>(null); // Track which item is being dragged
   const ref = useClickAway(() => {
     setFocusedCell(-1);
+    setExpanded(false)
   }) as any;
 
   // Handlers
@@ -40,7 +41,6 @@ export default function TableRow({ item, attrs, cellMinWidth = 150, onUpdate, on
     if (draggedItemId !== targetId) {
       onExchangeItems(draggedItemId, targetId); // Call the provided function to exchange items
     }
-    handleDragEnd(); // Reset the dragging state
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLElement>) => {
@@ -64,7 +64,7 @@ export default function TableRow({ item, attrs, cellMinWidth = 150, onUpdate, on
         key={item.id}
         className={`-table-row grid py-[10px] hover:border-gray-300`}
         style={{
-          gridTemplateColumns: ['100px', ...attrs.map((attr) => `${Math.max(attr.width || 0, cellMinWidth)}px`)].join(' '),
+          gridTemplateColumns: ['100px', ...attrs.map((attr) => `${Math.max(attr.width || 0)}px`)].join(' '),
         }}
       >
         <div className="flex items-center justify-end">
@@ -100,8 +100,7 @@ export default function TableRow({ item, attrs, cellMinWidth = 150, onUpdate, on
         {attrs.filter(attr => !attr.newWindow).map((attr, cellIndex) => (
           <div
             key={cellIndex}
-            className={`cell-container px-3 flex items-center justify-between 
-            w-${Math.max(attr.width || 0, cellMinWidth)}px 
+            className={`cell-container px-3 flex items-center justify-between
             transition duration-200
             ${focusedCell === cellIndex ? 'border-2 border-blue-400 shadow-lg' : 'border border-transparent'}`}
             onClick={() => setFocusedCell(focusedCell !== cellIndex ? cellIndex : -1)}
@@ -117,16 +116,14 @@ export default function TableRow({ item, attrs, cellMinWidth = 150, onUpdate, on
         ))}
       </div>
 
-      {/* Expandable Area */}
-      <div className={`transition-all duration-300 ease-in-out overflow-hidden max-h-0 ${expanded ? 'max-h-[500px] opacity-100 translate-y-0' : 'opacity-0 translate-y-[-10px]'}`}>
-        <div className="expand-window rounded-md ml-[100px] mr-[50px]">
-          {attrs.filter(attr => attr.newWindow).map(attr => (
-            <div className="my-2" key={attr.name}>
-              <div className="text-[16px]">{attr.display}</div>
-              <TextCell itemId={item.id} attr={attr} value={item[attr.name]} onUpdate={onUpdate} />
-            </div>
-          ))}
-        </div>
+      <div className={`expand-window transition-all duration-300 ease-in-out overflow-hidden rounded-md ml-[100px] mr-[50px] max-h-0
+        ${expanded ? 'max-h-[500px] opacity-100 translate-y-0' : 'opacity-0 translate-y-[-10px]'}`}>
+        {attrs.filter(attr => attr.newWindow).map(attr => (
+          <div className="my-2" key={attr.name}>
+            <TextCell itemId={item.id} attr={attr} value={item[attr.name]} onUpdate={onUpdate} />
+            <Divider />
+          </div>
+        ))}
       </div>
     </div>
   );

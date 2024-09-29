@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
+import { filterOnQuery } from '@functions/text-analysis'
 import { GoSearch } from 'react-icons/go';
 import Fuse from 'fuse.js';
 import Latex from '@components/latex';
@@ -54,25 +55,8 @@ export default function Terminology({ data, field }: { data: Term[], field?: Fie
     if (query === '') {
       filterOnTopic()
     } else {
-      filterOnQuery(query);
+      setFilteredTerms(filterOnQuery(query, filteredTerms));
     }
-
-  }
-
-  function filterOnQuery(query: string) {
-    let filtered = filteredTerms.filter(term => {
-      if (query.trim()) {
-        const fuse = new Fuse([term], {
-          keys: ['name'],
-          includeScore: true,
-          threshold: 0.5,
-        });
-        const results = fuse.search(query);
-        return results.length > 0;
-      }
-      return true;
-    });
-    setFilteredTerms(filtered)
   }
 
   const filterOnTopic = useCallback(() => {

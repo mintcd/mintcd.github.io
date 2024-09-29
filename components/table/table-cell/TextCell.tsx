@@ -14,6 +14,7 @@ export default function TextCell({
   onUpdate: (itemId: number, attrName: string, value: string) => void;
 }) {
   const [cellState, setCellState] = useState('noEdit');
+  const [oldValue, setOldValue] = useState(value);
   const [editingValue, setEditingValue] = useState(value);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -21,9 +22,17 @@ export default function TextCell({
   const ref = useClickAway(() => {
     if (cellState === 'editing') {
       setCellState('noEdit');
-      if (editingValue.length > 0) onUpdate(itemId, attr.name, editingValue);
+      handleUpdate()
     }
   }) as any;
+
+  function handleUpdate() {
+    if (editingValue !== oldValue) {
+      onUpdate(itemId, attr.name, editingValue);
+      setOldValue(editingValue)
+    }
+    setCellState("noEdit");
+  }
 
   useEffect(() => {
     if (cellState === 'editing' && textareaRef.current) {
@@ -41,12 +50,13 @@ export default function TextCell({
   }, [editingValue]);
 
   return (
-    <div className={`text-cell h-full ${attr.name !== 'id' && 'w-full'} overflow-hidden`} ref={ref}>
+    <div className={`table-text-cell h-full ${attr.name !== 'id' && 'w-full'} overflow-hidden`} ref={ref}>
       {cellState === 'noEdit' && (
         <div
           className="h-full min-h-[1.75rem] flex items-center cursor-pointer"
           onClick={() => {
             setCellState("editing");
+            setOldValue(value)
             setEditingValue(value);
           }}
         >
@@ -65,8 +75,7 @@ export default function TextCell({
                 e.preventDefault();
                 setEditingValue(editingValue + '\n');
               } else {
-                onUpdate(itemId, attr.name, editingValue);
-                setCellState("noEdit");
+                handleUpdate()
               }
             }
           }}

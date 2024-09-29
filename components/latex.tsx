@@ -2,40 +2,22 @@ import React from 'react';
 import Latex from 'react-latex-next';
 import 'katex/dist/katex.min.css';
 
-const MyLatex = ({ children }: {
-  children: string
-}) => {
-  const macros: { [key: string]: string } = {
-    "\\EE": "\\mathbb{E}",
-    "\\NN": "\\mathbb{N}",
-    "\\PP": "\\mathbb{P}",
-    "\\QQ": "\\mathbb{Q}",
-    "\\RR": "\\mathbb{R}",
-    "\\VV": "\\mathbb{V}",
+export default function MyLatex({ children }: { children: string }) {
 
-    "\\B": "\\mathcal{B}",
-    "\\C": "\\mathcal{C}",
-    "\\D": "\\mathcal{D}",
-    "\\E": "\\mathcal{E}",
-    "\\F": "\\mathcal{F}",
-    "\\G": "\\mathcal{G}",
-    "\\I": "\\mathcal{I}",
-    "\\L": "\\mathcal{L}",
-    "\\P": "\\mathcal{P}",
-    "\\T": "\\mathcal{T}",
-    "\\X": "\\mathcal{X}",
-    "\\Y": "\\mathcal{Y}",
+  const alphabet: string[] = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i));
+  const macros: Record<string, string> = {}
 
-    "\\d": "\\mathrm{d}",
+  alphabet.forEach(letter => {
+    macros[`\\${letter}${letter}`] = `\\mathbb{${letter}}`;
+    macros[`\\${letter}`] = `\\mathcal{${letter}}`;
+  });
 
-    "\\1": "\\mathbf{1}"
-  };
+  // Preprocess the input string to handle newlines
+  const preprocessedChildren = children.replace(/\n/g, '<br/>'); // Replace '\n' with LaTeX line break '\\'
 
   return (
     <div className='latex-container font-modern text-[14px]'>
-      <Latex macros={macros}>{children}</Latex>
+      <Latex macros={macros}>{String(preprocessedChildren)}</Latex>
     </div>
   );
 };
-
-export default MyLatex;

@@ -33,5 +33,6 @@ module.exports = {
       },
     },
   },
+  blocklist: ['table-header-group', 'table-row'],
   darkMode: 'class',
 }

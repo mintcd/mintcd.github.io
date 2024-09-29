@@ -52,7 +52,7 @@ export default function TableRow({ item, attrs, onUpdate, onExchangeItems }:
 
   return (
     <div
-      className={`${draggedOver && 'border-2 border-blue-400'} transition-all duration-200 ease-in-out`} // Smooth visual feedback for dragging
+      className={`table-row ${draggedOver && 'border-2 border-blue-400'} transition-all duration-200 ease-in-out`} // Smooth visual feedback for dragging
       onDrop={(e) => handleDrop(e, item.id)}
       onDragOver={handleDragOver}
       onDragLeave={() => setDraggedOver(false)}
@@ -120,6 +120,7 @@ export default function TableRow({ item, attrs, onUpdate, onExchangeItems }:
         ${expanded ? 'max-h-[500px] opacity-100 translate-y-0' : 'opacity-0 translate-y-[-10px]'}`}>
         {attrs.filter(attr => attr.newWindow).map(attr => (
           <div className="my-2" key={attr.name}>
+            <span className="text-[16px] font-bold">{attr.display}</span>
             <TextCell itemId={item.id} attr={attr} value={item[attr.name]} onUpdate={onUpdate} />
             <Divider />
           </div>

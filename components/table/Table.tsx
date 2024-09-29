@@ -13,7 +13,7 @@ import DropDown from "@components/DropDown";
 import Autocomplete from "@components/autocomplete/Autocomplete";
 import Checkbox from "@components/checkbox/Checkbox";
 
-import { AddRounded } from '@mui/icons-material';
+import { AddRounded, SearchRounded } from '@mui/icons-material';
 import NavigateNextRoundedIcon from '@mui/icons-material/NavigateNextRounded';
 import NavigateBeforeRoundedIcon from '@mui/icons-material/NavigateBeforeRounded';
 import ViewColumnRoundedIcon from '@mui/icons-material/ViewColumnRounded';
@@ -399,6 +399,8 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
             }
           />
 
+          <SearchRounded className="text-[#023e8a] text-[20px]" />
+
 
         </div>
         <div className="mx-[20px] italic">
@@ -406,7 +408,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
         </div>
       </div>
 
-      <div className="table-header grid text-[16px] p-1 border-b-[1px]"
+      <div className="table-header-group grid text-[16px] p-1 border-b-[1px]"
         style={{
           gridTemplateColumns: ['100px', ...orderedAttrs
             .map((attr) => `${attr.width}px`)]

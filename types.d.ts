@@ -2,6 +2,13 @@ type JsonObject<dataType> = {
     [key: string]: dataType
 }
 
+type FilterProp = {
+    attrName?: string,
+    action?: "contains" | '',
+    option?: string,
+    applied?: boolean
+}
+
 type AttrProps = {
     name: string,
     type: 'text' | 'multiselect',

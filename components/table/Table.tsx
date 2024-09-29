@@ -12,28 +12,14 @@ import MenuIcon from "./MenuIcon";
 import DropDown from "@components/DropDown";
 import Autocomplete from "@components/autocomplete/Autocomplete";
 import Checkbox from "@components/checkbox/Checkbox";
-
-import { AddRounded, SearchRounded } from '@mui/icons-material';
-import NavigateNextRoundedIcon from '@mui/icons-material/NavigateNextRounded';
-import NavigateBeforeRoundedIcon from '@mui/icons-material/NavigateBeforeRounded';
-import ViewColumnRoundedIcon from '@mui/icons-material/ViewColumnRounded';
-import ArrowDownwardRoundedIcon from '@mui/icons-material/ArrowDownwardRounded';
-import FilterAltRoundedIcon from '@mui/icons-material/FilterAltRounded';
-import Download from "@mui/icons-material/Download";
-import HorizontalRuleRoundedIcon from '@mui/icons-material/HorizontalRuleRounded';
-import ArrowUpwardRoundedIcon from '@mui/icons-material/ArrowUpwardRounded';
-import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
-import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
-import ClearRoundedIcon from '@mui/icons-material/ClearRounded';
-import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
 import TableRow from "./table-row/TableRow";
 
-type FilterProp = {
-  attrName?: string,
-  action?: "contains" | '',
-  option?: string,
-  applied?: boolean
-}
+import {
+  AddRounded, SearchRounded, NavigateNextRounded,
+  NavigateBeforeRounded, ViewColumnRounded, ArrowDownwardRounded,
+  FilterAltRounded, Download, HorizontalRuleRounded, ArrowUpwardRounded,
+  SettingsRounded, PlayArrowRounded, ClearRounded, PlayArrowOutlined
+} from '@mui/icons-material';
 
 export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCreateItem, onExchangeItems }:
   {
@@ -49,6 +35,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
   // Constants
   const cellMinWidth = 100
   const itemsPerPage = 10;
+  const optionsColumnWidth = 75
 
   // States and Refs
   const [attrsByName, setAttrsByName] = useState(() => {
@@ -87,6 +74,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     if (storedFilters) return JSON.parse(storedFilters)
     return []
   })
+
   const [addingFilter, setAddingFilter] = useState<FilterProp>({})
   const [filterError, setFilterError] = useState("")
 
@@ -134,6 +122,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     newFilters[filterIndex].applied = !newFilters[filterIndex].applied
     setFilters(newFilters);
     localStorage.setItem('filters', JSON.stringify(newFilters))
+    setCurrentPage(1)
   }
 
 
@@ -148,7 +137,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     setAttrsByName({ ...attrsByName, [attrName]: { ...attrsByName[attrName], sort: nextState } });
     setSorting({ attrName, direction: nextState });
 
-    setProcessedData(sortData(data, attrName, nextState));
+    setProcessedData(sortData(processedData, attrName, nextState));
   }
 
   function handleColumnAppearance(columnName: string) {
@@ -254,11 +243,12 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
   }, [data, currentItem, sorting, filters]);
 
   return (
-    <div className="table-container flex flex-col h-auto shadow-md">
+    <div className="table-container flex flex-col h-[80vh] overflow-auto shadow-md">
       <div className="table-meta-header flex justify-between">
         <div className="table-option-container flex space-x-3">
           <DropDown
-            toggleButton={<ViewColumnRoundedIcon className="text-[#023e8a] text-[20px]" />}
+            key="column-visibility"
+            toggleButton={<ViewColumnRounded className="text-[#023e8a] text-[20px]" />}
             content={
               <div className="p-4 w-48 bg-white border border-gray-300 shadow-lg space-y-2">
                 {attrs.map(attr => (
@@ -276,6 +266,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
             }
           />
           <DropDown
+            key="download"
             toggleButton={<Download className="text-[#023e8a] text-[20px]" />}
             content={<div className="p-4 w-48 bg-white border border-gray-300 shadow-lg space-y-2">
               <button onClick={() => exportToCSV(Object.keys(orderedAttrs), data, name)} >Export to CSV</button>
@@ -284,7 +275,8 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
             }
           />
           <DropDown
-            toggleButton={<FilterAltRoundedIcon className="text-[#023e8a] text-[20px]" />}
+            key="filter"
+            toggleButton={<FilterAltRounded className="text-[#023e8a] text-[20px]" />}
             content={
               <div className="p-4 w-[700px] bg-white border border-gray-300 shadow-lg space-y-2">
                 {filters.map((filter, index) => (
@@ -307,16 +299,17 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
                         suggestions={[...new Set(data.flatMap(item => item[filter.attrName ? filter.attrName : 0]))].sort()}
                         style={{ width: 150, marginLeft: 5 }}
                         onSubmit={(value) => handleModifyFilter(index, { option: value })}
+                        maxDisplay={5}
                       />
                     </div>
 
                     <div >
                       {
                         filter.applied
-                          ? <PlayArrowRoundedIcon onClick={() => handleApplyFilter(index)} />
-                          : <PlayArrowOutlinedIcon onClick={() => handleApplyFilter(index)} />
+                          ? <PlayArrowRounded onClick={() => handleApplyFilter(index)} />
+                          : <PlayArrowOutlined onClick={() => handleApplyFilter(index)} />
                       }
-                      <ClearRoundedIcon onClick={() => handleClearFilter(index)} />
+                      <ClearRounded onClick={() => handleClearFilter(index)} />
                     </div>
                   </div>
                 ))}
@@ -392,7 +385,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
           />
 
           <DropDown
-            toggleButton={<SettingsRoundedIcon className="text-[#023e8a] text-[20px]" />}
+            toggleButton={<SettingsRounded className="text-[#023e8a] text-[20px]" />}
             content={<div className="p-4 w-48 bg-white border border-gray-300 shadow-lg space-y-2">
 
             </div>
@@ -410,11 +403,11 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
 
       <div className="table-header-group grid text-[16px] p-1 border-b-[1px]"
         style={{
-          gridTemplateColumns: ['100px', ...orderedAttrs
+          gridTemplateColumns: [`${optionsColumnWidth}px`, ...orderedAttrs
             .map((attr) => `${attr.width}px`)]
             .join(' ')
         }}>
-        <div></div>
+        <div className="options-header"></div>
         {
           orderedAttrs.filter(attr => attr.newWindow === false).map((attr, index) =>
             <div
@@ -437,17 +430,17 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
                     className="relative w-[20px] h-[20px] hover:bg-gray-100 hover:rounded-full"
                     onClick={() => handleSort(attr.name, attr.sort)}
                   >
-                    <HorizontalRuleRoundedIcon
+                    <HorizontalRuleRounded
                       className={`absolute inset-0 m-auto text-[16px]
                      transition-transform duration-300 ease-in-out transform ${attr.sort === 'none' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'
                         }`}
                     />
-                    <ArrowDownwardRoundedIcon
+                    <ArrowDownwardRounded
                       className={`absolute inset-0 m-auto text-[16px]
                      transition-transform duration-300 ease-in-out transform ${attr.sort === 'asc' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'
                         }`}
                     />
-                    <ArrowUpwardRoundedIcon
+                    <ArrowUpwardRounded
                       className={`absolute inset-0 m-auto text-[16px]
                      transition-transform duration-300 ease-in-out transform ${attr.sort === 'desc' ? 'rotate-0 opacity-100' : '-rotate-90 opacity-0'
                         }`}
@@ -462,7 +455,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
                       <div className="absolute top-[10px] bg-white border shadow-md w-[150px]">
                         <div className="p-2 hover:bg-gray-200 w-full flex items-center justify-between">
                           Filter
-                          <FilterAltRoundedIcon className="text-[16px]" />
+                          <FilterAltRounded className="text-[16px]" />
                         </div>
                       </div>
                     }
@@ -478,9 +471,15 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
         }
       </div>
 
-      <div className="table-body text-[14px] text-gray-800">
+      <div className="table-body flex-grow text-[14px] text-gray-800">
         {paginatedData.map((item) => (
-          <TableRow key={item.id} item={item} attrs={orderedAttrs} onUpdate={onUpdateCell} onExchangeItems={onExchangeItems} />
+          <TableRow
+            key={item.id}
+            item={item}
+            attrs={orderedAttrs}
+            optionsColumnWidth={optionsColumnWidth}
+            onUpdate={onUpdateCell}
+            onExchangeItems={onExchangeItems} />
         ))}
       </div>
 
@@ -488,7 +487,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
         <AddRounded className={` cursor-pointer text-[20px]`}
           onClick={onCreateItem} />
         <div className="pagination-controls flex items-center justify-end">
-          <NavigateBeforeRoundedIcon
+          <NavigateBeforeRounded
             className="hover:cursor-pointer"
             onClick={() => handlePageChange(currentPage > 1 ? currentPage - 1 : currentPage)}
           />
@@ -496,7 +495,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
             {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, processedData.length)} of {processedData.length}
           </span>
 
-          <NavigateNextRoundedIcon
+          <NavigateNextRounded
             className="hover:cursor-pointer"
             onClick={() => handlePageChange(currentPage !== totalPages ? currentPage + 1 : currentPage)}
           />

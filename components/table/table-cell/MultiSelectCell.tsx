@@ -1,20 +1,20 @@
 import Tag from '@components/atoms/Tag';
 import Latex from '@components/latex';
 import Autocomplete from '@components/autocomplete/Autocomplete';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useClickAway } from "@uidotdev/usehooks";
 
-export default function MultiSelectCell({ itemId, attr, values, onUpdate, suggestions }:
+export default function MultiSelectCell({ itemId, attr, values, onUpdate, suggestions, focused }:
   {
     itemId: number
     attr: AttrProps
     values: string[],
     onUpdate: (itemId: number, attr: string, value: string[]) => void
-    suggestions: string[]
+    suggestions: string[],
+    focused?: boolean
   }
 ) {
   const [cellState, setCellState] = useState("noEdit");
-  const [editingValue, setEditingValue] = useState("");
 
   const ref = useClickAway(() => {
     setCellState('noEdit');
@@ -23,6 +23,11 @@ export default function MultiSelectCell({ itemId, attr, values, onUpdate, sugges
   const handleTagClick = (event: React.MouseEvent) => {
     event.stopPropagation();
   };
+
+  useEffect(() => {
+    if (focused) setCellState('editing')
+    else setCellState('noEdit')
+  }, [focused])
 
   return (
     <div className="table-multiselect-cell flex flex-wrap w-full h-full"
@@ -57,9 +62,9 @@ export default function MultiSelectCell({ itemId, attr, values, onUpdate, sugges
             if (newValue && cellState === 'editing') {
               onUpdate(itemId, attr.name, [...values, newValue]);
               setCellState('noEdit');
-              setEditingValue('');
             }
           }}
+          maxDisplay={5}
         />
       }
     </div >

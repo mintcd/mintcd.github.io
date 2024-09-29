@@ -1,6 +1,7 @@
-import { CSSProperties, ReactElement, useState, useEffect, useRef } from 'react';
+import { CSSProperties, ReactElement, useState, useEffect, useRef, ReactNode } from 'react';
 import { useClickAway } from "@uidotdev/usehooks";
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
+import zIndices from '@styles/z-indices';
 
 export default function Autocomplete({
   suggestions,
@@ -10,10 +11,11 @@ export default function Autocomplete({
   value,
   freeSolo,
   icon = true,
+  renderedSuggestion,
   maxDisplay,
   onSubmit
 }: {
-  suggestions: string[],
+  suggestions: string[]
   placeholder?: string,
   value?: string
   autoFocus?: boolean
@@ -22,6 +24,7 @@ export default function Autocomplete({
   maxDisplay?: number,
   style?: CSSProperties,
   onSubmit: (selectedValue: string) => void
+  renderedSuggestion?: (suggestion: string) => ReactNode
 }): ReactElement {
   const [inputValue, setInputValue] = useState(value || '');
   const [submittedValue, setSubmittedValue] = useState(value || '')
@@ -120,8 +123,13 @@ export default function Autocomplete({
 
       {focused && (
         <ul
-          className={`absolute z-[1000] bg-white rounded mt-1 min-w-[150px] max-h-[${maxDisplay ? maxDisplay : 10}rem] overflow-y-auto`}
+          className="absolute bg-white rounded mt-1 min-w-[150px] overflow-y-auto shadow-sm"
+          style={{
+            maxHeight: maxDisplay ? `${maxDisplay * 2.5}rem` : 'auto',
+            zIndex: zIndices.autoComplete
+          }}
         >
+
           {filteredSuggestions.map((suggestion, index) => (
             <li
               key={index}

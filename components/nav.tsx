@@ -51,9 +51,9 @@ export default function Nav() {
           </div>
 
           <div className="md:hidden">
-            <button onClick={toggleMobileMenu} className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-700">
+            <div onClick={toggleMobileMenu} className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-700">
               <BsList size={24} />
-            </button>
+            </div>
           </div>
         </div>
       </div>

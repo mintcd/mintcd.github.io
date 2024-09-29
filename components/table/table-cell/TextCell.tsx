@@ -1,84 +1,58 @@
 import Latex from "@components/latex";
+import { TextField } from "@components/atoms"
 import { useClickAway } from "@uidotdev/usehooks";
 import { useEffect, useRef, useState } from "react";
 
 export default function TextCell({
   itemId,
   attr,
-  value,
+  initialValue,
   onUpdate,
+  focused,
 }: {
   itemId: number;
   attr: AttrProps;
-  value: string;
+  initialValue: string;
   onUpdate: (itemId: number, attrName: string, value: string) => void;
+  focused?: boolean;
 }) {
-  const [cellState, setCellState] = useState('noEdit');
-  const [oldValue, setOldValue] = useState(value);
-  const [editingValue, setEditingValue] = useState(value);
-
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [cellState, setCellState] = useState(focused ? 'editing' : 'noEdit')
+  const [value, setValue] = useState(initialValue || "");
 
   const ref = useClickAway(() => {
     if (cellState === 'editing') {
       setCellState('noEdit');
-      handleUpdate()
     }
   }) as any;
 
-  function handleUpdate() {
-    if (editingValue !== oldValue) {
-      onUpdate(itemId, attr.name, editingValue);
-      setOldValue(editingValue)
-    }
+  function handleUpdate(value: string) {
+    onUpdate(itemId, attr.name, value);
     setCellState("noEdit");
   }
 
   useEffect(() => {
-    if (cellState === 'editing' && textareaRef.current) {
-      const length = textareaRef.current.value.length;
-      textareaRef.current.setSelectionRange(length, length);
-      textareaRef.current.focus();
-    }
-  }, [cellState]);
-
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto"; // Reset the height
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; // Set to scroll height
-    }
-  }, [editingValue]);
+    if (focused) setCellState('editing')
+    else setCellState('noEdit')
+  }, [focused])
 
   return (
-    <div className={`table-text-cell h-full ${attr.name !== 'id' && 'w-full'} overflow-hidden`} ref={ref}>
+    <div className={`table-text-cell`} ref={ref}>
       {cellState === 'noEdit' && (
         <div
-          className="h-full min-h-[1.75rem] flex items-center cursor-pointer"
+          className="min-h-[3rem] cursor-pointer"
           onClick={() => {
             setCellState("editing");
-            setOldValue(value)
-            setEditingValue(value);
+            setValue(initialValue);
           }}
         >
-          <Latex>{String(value)}</Latex>
+          <Latex>{String(initialValue)}</Latex>
         </div>
       )}
       {cellState === 'editing' && (
-        <textarea
-          className="h-full w-full p-0 focus:outline-none border-none resize-none bg-inherit"
-          ref={textareaRef}
-          value={editingValue}
-          onChange={(e) => setEditingValue(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              if (e.shiftKey) {
-                e.preventDefault();
-                setEditingValue(editingValue + '\n');
-              } else {
-                handleUpdate()
-              }
-            }
-          }}
+        <TextField
+          initialValue={value}
+          onUpdate={handleUpdate}
+          type={attr.useLatex ? 'latex' : 'text'}
         />
       )}
     </div>

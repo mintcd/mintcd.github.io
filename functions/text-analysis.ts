@@ -1,6 +1,16 @@
 import { createCanvas } from 'canvas';
 import Fuse from 'fuse.js';
 
+export function getAllIndices(str: string, char: string): number[] {
+  const indices: number[] = [];
+  for (let i = 0; i < str.length; i++) {
+    if (str[i] === char) {
+      indices.push(i);
+    }
+  }
+  return indices;
+}
+
 export function capitalizeFirstLetter(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1)
 }

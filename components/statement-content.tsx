@@ -36,7 +36,7 @@ export default function StatementContent({ statement }: { statement: Vertex | un
             <span className={`mr-1 text-lg font-semibold`}>
               Examples
             </span>
-            {statement.examples.map((example) => <Latex>{example}</Latex>)}
+            {statement.examples.map((example, index) => <Latex key={index}>{example}</Latex>)}
           </div>
         )}
       </div>

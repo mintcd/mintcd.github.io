@@ -10,15 +10,17 @@ export function initiateLayout(vertices: Vertex[], width: number, height: number
     ranksep: 5,
   });
 
-  vertices.forEach((vertex: Vertex) => {
-    dagreGraph.setNode(vertex.key, {
+  const processedVertices = vertices.filter(v => v.name.length > 0)
+
+  processedVertices.forEach((vertex: Vertex) => {
+    dagreGraph.setNode(vertex.name, {
       width: width,
       height: height,
       ...vertex,
     });
   });
 
-  const edges = getEdges(vertices)
+  const edges = getEdges(processedVertices)
 
   edges.forEach((edge: Edge) => {
     dagreGraph.setEdge(edge.source, edge.target, {
@@ -28,33 +30,32 @@ export function initiateLayout(vertices: Vertex[], width: number, height: number
 
   dagre.layout(dagreGraph)
 
-  vertices = vertices.map((vertex: Vertex) => ({
+  return processedVertices.map((vertex: Vertex) => ({
     ...vertex,
-    x: dagreGraph.node(vertex.key).x,
-    y: dagreGraph.node(vertex.key).y,
+    x: dagreGraph.node(vertex.name).x,
+    y: dagreGraph.node(vertex.name).y,
   }));
-  return vertices
 }
 
 export function getVerticesOfTopic(vertices: Vertex[], topics: Field[]) {
   // Helper function to check if a vertex contains at least one of the specified topics
   const hasAnyTopic = (vertex: Vertex, topics: Field[]) => {
-    if (!vertex.fields) return false;
-    return topics.some((topic) => vertex.fields && vertex.fields.includes(topic));
+    if (!vertex.field) return false;
+    return topics.some((topic) => vertex.field && vertex.field.includes(topic));
   };
 
   // Filter vertices that have at least one of the specified topics
   const filteredVertices = vertices.filter((vertex: Vertex) => hasAnyTopic(vertex, topics));
-  const filteredVertexKeys = new Set(filteredVertices.map((vertex: Vertex) => vertex.key));
+  const filteredVertexKeys = new Set(filteredVertices.map((vertex: Vertex) => vertex.name));
 
   for (const vertex of filteredVertices) {
     if (vertex.parents) {
       for (const parent of vertex.parents) {
-        if (!filteredVertexKeys.has(parent.key)) {
-          const parentVertex = vertices.find((vertex: Vertex) => vertex.key === parent.key);
+        if (!filteredVertexKeys.has(parent)) {
+          const parentVertex = vertices.find((vertex: Vertex) => vertex.name === parent);
           if (parentVertex) {
             filteredVertices.push(parentVertex);
-            filteredVertexKeys.add(parentVertex.key);
+            filteredVertexKeys.add(parentVertex.name);
           }
         }
       }
@@ -64,7 +65,6 @@ export function getVerticesOfTopic(vertices: Vertex[], topics: Field[]) {
 }
 
 
-
 export function getEdges(vertices: Vertex[]): Edge[] {
   let edges: Edge[] = [];
 
@@ -72,15 +72,14 @@ export function getEdges(vertices: Vertex[]): Edge[] {
     if (vertex.parents && vertex.parents.length > 0) {
       vertex.parents.forEach(parent => {
         edges.push({
-          source: parent.key,
-          target: vertex.key ? vertex.key : '',
-          relation: parent.relation
+          source: parent,
+          target: vertex.name ? vertex.name : '',
         });
       });
     }
 
     edges = edges.filter(function (edge) {
-      return vertices.map(vertex => vertex.key).includes(edge.source)
+      return vertices.map(vertex => vertex.name).includes(edge.source)
     })
 
     return edges
@@ -125,20 +124,20 @@ export function computeNodeDepths(terms: Vertex[]): Vertex[] {
 
   // Create a map of node keys to their corresponding nodes
   terms.forEach(term => {
-    termMap.set(term.key, term);
+    termMap.set(term.name, term);
     term.depth = undefined; // Reset depths
   });
 
   // Depth-First Search function
   function dfs(node: Vertex, depth: number) {
-    if (visited.has(node.key)) return;
-    visited.add(node.key);
+    if (visited.has(node.name)) return;
+    visited.add(node.name);
 
     node.depth = Math.min(node.depth ?? Infinity, depth);
 
     if (node.parents) {
       node.parents.forEach(parent => {
-        const parentNode = termMap.get(parent.key);
+        const parentNode = termMap.get(parent);
         if (parentNode) {
           dfs(parentNode, depth - 1);
         }
@@ -148,7 +147,7 @@ export function computeNodeDepths(terms: Vertex[]): Vertex[] {
 
   // Start DFS from each node
   terms.forEach(term => {
-    if (!visited.has(term.key)) {
+    if (!visited.has(term.name)) {
       dfs(term, 0);
     }
   });

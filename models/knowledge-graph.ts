@@ -705,4 +705,4 @@ const graph = {
   }
 }
 
-export default graph as Graph
+export default graph

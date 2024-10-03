@@ -2,9 +2,16 @@ type JsonObject<dataType> = {
     [key: string]: dataType
 }
 
+type Point = {
+    x: number,
+    y: number,
+    z: number,
+}
+
+
 type FilterProp = {
-    attrName?: string,
-    action?: "contains" | '',
+    name?: string,
+    action?: "contains" | "is" | undefined,
     option?: string,
     applied?: boolean
 }
@@ -72,13 +79,13 @@ type Term = {
 
 type Vertex = {
     // Basic Properties
-    key: string,
+    key?: string,
     name: string,
     abbreviation?: string,
-    type: StatementType
+    type: string
 
     // Graph properties
-    parents: { key: string, relation?: RelationType }[],
+    parents: string[],
     depth?: number,
 
     // Knowledge properties
@@ -90,7 +97,7 @@ type Vertex = {
     href?: string,
 
     // Taxonomy properties
-    fields: Field[],
+    field: Field[],
     chapter?: string,
 
     // Style properties

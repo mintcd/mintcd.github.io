@@ -12,11 +12,21 @@ export default function MyLatex({ children }: { children: string }) {
     macros[`\\${letter}`] = `\\mathcal{${letter}}`;
   });
 
+  const preprocessItemize = (latexString: string) => {
+    // Replace itemize environments with <ul> and <li> tags
+    return latexString
+      .replace(/\\begin{itemize}/g, '<ul>')
+      .replace(/\\end{itemize}/g, '</ul>')
+      .replace(/\\item/g, '<li>')
+      .replace(/<\/li>\s*<li>/g, '</li><li>') // Handle spacing issues between list items
+      .replace(/<\/li>\s*<\/ul>/g, '</li></ul>'); // Properly close the last <li>
+  };
+
   // Preprocess the input string to handle newlines
-  const preprocessedChildren = children.replace(/\n/g, '<br/>'); // Replace '\n' with LaTeX line break '\\'
+  const preprocessedChildren = preprocessItemize(children.replace(/\n/g, '<br/>')); // Replace '\n' with LaTeX line break '\\'
 
   return (
-    <div className='latex-container font-modern text-[14px]'>
+    <div className='latex-container font-modern'>
       <Latex macros={macros}>{String(preprocessedChildren)}</Latex>
     </div>
   );

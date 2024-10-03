@@ -1,21 +1,21 @@
-'use client'
+'use client';
 import { useRef, useEffect, useState, RefObject } from 'react';
 import { createRoot } from 'react-dom/client';
-
 import CenterFocusStrongRoundedIcon from '@mui/icons-material/CenterFocusStrongRounded';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-
-import { select, selectAll } from 'd3-selection'
-import { drag } from 'd3-drag'
+import { select } from 'd3-selection';
+import { drag } from 'd3-drag';
 import { forceSimulation, forceLink, forceCenter, forceCollide } from 'd3-force';
 
-import VertexContent from '@components/statement-content';
-import { getEdges, initiateLayout, computeNodeDepths, getVerticesOfTopic } from '@functions/graph-analysis';
+import { getEdges, initiateLayout, getVerticesOfTopic } from '@functions/graph-analysis';
 import { useZoomBehavior } from '@components/graph/behaviors';
-import GraphNode from '@components/graph/graph-node';
-import GraphStyles from '@styles/graph';
+import GraphNode from './graph-node';
+import GraphLink from './graph-link';
+import GraphStyles from './styles';
+import { selectAll } from 'd3';
 
 export default function KnowledgeGraph({ graphData }: { graphData: Graph }) {
+
   const contentRef = useRef(null);
   const containerRef = useRef<SVGSVGElement>(null);
   const dropdownRef = useRef(null);
@@ -25,20 +25,22 @@ export default function KnowledgeGraph({ graphData }: { graphData: Graph }) {
   const [selectedNode, setSelectedNode] = useState<Vertex | undefined>(undefined);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedField, setSelectedField] = useState<Field | "all-fields">('all-fields');
+  const [params, setParams] = useState({
+    width: 500,
+    height: 500,
+    radius: 10,
+    fontSize: 3
+  });
 
   function getFieldsWithAllOption(vertices: Vertex[]): { value: string; label: string }[] {
     const fieldsSet = new Set<string>();
-
     vertices.forEach(vertex => {
-      if (vertex.fields) {
-        vertex.fields.forEach(field => fieldsSet.add(field));
+      if (vertex.field) {
+        vertex.field.forEach(field => fieldsSet.add(field));
       }
     });
 
-    const uniqueFields = Array.from(fieldsSet);
-
-    // Sort the fields alphabetically
-    uniqueFields.sort();
+    const uniqueFields = Array.from(fieldsSet).sort();
 
     return [{ value: "all-fields", label: "All Fields" },
     ...uniqueFields.map(field => ({
@@ -46,15 +48,7 @@ export default function KnowledgeGraph({ graphData }: { graphData: Graph }) {
       label: field.split("-").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")
     })),];
   }
-
   const fields = getFieldsWithAllOption(graphData.vertices);
-
-  const [params, setParams] = useState({
-    width: 500,
-    height: 500,
-    radius: 10,
-    fontSize: 3
-  });
 
   let vertices = graphData.vertices;
   if (selectedField !== "all-fields") {
@@ -64,23 +58,20 @@ export default function KnowledgeGraph({ graphData }: { graphData: Graph }) {
 
   let edges = getEdges(vertices);
 
-  // Get window size
   useEffect(() => {
     setSelectedField(window.localStorage.getItem('selectedField') as Field || 'all-fields');
     const updateSize = () => {
       if (environmentRef.current) {
-        const { width, height } = environmentRef.current.getBoundingClientRect();
-        setParams({ width: width, height: width, radius: width / 50, fontSize: width / 200 });
+        const { width } = environmentRef.current.getBoundingClientRect();
+        setParams({ width: width, height: width, radius: width / 40, fontSize: width / 300 });
       }
     };
 
     updateSize();
     window.addEventListener('resize', updateSize);
-
     return () => window.removeEventListener('resize', updateSize);
   }, []);
 
-  // Hook for SVG Graph Rendering
   useEffect(() => {
     const graphContainer = select(containerRef.current as SVGSVGElement)
       .attr('width', params.width)
@@ -88,21 +79,23 @@ export default function KnowledgeGraph({ graphData }: { graphData: Graph }) {
 
     const graph = graphContainer.select(".graph");
 
-    const links = graph.selectAll("line")
+    const links = graph
+      .selectAll(".link-container")
       .data(edges)
       .enter()
       .append("g")
       .attr("class", "link-container")
-      .append("line")
-      .style("stroke", "#aaa")
-      .attr("stroke-width", 0.5)
-      .attr("marker-end", function (d) {
-        const edge = d as Edge;
-        return edge.relation && edge.relation === 'specializes' ? "url(#arrow-specializes)" : "url(#arrow)";
-      });
+      .each(function (e: Edge) {
+        createRoot(this as any).render(
+          <GraphLink
+            edge={e}
+            radius={params.radius}
+          />
+        );
+      })
 
     const nodes = graph
-      .selectAll(".node")
+      .selectAll(".node-container")
       .data(vertices)
       .enter()
       .append("g")
@@ -112,57 +105,57 @@ export default function KnowledgeGraph({ graphData }: { graphData: Graph }) {
           <GraphNode
             vertex={d}
             radius={params.radius}
-            setSelectedNode={setSelectedNode}
-            selectedNode={selectedNode}
           />
         );
-      });
+      })
+      .on("click", (_, v) => setSelectedNode(v))
 
     const simulation = forceSimulation(vertices)
-      .alphaDecay(0.5)
-      .force('center', forceCenter(params.width / 2, params.height / 2))
+      .alpha(0.1) // Start with a lower alpha value
+      .alphaDecay(0.05) // Slower decay for alpha
+      .force('center', forceCenter(params.width / 2, params.height / 4))
       .force('link', forceLink(edges)
         .distance(params.radius)
         .id(function (node) {
           const v = node as Vertex;
-          return v.key ? v.key : '';
+          return v.name ? v.name : '';
         }))
       .force('collide', forceCollide(1.5 * params.radius));
 
     simulation.on("tick", () => {
       nodes.attr("transform", function (d) {
         const v = d as Vertex;
-
         // Ensure x is within bounds
         v.x = Math.max(params.radius, Math.min(params.width - params.radius, v.x || 0));
         v.y = Math.max(params.radius, Math.min(params.height - params.radius, v.y || 0));
-
         return `translate(${v.x},${v.y})`;
       });
 
       links
+        .select("line")
         .attr("x1", (d) => {
-          const edge = d as any
+          const edge = d as any;
           const angle = Math.atan2(edge.target.y - edge.source.y, edge.target.x - edge.source.x);
           return edge.source.x + params.radius * Math.cos(angle);
         })
         .attr("y1", (d) => {
-          const edge = d as any
+          const edge = d as any;
           const angle = Math.atan2(edge.target.y - edge.source.y, edge.target.x - edge.source.x);
           return edge.source.y + params.radius * Math.sin(angle);
         })
         .attr("x2", (d) => {
-          const edge = d as any
+          const edge = d as any;
           const angle = Math.atan2(edge.source.y - edge.target.y, edge.source.x - edge.target.x);
           return edge.target.x + params.radius * Math.cos(angle);
         })
         .attr("y2", (d) => {
-          const edge = d as any
+          const edge = d as any;
           const angle = Math.atan2(edge.source.y - edge.target.y, edge.source.x - edge.target.x);
           return edge.target.y + params.radius * Math.sin(angle);
         });
     });
 
+    // Drag behavior
     const nodeDrag = drag()
       .on("start", function dragStartedHandler(event, d) {
         const v = d as Vertex;
@@ -189,46 +182,20 @@ export default function KnowledgeGraph({ graphData }: { graphData: Graph }) {
       graph.selectAll('*').remove();
       simulation.stop();
     };
-  }, [edges, vertices, selectedNode, params, graphRendered, selectedField]);
+  }, [params, graphRendered, selectedField]);
+
+  useEffect(() => {
+    selectAll(".node")
+      .data(vertices)
+      .select("circle")
+      .attr("opacity", (v) => v.name === selectedNode?.name ? 1 : 0.5)
+  })
 
   useZoomBehavior(select(containerRef.current as SVGElement));
 
-  useEffect(() => {
-    if (graphRendered) {
-      const graphContainer = select(containerRef.current as SVGSVGElement);
-      graphContainer.selectAll(".shape").data(vertices)
-        .style("opacity", (d) => {
-          const v = d as Vertex;
-          return selectedNode !== undefined && v.name === selectedNode.name ? 1 : 0.7;
-        });
-    }
-  }, [vertices, selectedNode, graphRendered]);
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !(dropdownRef.current as HTMLElement).contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    }
-
-    function escHandler(event: globalThis.KeyboardEvent) {
-      if (event.key === 'Escape') {
-        setIsOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', escHandler);
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', escHandler);
-    };
-
-  });
-
   return (
-    <div className='sm:grid grid-cols-6 place-items-center'>
-      <div ref={dropdownRef} id='select' className=' col-span-4 mb-4 w-48'>
+    <div className=''>
+      <div ref={dropdownRef} id='select' className='mb-4 w-48'>
         <div
           className="bg-white border border-gray-300 rounded-md p-2 flex justify-between items-center cursor-pointer col-span-4"
           onClick={() => setIsOpen(!isOpen)}
@@ -256,25 +223,18 @@ export default function KnowledgeGraph({ graphData }: { graphData: Graph }) {
           </div>
         )}
       </div>
-      <div ref={environmentRef} className={`col-span-4 w-full
-                      flex flex-col items-center justify-center 
-                     overflow-hidden`}>
+      <div ref={environmentRef} className={`w-[70vw] flex flex-col items-center justify-center overflow-hidden`}>
         <div className='bg-gray-200 rounded-3xl'>
           <svg ref={containerRef} className='graph-container'>
             <GraphStyles />
             <foreignObject id='reset-button' className='cursor-pointer w-[50px] h-[50px] translate-x-[25px] translate-y-[25px]'>
               <CenterFocusStrongRoundedIcon className={`w-${params.width / 20} h-${params.height / 20}`} />
             </foreignObject>
-            <g className='graph'></g>
+            <g className='graph'>
+            </g>
           </svg>
         </div>
       </div>
-      <div
-        className={`col-span-2 z-50 rounded-3xl sm:mt-0 sm:ml-5 mt-5
-                      text-gray-800 w-full h-full`}
-        ref={contentRef}>
-        <VertexContent statement={selectedNode} />
-      </div>
-    </div >
+    </div>
   );
-};
+}

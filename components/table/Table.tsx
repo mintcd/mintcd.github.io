@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo, useReducer } from "react";
+import { useClickAway } from "@uidotdev/usehooks";
 import './table.css'
 
 import { getTextWidth, capitalizeFirstLetter } from "@functions/text-analysis";
@@ -8,9 +9,7 @@ import { sortData } from "@functions/database";
 import { exportToCSV, exportToJSON } from "@functions/document"
 
 import ColumnSeparator from "./ColumnSeparator";
-import MenuIcon from "./MenuIcon";
-import DropDown from "@components/DropDown";
-import Autocomplete from "@components/autocomplete/Autocomplete";
+import { Dropdown } from "@components/molecules";
 import Checkbox from "@components/checkbox/Checkbox";
 import TableRow from "./table-row/TableRow";
 
@@ -18,8 +17,20 @@ import {
   AddRounded, SearchRounded, NavigateNextRounded,
   NavigateBeforeRounded, ViewColumnRounded, ArrowDownwardRounded,
   FilterAltRounded, Download, HorizontalRuleRounded, ArrowUpwardRounded,
-  SettingsRounded, PlayArrowRounded, ClearRounded, PlayArrowOutlined
+  SettingsRounded, PlayArrowRounded, ClearRounded, PlayArrowOutlined, MoreVertRounded
 } from '@mui/icons-material';
+
+type menuState = "filters" | "sorts" | "column-visibility" | "download" | "settings" | "search" | ""
+type FilterProp = {
+  name: string,
+  actions?: [
+    {
+      predicate: "contains" | "is",
+      criteria: string[]
+    }
+  ]
+}
+
 
 export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCreateItem, onExchangeItems }:
   {
@@ -37,7 +48,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
   const itemsPerPage = 10;
   const optionsColumnWidth = 75
 
-  // States and Refs
+  // States
   const [attrsByName, setAttrsByName] = useState(() => {
     const storedAttrsByName = localStorage.getItem('attrsByName')
     if (storedAttrsByName) return JSON.parse(storedAttrsByName)
@@ -61,7 +72,6 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
   })
 
   const [focusedHeader, setFocusedHeader] = useState(-1);
-  const [currentItem, setCurrentItem] = useState<DataItem | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [processedData, setProcessedData] = useState(data)
   const [sorting, setSorting] = useState<{ attrName: string, direction: 'asc' | 'desc' | 'none' }>({
@@ -69,23 +79,30 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     direction: 'none',
   });
 
-  const [filters, setFilters] = useState<FilterProp[]>(() => {
-    const storedFilters = localStorage.getItem('filters')
-    if (storedFilters) return JSON.parse(storedFilters)
-    return []
-  })
 
-  const [addingFilter, setAddingFilter] = useState<FilterProp>({})
-  const [filterError, setFilterError] = useState("")
+  const [menu, setMenu] = useState<menuState>("");
 
-  const animationFrameRef = useRef<number | null>(null);
-  const resizingRef = useRef({ startX: 0, startWidth: 0, attrName: '' });
+
+  const [filters, dispatchFilters] = useReducer(filterReducer, [] as FilterProp[])
+  function filterReducer(state: FilterProp[], action: FilterProp) {
+    if (state.find(filter => filter.name === action.name) === undefined) {
+      state.push(action)
+    }
+    else {
+    }
+    setMenu("filters")
+    return state
+  }
+
+  const menuRef = useClickAway(() => {
+    setMenu("")
+  }) as any
 
   // Derived values
   const orderedAttrs = useMemo(() => {
     return Object.keys(attrsByName)
       .map((attrName) => attrsByName[attrName])
-      .filter(attr => !attr.hidden)
+      .filter(attr => !attr.hidden && !attr.newWindow)
       .sort((x, y) => (x.order && y.order ? x.order - y.order : 0));
   }, [attrsByName]);
 
@@ -96,48 +113,14 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     return Math.ceil(processedData.length / itemsPerPage);
   }, [processedData]);
 
+  const animationFrameRef = useRef<number | null>(null);
+  const resizingRef = useRef({ startX: 0, startWidth: 0, attrName: '' });
+
   // Handlers
-  function handleModifyFilter(
-    filterIndex: number,
-    attr: { attrName?: string; option?: string; action?: string; applied?: boolean }
-  ) {
-    const newFilters = [...filters] as FilterProp[];
-    const key = Object.keys(attr)[0] as keyof FilterProp; // assert the type here
-    if (key) {
-      // Type assertion to ensure compatibility
-      newFilters[filterIndex][key] = attr[key] as any; // Use 'as any' to bypass strict type checking
-      setFilters(newFilters);
-    }
-    localStorage.setItem('filters', JSON.stringify(newFilters))
-  }
 
-  function handleClearFilter(filterIndex: number) {
-    const newFilters = filters.filter((_, index) => index !== filterIndex); // Remove the filter at filterIndex
-    setFilters(newFilters); // Update state with the new filters array
-    localStorage.setItem('filters', JSON.stringify(newFilters))
-  }
-
-  function handleApplyFilter(filterIndex: number) {
-    const newFilters = [...filters]
-    newFilters[filterIndex].applied = !newFilters[filterIndex].applied
-    setFilters(newFilters);
-    localStorage.setItem('filters', JSON.stringify(newFilters))
-    setCurrentPage(1)
-  }
-
-
-  function handleSort(attrName: string, currentState: 'none' | 'asc' | 'desc' | undefined) {
-
-    let nextState: 'none' | 'asc' | 'desc' = 'none';
-
-    if (currentState === 'none') nextState = 'asc';
-    else if (currentState === 'asc') nextState = 'desc';
-    else if (currentState === 'desc') nextState = 'none';
-
-    setAttrsByName({ ...attrsByName, [attrName]: { ...attrsByName[attrName], sort: nextState } });
-    setSorting({ attrName, direction: nextState });
-
-    setProcessedData(sortData(processedData, attrName, nextState));
+  function handleSort(attrName: string, direction: 'none' | 'asc' | 'desc') {
+    setAttrsByName({ ...attrsByName, [attrName]: { ...attrsByName[attrName], sort: direction } });
+    setSorting({ attrName, direction: direction });
   }
 
   function handleColumnAppearance(columnName: string) {
@@ -232,255 +215,211 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
 
   // Effects
   useEffect(() => {
+    // Process data before rendering
     let processedData = [...data]
-    filters.forEach((filter) => {
-      if (!filter.applied) return
-      const filteredAttr = filter.attrName as string
-      processedData = processedData.filter(item => item[filteredAttr].includes(filter.option) || item[filteredAttr].length === 0)
-    })
+
+    // Apply filters
+    // filters.forEach((filter) => {
+    //   if (!filter.applied) return
+    //   const filteredAttr = filter.name as string
+    //   processedData = processedData.filter(item => item[filteredAttr].includes(filter.option) || item[filteredAttr].length === 0)
+    // })
+
+    // Apply sorting
     setProcessedData(sortData(processedData, sorting.attrName, sorting.direction));
-    setCurrentItem(data.find(item => currentItem && item.id === currentItem.id) as DataItem);
-  }, [data, currentItem, sorting, filters]);
+    // setCurrentItem(data.find(item => currentItem && item.id === currentItem.id) as DataItem);
+  }, [data, sorting, filters]);
 
   return (
-    <div className="table-container flex flex-col h-[80vh] overflow-auto shadow-md">
-      <div className="table-meta-header flex justify-between">
-        <div className="table-option-container flex space-x-3">
-          <DropDown
-            key="column-visibility"
-            toggleButton={<ViewColumnRounded className="text-[#023e8a] text-[20px]" />}
-            content={
-              <div className="p-4 w-48 bg-white border border-gray-300 shadow-lg space-y-2">
-                {attrs.map(attr => (
-                  !attrsByName[attr.name].newWindow && (
-                    <div key={attr.name} className="flex justify-between items-center">
-                      <span className="text-gray-800">{attrsByName[attr.name].display}</span>
-                      <Checkbox
-                        value={!attrsByName[attr.name].hidden}
-                        onChange={() => handleColumnAppearance(attr.name)}
-                      />
-                    </div>
-                  )
-                ))}
-              </div>
-            }
-          />
-          <DropDown
-            key="download"
-            toggleButton={<Download className="text-[#023e8a] text-[20px]" />}
-            content={<div className="p-4 w-48 bg-white border border-gray-300 shadow-lg space-y-2">
-              <button onClick={() => exportToCSV(Object.keys(orderedAttrs), data, name)} >Export to CSV</button>
-              <button onClick={() => exportToJSON(data, name)} >Export to JSON</button>
-            </div>
-            }
-          />
-          <DropDown
-            key="filter"
-            toggleButton={<FilterAltRounded className="text-[#023e8a] text-[20px]" />}
-            content={
-              <div className="p-4 w-[700px] bg-white border border-gray-300 shadow-lg space-y-2">
-                {filters.map((filter, index) => (
-                  <div key={`filter-${index}`} className="flex justify-between items-center">
-                    <div className="flex space-x-3">
-                      <Autocomplete
-                        value={capitalizeFirstLetter(filter.attrName || '')}
-                        suggestions={Object.keys(attrsByName).map(attrName => attrsByName[attrName].display)}
-                        style={{ width: 150, marginLeft: 5 }}
-                        onSubmit={(value) => handleModifyFilter(index, { attrName: value })}
-                      />
-                      <Autocomplete
-                        value={filter.action}
-                        suggestions={['contains']}
-                        style={{ width: 150, marginLeft: 5 }}
-                        onSubmit={(value) => handleModifyFilter(index, { action: value })}
-                      />
-                      <Autocomplete
-                        value={filter.option}
-                        suggestions={[...new Set(data.flatMap(item => item[filter.attrName ? filter.attrName : 0]))].sort()}
-                        style={{ width: 150, marginLeft: 5 }}
-                        onSubmit={(value) => handleModifyFilter(index, { option: value })}
-                        maxDisplay={5}
-                      />
-                    </div>
+    <div className="table-container flex flex-col overflow-auto shadow-md relative">
 
-                    <div >
-                      {
-                        filter.applied
-                          ? <PlayArrowRounded onClick={() => handleApplyFilter(index)} />
-                          : <PlayArrowOutlined onClick={() => handleApplyFilter(index)} />
-                      }
-                      <ClearRounded onClick={() => handleClearFilter(index)} />
-                    </div>
-                  </div>
-                ))}
-
-                <div className="flex justify-between items-center">
-                  <div className="flex">
-                    <Autocomplete
-                      placeholder="column"
-                      value={capitalizeFirstLetter(addingFilter.attrName || '')}
-                      suggestions={Object.keys(attrsByName).map(attrName => attrsByName[attrName].display)}
-                      style={{ width: 150, marginLeft: 5 }}
-                      onSubmit={(value) => {
-                        setAddingFilter({ ...addingFilter, attrName: value.toLowerCase() })
-                      }}
-                    />
-                    <Autocomplete
-                      placeholder="action"
-                      value={addingFilter.action}
-                      suggestions={['contains']}
-                      style={{ width: 150, marginLeft: 5 }}
-                      onSubmit={(value) => {
-                        setAddingFilter({ ...addingFilter, action: value as "contains" })
-                      }}
-                    />
-                    <Autocomplete
-                      placeholder="option"
-                      value={addingFilter.option}
-                      suggestions={
-                        addingFilter.attrName
-                          ? [...new Set(data.flatMap(item => {
-                            const attrName = addingFilter.attrName as string
-                            const key = item[attrName];
-                            return key !== undefined && key !== null ? key : [];
-                          }))]
-                          : []
-                      }
-                      style={{ width: 150, marginLeft: 5 }}
-                      onSubmit={(value) => {
-                        setAddingFilter({ ...addingFilter, option: value });
-                      }}
-                    />
-                  </div>
-
-                  <AddRounded onClick={() => {
-                    if (!addingFilter.attrName) {
-                      setFilterError("Please add a filtered column");
-                      return;
-                    }
-
-                    if (filters.find(filter => (
-                      filter.attrName === addingFilter.attrName &&
-                      filter.action === addingFilter.action &&
-                      filter.option === addingFilter.option
-                    ))) {
-
-                      setFilterError("Already added this filter");
-                      return;
-                    }
-
-                    const newFilters = [...filters, { ...addingFilter, applied: true }]
-                    setFilters(newFilters);
-                    localStorage.setItem('filters', JSON.stringify(newFilters))
-                    setAddingFilter({ attrName: '', action: '', option: '' });
-                    setFilterError("");
-                  }} />
-
-                </div>
-                <div className="filter-error text-red-500">
-                  {filterError}
-                </div>
-              </div>
-            }
-          />
-
-          <DropDown
-            toggleButton={<SettingsRounded className="text-[#023e8a] text-[20px]" />}
-            content={<div className="p-4 w-48 bg-white border border-gray-300 shadow-lg space-y-2">
-
-            </div>
-            }
-          />
-
-          <SearchRounded className="text-[#023e8a] text-[20px]" />
-
-
-        </div>
-        <div className="mx-[20px] italic">
-          {upToDate ? "All changes saved." : "Processing..."}
-        </div>
-      </div>
-
-      <div className="table-header-group grid text-[16px] p-1 border-b-[1px]"
-        style={{
-          gridTemplateColumns: [`${optionsColumnWidth}px`, ...orderedAttrs
-            .map((attr) => `${attr.width}px`)]
-            .join(' ')
-        }}>
-        <div className="options-header"></div>
-        {
-          orderedAttrs.filter(attr => attr.newWindow === false).map((attr, index) =>
-            <div
-              key={index}
-              className="table-header-cell py-2 flex justify-between items-center relative"
-              onMouseEnter={() => setFocusedHeader(index)}
-            >
-              <div className="flex-grow"
-                draggable
-                onDragStart={(e) => handleColumnDragStart(e, attr.name)}
-                onDragOver={handleColumnDragOver}
-                onDrop={(e) => handleColumnDrop(e, attr.name)}
-              >
-                {attr.display}
-              </div>
-
-              <div className="column-option flex items-center flex-nowrap">
-                {focusedHeader === index &&
-                  <div
-                    className="relative w-[20px] h-[20px] hover:bg-gray-100 hover:rounded-full"
-                    onClick={() => handleSort(attr.name, attr.sort)}
-                  >
-                    <HorizontalRuleRounded
-                      className={`absolute inset-0 m-auto text-[16px]
-                     transition-transform duration-300 ease-in-out transform ${attr.sort === 'none' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'
-                        }`}
-                    />
-                    <ArrowDownwardRounded
-                      className={`absolute inset-0 m-auto text-[16px]
-                     transition-transform duration-300 ease-in-out transform ${attr.sort === 'asc' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'
-                        }`}
-                    />
-                    <ArrowUpwardRounded
-                      className={`absolute inset-0 m-auto text-[16px]
-                     transition-transform duration-300 ease-in-out transform ${attr.sort === 'desc' ? 'rotate-0 opacity-100' : '-rotate-90 opacity-0'
-                        }`}
-                    />
-                  </div>
-                }
-                {
-                  focusedHeader === index &&
-                  <DropDown
-                    toggleButton={<MenuIcon />}
-                    content={
-                      <div className="absolute top-[10px] bg-white border shadow-md w-[150px]">
-                        <div className="p-2 hover:bg-gray-200 w-full flex items-center justify-between">
-                          Filter
-                          <FilterAltRounded className="text-[16px]" />
-                        </div>
-                      </div>
-                    }
+      <div className="table-menu absolute top-[20px] right-0 z-10 bg-white border border-gray-300" ref={menuRef}>
+        {menu === 'column-visibility' &&
+          <div className="column-visibility-menu p-4 w-48 shadow-lg space-y-2">
+            {attrs.map(attr => (
+              !attrsByName[attr.name].newWindow && (
+                <div key={attr.name} className="flex justify-between items-center">
+                  <span className="text-gray-800">{attrsByName[attr.name].display}</span>
+                  <Checkbox
+                    value={!attrsByName[attr.name].hidden}
+                    onChange={() => handleColumnAppearance(attr.name)}
                   />
+                </div>
+              )
+            ))}
+          </div>
+        }
+        {menu === 'download' &&
+          <div className="p-4 w-48 shadow-lg space-y-2">
+            <button onClick={() => exportToCSV(Object.keys(attrs), data, name)} >Export to CSV</button>
+            <button onClick={() => exportToJSON(data, name)} >Export to JSON</button>
+          </div>
+        }
+        {menu === 'filters' &&
+          <div className="p-4 shadow-lg space-y-2 w-[500px]">
+            {filters.map(filter => (
+              <Dropdown
+                key={filter.name}
+                toggleButton={<div className=" bg-slate-300 rounded-full py-[2px] px-[8px] w-fit">
+                  {attrsByName[filter.name].display}{filter.actions && ":" + filter.actions.flatMap(action => action.criteria)}
+                </div>}
+                content={
+                  <div className="filter-options w-[100px] h-[16px] shadow-md">
+                    {
+                      attrsByName[filter.name].type === 'multiselect' &&
+                      <div></div>
+                    }
+                  </div>
                 }
-                <ColumnSeparator
-                  className="hover:cursor-col-resize hover:font-bold hover:text-blue-400"
-                  onMouseDown={(e) => handleMouseDown(e, attr.name)}
-                />
-              </div>
-            </div>
-          )
+              />
+            ))}
+
+          </div>
+        }
+        {menu === 'settings' &&
+          <div className="p-4 w-48 bg-white border border-gray-300 shadow-lg space-y-2">
+
+          </div>
+        }
+        {menu === 'search' &&
+          <div className="p-4 w-48 bg-white border border-gray-300 shadow-lg space-y-2">
+
+          </div>
         }
       </div>
 
-      <div className="table-body flex-grow text-[14px] text-gray-800">
-        {paginatedData.map((item) => (
-          <TableRow
-            key={item.id}
-            item={item}
-            attrs={orderedAttrs}
-            optionsColumnWidth={optionsColumnWidth}
-            onUpdate={onUpdateCell}
-            onExchangeItems={onExchangeItems} />
-        ))}
+      <div className="table-extension flex justify-between h-[20px]">
+        <div className="sync-state mx-[20px] italic">
+          {upToDate ? "All changes saved." : "Processing..."}
+        </div>
+
+        <div className="option-icons flex space-x-3">
+          <ViewColumnRounded className="text-[#023e8a] text-[20px]"
+            onClick={() => setMenu("column-visibility")} />
+          <Download className="text-[#023e8a] text-[20px]"
+            onClick={() => setMenu("download")} />
+          <FilterAltRounded className="text-[#023e8a] text-[20px]"
+            onClick={() => setMenu("filters")}
+          />
+          <SettingsRounded className="text-[#023e8a] text-[20px]"
+            onClick={() => setMenu("settings")}
+          />
+          <SearchRounded className="text-[#023e8a] text-[20px]"
+            onClick={() => setMenu("search")}
+          />
+        </div>
+      </div>
+
+      <div className="table-content">
+        <div className="header-group grid p-1 border-b-[1px]"
+          style={{
+            gridTemplateColumns: [`${optionsColumnWidth}px`, ...orderedAttrs
+              .map((attr) => `${attr.width}px`)]
+              .join(' ')
+          }}>
+          <div className="options-header"></div>
+          {
+            orderedAttrs.map((attr, index) =>
+              <div
+                key={index}
+                className={`header-cell-${attr.name} py-2 flex justify-between items-center relative`}
+                onMouseEnter={() => setFocusedHeader(index)}
+              >
+                <div className="header-name flex-grow text-[16px] "
+                  draggable
+                  onDragStart={(e) => handleColumnDragStart(e, attr.name)}
+                  onDragOver={handleColumnDragOver}
+                  onDrop={(e) => handleColumnDrop(e, attr.name)}
+                >
+                  {attr.display}
+                </div>
+
+                <div className="column-option flex items-center flex-nowrap">
+                  {focusedHeader === index &&
+                    <div
+                      className="relative w-[20px] h-[20px] hover:bg-gray-100 hover:rounded-full"
+                      onClick={() => {
+                        if (sorting.attrName !== attr.name) {
+                          handleSort(attr.name, 'asc')
+                        } else {
+                          if (sorting.direction === 'none') {
+                            handleSort(attr.name, 'asc')
+                          }
+                          if (sorting.direction === 'asc') {
+                            handleSort(attr.name, 'desc')
+                          }
+                          if (sorting.direction === 'desc') {
+                            handleSort(attr.name, 'none')
+                          }
+                        }
+                      }}
+                    >
+                      <HorizontalRuleRounded
+                        className={`absolute inset-0 m-auto text-[16px]
+                     transition-transform duration-300 ease-in-out transform ${attr.sort === 'none' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'
+                          }`}
+                      />
+                      <ArrowDownwardRounded
+                        className={`absolute inset-0 m-auto text-[16px]
+                     transition-transform duration-300 ease-in-out transform ${attr.sort === 'asc' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'
+                          }`}
+                      />
+                      <ArrowUpwardRounded
+                        className={`absolute inset-0 m-auto text-[16px]
+                     transition-transform duration-300 ease-in-out transform ${attr.sort === 'desc' ? 'rotate-0 opacity-100' : '-rotate-90 opacity-0'
+                          }`}
+                      />
+                    </div>
+                  }
+                  {
+                    focusedHeader === index &&
+                    <Dropdown
+                      toggleButton={<MoreVertRounded />}
+                      content={
+                        <div className="absolute top-[10px] bg-white border shadow-md w-[150px]">
+                          <div className="p-2 hover:bg-gray-200 w-full flex items-center"
+                            onClick={() => handleSort(attr.name, 'asc')}
+                          >
+                            <ArrowDownwardRounded className="text-[16px] mr-3" />
+                            Sort ascending
+                          </div>
+                          <div className="p-2 hover:bg-gray-200 w-full flex items-center"
+                            onClick={() => handleSort(attr.name, 'desc')}
+                          >
+                            <ArrowUpwardRounded className="text-[16px] mr-3" />
+                            Sort descending
+                          </div>
+                          <div className="p-2 hover:bg-gray-200 w-full flex items-center"
+                            onClick={() => dispatchFilters({ name: attr.name })}
+                          >
+                            <FilterAltRounded className="text-[16px] mr-3" />
+                            Filter
+                          </div>
+                        </div>
+                      }
+                    />
+                  }
+                  <ColumnSeparator
+                    className="hover:cursor-col-resize hover:font-bold hover:text-blue-400"
+                    onMouseDown={(e) => handleMouseDown(e, attr.name)}
+                  />
+                </div>
+              </div>
+            )
+          }
+        </div>
+
+        <div className="table-body flex-grow text-[14px] text-gray-800">
+          {paginatedData.map((item) => (
+            <TableRow
+              key={item.id}
+              item={item}
+              attrs={orderedAttrs}
+              optionsColumnWidth={optionsColumnWidth}
+              onUpdate={onUpdateCell}
+              onExchangeItems={onExchangeItems} />
+          ))}
+        </div>
       </div>
 
       <div className="table-footer flex items-center justify-between text-[#023e8a]">

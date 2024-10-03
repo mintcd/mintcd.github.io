@@ -2,7 +2,7 @@
 import { ReactNode, useState, useRef } from "react";
 import { useOnClickOutside } from 'usehooks-ts';
 
-export default function DropDown({
+export default function Dropdown({
   toggleButton,
   content,
   ...props
@@ -20,7 +20,7 @@ export default function DropDown({
   useOnClickOutside(dropdownRef, () => setIsOpen(false));
 
   return (
-    <div className={`drop-down relative inline-block `} ref={dropdownRef} {...props}>
+    <div className={`drop-down relative`} ref={dropdownRef} {...props}>
       <div onClick={handleToggle} className="cursor-pointer">
         {toggleButton}
       </div>

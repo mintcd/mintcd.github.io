@@ -1,30 +1,26 @@
-import React from 'react';
-import { select } from 'd3-selection';
 import Latex from '@components/latex';
 import { breakLinesForCircle } from '@functions/graph-analysis';
 import { statementProps } from '@styles/statement-props';
 
 import "@styles/global.css"
 
-export default function GraphNode({ vertex, radius, fontSize = radius / 4, selectedNode, setSelectedNode }
+export default function GraphNode({ vertex, radius, fontSize = radius / 3 }
   : {
     vertex: Vertex,
     radius: number,
     fontSize?: number,
-    selectedNode: Vertex | undefined,
-    setSelectedNode: (v: Vertex) => void
   }) {
+
+
   return (
     <g
       className={`node node-${vertex.key} hover:cursor-pointer`}
-      onClick={() => { setSelectedNode(vertex); }}
     >
       <circle
         className="shape"
         r={radius}
         stroke="none"
-        fill={vertex.color || statementProps[vertex.type] ? statementProps[vertex.type].color : ''}
-      // opacity={vertex.name == selectedNode?.name ? 1 : 0.5}
+        fill={vertex.color || (statementProps[vertex.type] ? statementProps[vertex.type].color : 'gray')}
       />
       <foreignObject
         width={2 * radius}
@@ -32,7 +28,7 @@ export default function GraphNode({ vertex, radius, fontSize = radius / 4, selec
         x={-radius}
         y={-radius}
       >
-        <div
+        <div className={``}
           style={{
             display: 'flex',
             flexDirection: 'column',
@@ -41,10 +37,10 @@ export default function GraphNode({ vertex, radius, fontSize = radius / 4, selec
             width: '100%',
             height: '100%',
             color: 'white',
-            fontSize: `${fontSize}px`,
+            fontSize: fontSize
           }}
         >
-          {breakLinesForCircle(vertex, radius).map((line, i) => (
+          {breakLinesForCircle(vertex, radius, fontSize).map((line, i) => (
             <Latex key={i}>{line}</Latex>
           ))}
         </div>

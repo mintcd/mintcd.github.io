@@ -2,38 +2,30 @@
 
 import { useState, useEffect } from 'react'
 
-import KnowledgeGraph from '@components/graph/main'
-import graph from '@models/knowledge-graph'
+import KnowledgeGraph from '@components/graph'
 import { fetchData } from '@functions/database'
-
-import Terminology from '@components/terminology'
-import objects from '@models/mathematics/terminology'
+import { getEdges } from '@functions/graph-analysis'
 
 export default function Mathematics() {
-  // const [data, setData] = useState<Graph>({ vertices: [] })
+  console.log("rendered")
+  const [data, setData] = useState<Graph>({ vertices: [] })
 
-  // useEffect(() => {
-  //   fetchData({
-  //     table: 'statements',
-  //     attrs: ['id', 'name', 'type', 'fields']
-  //   }).then((data) => {
-  //     console.log(data)
-  //     const vertices = data as unknown as Vertex[]
-  //     setData({
-  //       vertices: vertices
-  //     })
-  //   })
-  // })
+  useEffect(() => {
+    fetchData({
+      table: 'statement',
+      attrs: ['id', 'name', 'type', 'field', 'parents']
+    }).then((data) => {
+      const vertices = data as unknown as Vertex[]
+      setData({
+        vertices: vertices,
+        edges: getEdges(vertices)
+      })
+    })
+  }, [])
 
   return (
     <div className=''>
-      {/* <div className='mb-4 w-full'>
-        <div className="text-center text-3xl font-bold">
-          Terminology
-        </div>
-        <Terminology data={objects} />
-      </div> */}
-      <KnowledgeGraph graphData={graph as Graph} />
+      {data.vertices.length > 0 && <KnowledgeGraph graphData={data} />}
     </div>
   );
 

@@ -1,3 +1,5 @@
+'use client'
+
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { getAllIndices } from "@functions/text-analysis";
 import Latex from "@components/latex";
@@ -6,11 +8,14 @@ import { getCaretCoordinates } from "@functions/elements";
 export default function TextField({
   type,
   onUpdate,
-  initialValue
+  initialValue,
+  updateOnEnter = true
+
 }: {
   type: "text" | "latex";
   onUpdate: (value: string) => void;
   initialValue?: string;
+  updateOnEnter?: boolean;
 }) {
   const [oldValue, setOldValue] = useState("")
   const [editingValue, setEditingValue] = useState(initialValue || "");
@@ -20,7 +25,7 @@ export default function TextField({
   const [latexValue, setLatexValue] = useState('')
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter") {
+    if (updateOnEnter && e.key === "Enter") {
       if (e.shiftKey) {
         e.preventDefault();
         setEditingValue(editingValue + "\n");

@@ -1,5 +1,6 @@
 import TableCell from "@components/table/table-cell";
 import { useEffect, useState } from "react";
+import { AttrProps } from "../types";
 import { useClickAway } from "@uidotdev/usehooks";
 import { DragIndicatorOutlined, UnfoldMoreRounded, UnfoldLessRounded } from "@mui/icons-material";
 import TextCell from "../table-cell/TextCell";
@@ -69,7 +70,6 @@ export default function TableRow({ item, attrs, optionsColumnWidth, onUpdate, on
       window.removeEventListener('keydown', handleKeyPress); // Cleanup
     };
   }, [focusedCell, attrs.length]); // Add dependencies
-
 
   return (
     <div

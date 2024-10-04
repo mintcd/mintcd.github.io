@@ -1,5 +1,6 @@
 import MultiSelectCell from "./MultiSelectCell"
 import TextCell from "./TextCell"
+import { AttrProps } from "../types"
 
 export default function TableCell({ itemId, attr, value, onUpdate, suggestions, focused, onClick }:
   {

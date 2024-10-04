@@ -16,20 +16,6 @@ type FilterProp = {
     applied?: boolean
 }
 
-type AttrProps = {
-    name: string,
-    type: 'text' | 'multiselect',
-    display: string,
-    useLatex?: boolean,
-    referencing?: string,
-    width?: number,
-    order?: number,
-    newWindow?: boolean,
-    hidden?: boolean,
-    sort?: 'none' | 'asc' | 'desc',
-    suggestions?: string[]
-}
-
 type DataItem = {
     [key: string]: any;
 };

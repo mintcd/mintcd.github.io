@@ -61,7 +61,7 @@ export async function updateItem(table: string, itemId: number, attrValue: JsonO
   return data
 }
 
-export async function createItem(table: string, data: DataItem[], attrProps: AttrProps[]) {
+export async function createItem(table: string, data: DataItem[]) {
   // Find the smallest available ID
   const currentIds = data.map(item => item.id).sort((x: number, y: number) => x - y);
   let newId = 1;
@@ -73,10 +73,6 @@ export async function createItem(table: string, data: DataItem[], attrProps: Att
   }
 
   const createdItem: DataItem = { id: newId }
-  for (const attr of attrProps) {
-    if (attr.name == 'id') continue
-    createdItem[attr.name] = attr.type === 'multiselect' ? [] : ''
-  }
 
   // Insert the new item with the smallest available ID
   const { error } = await supabase.from(table).insert(createdItem);
@@ -84,26 +80,4 @@ export async function createItem(table: string, data: DataItem[], attrProps: Att
   if (error) {
     console.error('Error inserting item:', error);
   }
-}
-
-export function sortData(data: DataItem[], attrName: string, direction: 'asc' | 'desc' | 'none') {
-  if (direction === 'none') {
-    return data;
-  }
-
-  const sortedData = [...data].sort((a: DataItem, b: DataItem) => {
-    const aValue = a[attrName];
-    const bValue = b[attrName];
-    const isEmptyOrNull = (val: any) => val === null || val === undefined || val === '' || (Array.isArray(val) && val.length === 0);
-
-    if (direction === 'asc') {
-      if (isEmptyOrNull(aValue)) return 1;
-      return aValue > bValue ? 1 : -1;
-    } else {
-      if (isEmptyOrNull(bValue)) return 1;
-      return aValue < bValue ? 1 : -1;
-    }
-  });
-
-  return sortedData;
 }

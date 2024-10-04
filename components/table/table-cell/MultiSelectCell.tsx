@@ -4,6 +4,8 @@ import Autocomplete from '@components/autocomplete/Autocomplete';
 import { useEffect, useState } from 'react';
 import { useClickAway } from "@uidotdev/usehooks";
 
+import { AttrProps } from "../types"
+
 export default function MultiSelectCell({ itemId, attr, values, onUpdate, suggestions, focused }:
   {
     itemId: number
@@ -29,6 +31,8 @@ export default function MultiSelectCell({ itemId, attr, values, onUpdate, sugges
     else setCellState('noEdit')
   }, [focused])
 
+  console.log(attr)
+
   return (
     <div className="table-multiselect-cell flex flex-wrap w-full h-full"
       ref={ref}
@@ -46,6 +50,9 @@ export default function MultiSelectCell({ itemId, attr, values, onUpdate, sugges
             onClose={(e) => {
               e.stopPropagation(); // Prevent event from reaching the parent
               onUpdate(itemId, attr.name, values.filter((_, i) => i !== index));
+            }}
+            style={{
+              bgColor: attr.color[value]
             }}
           />
         ))

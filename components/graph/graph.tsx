@@ -182,7 +182,7 @@ export default function KnowledgeGraph({ graphData }: { graphData: Graph }) {
       graph.selectAll('*').remove();
       simulation.stop();
     };
-  }, [params, graphRendered, selectedField]);
+  }, [params, graphRendered, selectedField, edges, vertices]);
 
   useEffect(() => {
     selectAll(".node")

@@ -2,16 +2,16 @@
 
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 
-export default function Checkbox({ value, onChange }: {
-  value: boolean;
-  onChange: (value: boolean) => void;
+export default function Checkbox({ checked, onChange }: {
+  checked: boolean;
+  onChange: (checked: boolean) => void;
 }) {
   return (
     <label className="relative inline-flex items-center cursor-pointer">
       <input
         type="checkbox"
         className="sr-only peer"
-        checked={value}
+        checked={checked}
         onChange={(e) => onChange(e.target.checked)}
       />
       <div className={`w-[16px] h-[16px] bg-gray-200 flex items-center justify-center

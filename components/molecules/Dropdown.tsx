@@ -20,13 +20,13 @@ export default function Dropdown({
   useOnClickOutside(dropdownRef, () => setIsOpen(false));
 
   return (
-    <div className={`drop-down relative`} ref={dropdownRef} {...props}>
-      <div onClick={handleToggle} className="cursor-pointer">
+    <div className={`drop-down relative w-fit`} ref={dropdownRef} {...props}>
+      <span onClick={handleToggle} className="cursor-pointer">
         {toggleButton}
-      </div>
+      </span>
 
       <div
-        className={`absolute z-[10] max-w-[100px] mt-2 w-full bg-white border border-gray-200 shadow-lg transition-all duration-300 ease-out 
+        className={`absolute z-[10] mt-2 w-fit bg-white border border-gray-200 shadow-lg transition-all duration-300 ease-out 
           ${isOpen ? 'translate-y-0 opacity-100' : 'translate-y-[-10px] opacity-0 pointer-events-none'}`}
       >
         {content}

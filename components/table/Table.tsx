@@ -3,34 +3,21 @@
 import { useState, useRef, useEffect, useCallback, useMemo, useReducer } from "react";
 import { useClickAway } from "@uidotdev/usehooks";
 import './table.css'
-
-import { getTextWidth, capitalizeFirstLetter } from "@functions/text-analysis";
-import { sortData } from "@functions/database";
+import { FilterAction, menuState, AttrProps } from './types.ts'
+import { filterData, initializeAttrsByName, sortData, updateFilter } from "./functions.ts";
 import { exportToCSV, exportToJSON } from "@functions/document"
 
 import ColumnSeparator from "./ColumnSeparator";
 import { Dropdown } from "@components/molecules";
-import Checkbox from "@components/checkbox/Checkbox";
+import { Checkbox } from "@components/atoms";
 import TableRow from "./table-row/TableRow";
 
 import {
-  AddRounded, SearchRounded, NavigateNextRounded,
+  AddRounded, NavigateNextRounded,
   NavigateBeforeRounded, ViewColumnRounded, ArrowDownwardRounded,
   FilterAltRounded, Download, HorizontalRuleRounded, ArrowUpwardRounded,
-  SettingsRounded, PlayArrowRounded, ClearRounded, PlayArrowOutlined, MoreVertRounded
+  SettingsRounded, MoreVertRounded,
 } from '@mui/icons-material';
-
-type menuState = "filters" | "sorts" | "column-visibility" | "download" | "settings" | "search" | ""
-type FilterProp = {
-  name: string,
-  actions?: [
-    {
-      predicate: "contains" | "is",
-      criteria: string[]
-    }
-  ]
-}
-
 
 export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCreateItem, onExchangeItems }:
   {
@@ -51,24 +38,8 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
   // States
   const [attrsByName, setAttrsByName] = useState(() => {
     const storedAttrsByName = localStorage.getItem('attrsByName')
-    if (storedAttrsByName) return JSON.parse(storedAttrsByName)
-
-    const attrsByName: { [key: string]: AttrProps } = {}
-    attrs.forEach((attr, index) => {
-      attrsByName[attr.name] = {
-        ...attr,
-        width: Math.min(Math.max(Math.max(...data.map(item => getTextWidth(String(item[attr.name])))), 100), 200),
-        order: index,
-        hidden: false,
-        display: capitalizeFirstLetter(attr.name),
-        sort: 'none',
-        suggestions: Array.from(new Set(data.flatMap(item => attr.referencing
-          ? item[attr.referencing]
-          : item[attr.name])))
-          .sort()
-      }
-    })
-    return attrsByName;
+    if (storedAttrsByName) return JSON.parse(storedAttrsByName) as { [key: string]: AttrProps }
+    return initializeAttrsByName(attrs, data)
   })
 
   const [focusedHeader, setFocusedHeader] = useState(-1);
@@ -78,21 +49,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     attrName: '',
     direction: 'none',
   });
-
-
-  const [menu, setMenu] = useState<menuState>("");
-
-
-  const [filters, dispatchFilters] = useReducer(filterReducer, [] as FilterProp[])
-  function filterReducer(state: FilterProp[], action: FilterProp) {
-    if (state.find(filter => filter.name === action.name) === undefined) {
-      state.push(action)
-    }
-    else {
-    }
-    setMenu("filters")
-    return state
-  }
+  const [menu, setMenu] = useState<menuState>("")
 
   const menuRef = useClickAway(() => {
     setMenu("")
@@ -117,6 +74,12 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
   const resizingRef = useRef({ startX: 0, startWidth: 0, attrName: '' });
 
   // Handlers
+  function handleFilter(action: FilterAction) {
+    menu !== "filter" && setMenu("filter")
+    const updatedAttrsByName = updateFilter(attrsByName, action)
+    // Enable the filter
+    setAttrsByName(updatedAttrsByName)
+  }
 
   function handleSort(attrName: string, direction: 'none' | 'asc' | 'desc') {
     setAttrsByName({ ...attrsByName, [attrName]: { ...attrsByName[attrName], sort: direction } });
@@ -127,7 +90,6 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     const newAttrsByName = { ...attrsByName }
     newAttrsByName[columnName] = { ...newAttrsByName[columnName], hidden: !attrsByName[columnName].hidden }
     setAttrsByName(newAttrsByName)
-    localStorage.setItem('attrsByName', JSON.stringify(newAttrsByName))
   }
 
   const handleMouseDown = (e: React.MouseEvent, attrName: string) => {
@@ -159,8 +121,6 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     document.removeEventListener('mousemove', handleMouseMove);
     document.removeEventListener('mouseup', handleMouseUp);
     resizingRef.current.attrName = '';
-
-    localStorage.setItem('attrsByName', JSON.stringify(attrsByName));
 
   }, [attrsByName, handleMouseMove]);
 
@@ -204,7 +164,6 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
       }
       newAttrsByName[draggedName].order = targetOrder;
       setAttrsByName(newAttrsByName);
-      localStorage.setItem('attrsByName', JSON.stringify(newAttrsByName));
     }
   };
 
@@ -213,22 +172,16 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     setCurrentPage(page);
   };
 
+
   // Effects
   useEffect(() => {
-    // Process data before rendering
-    let processedData = [...data]
-
-    // Apply filters
-    // filters.forEach((filter) => {
-    //   if (!filter.applied) return
-    //   const filteredAttr = filter.name as string
-    //   processedData = processedData.filter(item => item[filteredAttr].includes(filter.option) || item[filteredAttr].length === 0)
-    // })
+    localStorage.setItem('attrsByName', JSON.stringify(attrsByName));
+    const processedData = filterData(data, attrsByName)
 
     // Apply sorting
     setProcessedData(sortData(processedData, sorting.attrName, sorting.direction));
-    // setCurrentItem(data.find(item => currentItem && item.id === currentItem.id) as DataItem);
-  }, [data, sorting, filters]);
+
+  }, [data, sorting, attrsByName]);
 
   return (
     <div className="table-container flex flex-col overflow-auto shadow-md relative">
@@ -241,7 +194,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
                 <div key={attr.name} className="flex justify-between items-center">
                   <span className="text-gray-800">{attrsByName[attr.name].display}</span>
                   <Checkbox
-                    value={!attrsByName[attr.name].hidden}
+                    checked={!attrsByName[attr.name].hidden}
                     onChange={() => handleColumnAppearance(attr.name)}
                   />
                 </div>
@@ -255,33 +208,76 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
             <button onClick={() => exportToJSON(data, name)} >Export to JSON</button>
           </div>
         }
-        {menu === 'filters' &&
+        {menu === 'filter' &&
           <div className="p-4 shadow-lg space-y-2 w-[500px]">
-            {filters.map(filter => (
-              <Dropdown
-                key={filter.name}
-                toggleButton={<div className=" bg-slate-300 rounded-full py-[2px] px-[8px] w-fit">
-                  {attrsByName[filter.name].display}{filter.actions && ":" + filter.actions.flatMap(action => action.criteria)}
-                </div>}
-                content={
-                  <div className="filter-options w-[100px] h-[16px] shadow-md">
-                    {
-                      attrsByName[filter.name].type === 'multiselect' &&
-                      <div></div>
-                    }
-                  </div>
-                }
-              />
-            ))}
+            {Object.keys(attrsByName)
+              .filter(attrName => attrsByName[attrName]['filterEnabled'])
+              .map((attrName) => (
+                <Dropdown
+                  key={attrName}
+                  toggleButton={
+                    <span className=" bg-slate-300 rounded-full py-[2px] px-[8px]">
+                      {attrsByName[attrName].display}
+                      {function () {
+                        const candidates = Object.values(attrsByName[attrName]['filter']).flat()
+                        return candidates.length > 0 ? ": " + candidates.join(", ") : ""
+                      }()}
+                    </span>
+                  }
+                  content={
+                    <div className="filter-options">
+                      {
+                        attrsByName[attrName].type === 'multiselect' &&
+                        <div>
+                          {attrsByName[attrName].display} is
+                          {attrsByName[attrName].suggestions?.map(suggestion => (
+                            <div key={suggestion} className="w-[200px]">
+                              <Checkbox checked={Boolean(attrsByName[attrName]['filter']['is']?.includes(suggestion))}
+                                onChange={() => handleFilter({
+                                  name: attrName,
+                                  predicate: "is",
+                                  candidate: suggestion
+                                })} />
+                              <span className="mx-2">
+                                {suggestion}
+                              </span>
+
+                            </div>
+                          ))}
+                        </div>
+                      }
+                      {/* {
+                      attrsByName[filter.name].type === 'text' &&
+                      <div>
+                        {attrsByName[filter.name].display} contains
+                        {attrsByName[filter.name].suggestions?.map(suggestion => (
+                          <div key={suggestion} className="w-[200px]">
+                            <Checkbox checked={filter.actions.some((action) => action.criteria.includes(suggestion))}
+                              onChange={() => dispatchFilters({
+                                name: filter.name,
+                                actions:
+                                  [{
+                                    predicate: "contains",
+                                    criteria: [suggestion]
+                                  }]
+
+                              })} />
+                            <span className="mx-2">
+                              {suggestion}
+                            </span>
+
+                          </div>
+                        ))}
+                      </div>
+                    } */}
+                    </div>
+                  }
+                />
+              ))}
 
           </div>
         }
         {menu === 'settings' &&
-          <div className="p-4 w-48 bg-white border border-gray-300 shadow-lg space-y-2">
-
-          </div>
-        }
-        {menu === 'search' &&
           <div className="p-4 w-48 bg-white border border-gray-300 shadow-lg space-y-2">
 
           </div>
@@ -299,13 +295,10 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
           <Download className="text-[#023e8a] text-[20px]"
             onClick={() => setMenu("download")} />
           <FilterAltRounded className="text-[#023e8a] text-[20px]"
-            onClick={() => setMenu("filters")}
+            onClick={() => setMenu("filter")}
           />
           <SettingsRounded className="text-[#023e8a] text-[20px]"
             onClick={() => setMenu("settings")}
-          />
-          <SearchRounded className="text-[#023e8a] text-[20px]"
-            onClick={() => setMenu("search")}
           />
         </div>
       </div>
@@ -390,7 +383,10 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
                             Sort descending
                           </div>
                           <div className="p-2 hover:bg-gray-200 w-full flex items-center"
-                            onClick={() => dispatchFilters({ name: attr.name })}
+                            onClick={() => handleFilter(
+                              {
+                                name: attr.name,
+                              })}
                           >
                             <FilterAltRounded className="text-[16px] mr-3" />
                             Filter
@@ -414,7 +410,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
             <TableRow
               key={item.id}
               item={item}
-              attrs={orderedAttrs}
+              attrs={Object.keys(attrsByName).map(attrName => attrsByName[attrName])}
               optionsColumnWidth={optionsColumnWidth}
               onUpdate={onUpdateCell}
               onExchangeItems={onExchangeItems} />

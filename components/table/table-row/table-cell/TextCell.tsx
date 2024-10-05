@@ -1,7 +1,7 @@
 import Latex from "@components/latex";
 import { TextField } from "@components/atoms"
 import { useClickAway } from "@uidotdev/usehooks";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function TextCell({
   itemId,

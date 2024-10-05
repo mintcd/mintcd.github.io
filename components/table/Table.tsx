@@ -95,17 +95,17 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
       <div className="table-menu absolute top-[20px] right-0 z-10 bg-white border border-gray-300" ref={menuRef}>
         {menu === 'column-visibility' &&
           <div className="column-visibility-menu p-4 w-48 shadow-lg space-y-2">
-            {attrs.map(attr => (
-              !attrsByName[attr.name].newWindow && (
-                <div key={attr.name} className="flex justify-between items-center">
-                  <span className="text-gray-800">{attrsByName[attr.name].display}</span>
-                  <Checkbox
-                    checked={!attrsByName[attr.name].hidden}
-                    onChange={() => handleColumnAppearance(attr.name)}
-                  />
-                </div>
-              )
-            ))}
+            {Object.values(attrsByName).map(attr => (
+              !attr.newWindow &&
+              <div key={attr.name} className="flex justify-between items-center">
+                <span className="text-gray-800">{attrsByName[attr.name].display}</span>
+                <Checkbox
+                  checked={!attrsByName[attr.name].hidden}
+                  onChange={() => handleColumnAppearance(attr.name)}
+                />
+              </div>
+            ))
+            }
           </div>
         }
         {menu === 'download' &&
@@ -211,7 +211,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
 
       <div className="table-content">
         <TableHeaderGroup
-          attrsByName={filterObject(attrsByName, (_, value) => value.newWindow === false)}
+          attrsByName={filterObject(attrsByName, (_, attr) => attr.newWindow === false && !attr.hidden)}
           setAttrsByName={setAttrsByName}
           style={style} />
 
@@ -220,7 +220,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
             <TableRow
               key={item.id}
               item={item}
-              attrs={Object.keys(attrsByName).map(attrName => attrsByName[attrName])}
+              attrsByName={filterObject(attrsByName, (_, attr) => !attr.hidden)}
               style={style}
               onUpdate={onUpdateCell}
               onExchangeItems={onExchangeItems} />

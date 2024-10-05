@@ -5,10 +5,10 @@ import { DragIndicatorOutlined, UnfoldMoreRounded, UnfoldLessRounded } from "@mu
 import TextCell from "./table-cell/TextCell";
 import { Divider } from "@mui/material";
 
-export default function TableRow({ item, attrs, onUpdate, onExchangeItems, style }:
+export default function TableRow({ item, attrsByName, onUpdate, onExchangeItems, style }:
   {
     item: DataItem,
-    attrs: AttrProps[],
+    attrsByName: AttrsByName,
     onUpdate: (itemId: number, attr: string, value: string | string[]) => void,
     onExchangeItems: (id1: number, id2: number) => void,
     style?: {
@@ -17,6 +17,8 @@ export default function TableRow({ item, attrs, onUpdate, onExchangeItems, style
     }
   }
 ) {
+
+  const attrs = Object.values(attrsByName)
 
   const regularAttrs = attrs.filter(attr => attr.newWindow === false)
   const expandedAttrs = attrs.filter(attr => attr.newWindow === true)
@@ -100,18 +102,18 @@ export default function TableRow({ item, attrs, onUpdate, onExchangeItems, style
                 onDragEnd={handleDragEnd} // Reset dragging state after the drag ends
                 className={`${draggingItemId === item.id ? 'opacity-50' : 'opacity-100'} transition-opacity`}
               >
-                <DragIndicatorOutlined className="text-[18px] hover:cursor-grab" />
+                <DragIndicatorOutlined className="size-[18px] hover:cursor-grab" />
               </span>
 
               {attrs.some(attr => attr.newWindow) && (
                 !expanded ? (
                   <UnfoldMoreRounded
-                    className="text-[18px] hover:cursor-pointer"
+                    className="size-[18px] hover:cursor-pointer"
                     onClick={() => setExpanded(true)}
                   />
                 ) : (
                   <UnfoldLessRounded
-                    className="text-[18px] hover:cursor-pointer"
+                    className="size-[18px] hover:cursor-pointer"
                     onClick={() => setExpanded(false)}
                   />
                 )

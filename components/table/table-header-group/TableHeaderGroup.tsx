@@ -119,7 +119,7 @@ export default function TableHeaderGroup({ style, attrsByName, setAttrsByName }:
             <div className="column-option flex items-center flex-nowrap">
               {focusedIndex === index &&
                 <div
-                  className="relative w-[20px] h-[20px] hover:bg-gray-100 hover:rounded-full"
+                  className="relative size-[20px] hover:bg-gray-100 hover:rounded-full"
                   onClick={() => {
                     if (attr.sort === 'none') {
                       setAttrsByName({ ...attrsByName, [attr.name]: { ...attrsByName[attr.name], sort: 'asc' } })
@@ -134,17 +134,17 @@ export default function TableHeaderGroup({ style, attrsByName, setAttrsByName }:
                   }}
                 >
                   <HorizontalRuleRounded
-                    className={`absolute inset-0 m-auto text-[16px]
+                    className={`absolute inset-0 m-auto size-[16px]
              transition-transform duration-300 ease-in-out transform ${attr.sort === 'none' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'
                       }`}
                   />
                   <ArrowDownwardRounded
-                    className={`absolute inset-0 m-auto text-[16px]
+                    className={`absolute inset-0 m-auto size-[16px]
              transition-transform duration-300 ease-in-out transform ${attr.sort === 'asc' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'
                       }`}
                   />
                   <ArrowUpwardRounded
-                    className={`absolute inset-0 m-auto text-[16px]
+                    className={`absolute inset-0 m-auto size-[16px]
              transition-transform duration-300 ease-in-out transform ${attr.sort === 'desc' ? 'rotate-0 opacity-100' : '-rotate-90 opacity-0'
                       }`}
                   />
@@ -153,25 +153,25 @@ export default function TableHeaderGroup({ style, attrsByName, setAttrsByName }:
               {
                 focusedIndex === index &&
                 <Dropdown
-                  toggleButton={<MoreVertRounded className="text-[18px]" />}
+                  toggleButton={<MoreVertRounded className="size-[18px]" />}
                   content={
                     <div className="absolute top-[10px] bg-white border shadow-md w-[150px]">
                       <div className="p-2 hover:bg-gray-200 w-full flex items-center"
                         onClick={() => setAttrsByName({ ...attrsByName, [attr.name]: { ...attrsByName[attr.name], sort: 'asc' } })}
                       >
-                        <ArrowDownwardRounded className="text-[16px] mr-3" />
+                        <ArrowDownwardRounded className="size-[16px] mr-3" />
                         Sort ascending
                       </div>
                       <div className="p-2 hover:bg-gray-200 w-full flex items-center"
                         onClick={() => setAttrsByName({ ...attrsByName, [attr.name]: { ...attrsByName[attr.name], sort: 'desc' } })}
                       >
-                        <ArrowUpwardRounded className="text-[16px] mr-3" />
+                        <ArrowUpwardRounded className="size-[16px] mr-3" />
                         Sort descending
                       </div>
                       <div className="p-2 hover:bg-gray-200 w-full flex items-center"
                         onClick={() => setAttrsByName(updateFilter(attrsByName, { name: attr.name }))}
                       >
-                        <FilterAltRounded className="text-[16px] mr-3" />
+                        <FilterAltRounded className="size-[16px] mr-3" />
                         Filter
                       </div>
                     </div>

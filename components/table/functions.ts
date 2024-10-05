@@ -1,8 +1,7 @@
-import { AttrProps, FilterAction } from "./types";
 import { capitalizeFirstLetter, getTextWidth } from "@functions/text-analysis";
 
-export function updateFilter(attrsByName: { [key: string]: AttrProps }, action: FilterAction)
-  : { [key: string]: AttrProps } {
+export function updateFilter(attrsByName: AttrsByName, action: FilterAction)
+  : AttrsByName {
   const updatedAttrsByName = { ...attrsByName }
   // Enable the filter
   updatedAttrsByName[action.name]["filterEnabled"] = true

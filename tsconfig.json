@@ -11,7 +11,7 @@
     ],
     "typeRoots": [
       "./node_modules/@types",
-      "./scripts",
+      "./@types"
     ],
     "allowJs": true,
     "skipLibCheck": true,

@@ -1,18 +1,20 @@
-import TableCell from "@components/table/table-cell";
+import TableCell from "./table-cell";
 import { useEffect, useState } from "react";
-import { AttrProps } from "../types";
 import { useClickAway } from "@uidotdev/usehooks";
 import { DragIndicatorOutlined, UnfoldMoreRounded, UnfoldLessRounded } from "@mui/icons-material";
-import TextCell from "../table-cell/TextCell";
+import TextCell from "./table-cell/TextCell";
 import { Divider } from "@mui/material";
 
-export default function TableRow({ item, attrs, optionsColumnWidth, onUpdate, onExchangeItems }:
+export default function TableRow({ item, attrs, onUpdate, onExchangeItems, style }:
   {
     item: DataItem,
     attrs: AttrProps[],
-    optionsColumnWidth?: number
     onUpdate: (itemId: number, attr: string, value: string | string[]) => void,
     onExchangeItems: (id1: number, id2: number) => void,
+    style?: {
+      optionsColumnWidth?: number,
+      cellMinWidth?: number
+    }
   }
 ) {
 
@@ -85,7 +87,8 @@ export default function TableRow({ item, attrs, optionsColumnWidth, onUpdate, on
         key={item.id}
         className={`regular-cell-group grid py-[10px] hover:border-gray-300`}
         style={{
-          gridTemplateColumns: [`${optionsColumnWidth || 100}px`, ...regularAttrs.map((attr) => `${Math.max(attr.width || 0)}px`)].join(' '),
+          gridTemplateColumns: [`${style?.optionsColumnWidth || 100}px`,
+          ...regularAttrs.sort((x, y) => x.order - y.order).map((attr) => `${Math.max(attr.width || 0)}px`)].join(' '),
         }}
       >
         <div className="flex justify-end">
@@ -118,7 +121,7 @@ export default function TableRow({ item, attrs, optionsColumnWidth, onUpdate, on
         </div>
 
         {/* Regular Cells */}
-        {regularAttrs.map((attr, index) => (
+        {regularAttrs.sort((x, y) => x.order - y.order).map((attr, index) => (
           <TableCell
             key={`table-cell-${item.id}-${index + 1}`}
             itemId={item.id}

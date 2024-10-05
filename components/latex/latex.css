@@ -1,0 +1,8 @@
+.latex-list {
+  list-style-type: disc; /* Adds bullet points */
+  margin-left: 20px; /* Adds indentation */
+}
+
+.latex-list li {
+  margin-bottom: 8px; /* Optional: Adds spacing between items */
+}

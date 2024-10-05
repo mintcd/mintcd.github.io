@@ -4,8 +4,6 @@ import Autocomplete from '@components/autocomplete/Autocomplete';
 import { useEffect, useState } from 'react';
 import { useClickAway } from "@uidotdev/usehooks";
 
-import { AttrProps } from "../types"
-
 export default function MultiSelectCell({ itemId, attr, values, onUpdate, suggestions, focused }:
   {
     itemId: number
@@ -23,15 +21,13 @@ export default function MultiSelectCell({ itemId, attr, values, onUpdate, sugges
   }) as any;
 
   const handleTagClick = (event: React.MouseEvent) => {
-    event.stopPropagation();
+    // event.stopPropagation();
   };
 
   useEffect(() => {
     if (focused) setCellState('editing')
     else setCellState('noEdit')
   }, [focused])
-
-  console.log(attr)
 
   return (
     <div className="table-multiselect-cell flex flex-wrap space-x-2 w-full h-full"
@@ -67,7 +63,7 @@ export default function MultiSelectCell({ itemId, attr, values, onUpdate, sugges
           suggestions={suggestions}
           onSubmit={(newValue) => {
             if (newValue && cellState === 'editing') {
-              onUpdate(itemId, attr.name, [...values, newValue]);
+              if (!values.includes(newValue)) onUpdate(itemId, attr.name, [...values, newValue]);
               setCellState('noEdit');
             }
           }}

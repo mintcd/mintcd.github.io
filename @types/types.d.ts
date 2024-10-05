@@ -37,6 +37,8 @@ type AttrProps = {
     }
 }
 
+type AttrsByName = { [name: string]: AttrProps }
+
 
 type FilterProp = {
     name?: string,

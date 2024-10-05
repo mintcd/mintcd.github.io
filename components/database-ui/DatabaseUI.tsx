@@ -4,7 +4,6 @@ import Table from '@components/table'
 import { createItem, exchangeItems, fetchData, updateItem } from '@functions/database';
 import { useCallback, useEffect, useState } from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
-import { AttrProps, DataItem } from '@types';
 
 
 export default function DatabaseUI({ table }: {

@@ -1,6 +1,5 @@
 // supabaseClient.js
 import { createClient } from '@supabase/supabase-js';
-import { DataItem, JsonObject } from '@types';
 
 export const supabase =
   createClient(

@@ -4,13 +4,14 @@ import { useCallback, useRef, useState } from "react"
 import { TbMinusVertical } from "react-icons/tb";
 import { updateFilter } from "../functions";
 
-export default function TableHeaderGroup({ style, attrsByName, setAttrsByName }: {
+export default function TableHeaderGroup({ style, attrsByName, setAttrsByName, setMenu }: {
   style?: {
     cellMinWidth?: number,
     optionsColumnWidth?: number
   },
   attrsByName: AttrsByName,
-  setAttrsByName: (newAttrsByName: AttrsByName) => void
+  setAttrsByName: (newAttrsByName: AttrsByName) => void,
+  setMenu: () => void
 }) {
 
   const animationFrameRef = useRef<number | null>(null);
@@ -177,7 +178,10 @@ export default function TableHeaderGroup({ style, attrsByName, setAttrsByName }:
                           Sort descending
                         </div>
                         <div className="p-2 hover:bg-gray-200 w-full flex items-center"
-                          onClick={() => setAttrsByName(updateFilter(attrsByName, { name: attr.name }))}
+                          onClick={() => {
+                            setMenu()
+                            setAttrsByName(updateFilter(attrsByName, { name: attr.name }))
+                          }}
                         >
                           <FilterAltRounded className="mr-3" style={{ fontSize: '16px' }} />
                           Filter

@@ -213,7 +213,9 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
         <TableHeaderGroup
           attrsByName={filterObject(attrsByName, (_, attr) => attr.newWindow === false && !attr.hidden)}
           setAttrsByName={setAttrsByName}
-          style={style} />
+          style={style}
+          setMenu={() => setMenu('filter')}
+        />
 
         <div className="table-body flex-grow text-gray-800">
           {paginatedData.map((item) => (
@@ -223,7 +225,8 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
               attrsByName={filterObject(attrsByName, (_, attr) => !attr.hidden)}
               style={style}
               onUpdate={onUpdateCell}
-              onExchangeItems={onExchangeItems} />
+              onExchangeItems={onExchangeItems}
+            />
           ))}
         </div>
       </div>

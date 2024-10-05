@@ -1,7 +1,6 @@
 import { Dropdown } from "@components/molecules";
 import { ArrowDownwardRounded, ArrowUpwardRounded, AtmRounded, FilterAltRounded, HorizontalRuleRounded, MoreVertRounded } from "@mui/icons-material";
 import { useCallback, useRef, useState } from "react"
-import { TbMinusVertical } from "react-icons/tb";
 import { updateFilter } from "../functions";
 
 export default function TableHeaderGroup({ style, attrsByName, setAttrsByName, setMenu }: {
@@ -17,6 +16,7 @@ export default function TableHeaderGroup({ style, attrsByName, setAttrsByName, s
   const animationFrameRef = useRef<number | null>(null);
   const resizingRef = useRef({ startX: 0, startWidth: 0, attrName: '' });
   const [focusedIndex, setFocusedIndex] = useState(-1)
+  const [resizeIndex, setResizeIndex] = useState(-1)
 
   const handleColumnDragStart = (e: React.DragEvent<HTMLDivElement>, draggedName: string) => {
     e.dataTransfer.setData('text/plain', draggedName);
@@ -92,7 +92,7 @@ export default function TableHeaderGroup({ style, attrsByName, setAttrsByName, s
   }, [handleMouseMove]);
 
   return (
-    <div className="header-group grid p-1 border-b-[1px]"
+    <div className="header-group grid pb-[1px] border-b-[1px]"
       style={{
         gridTemplateColumns: [`${style?.optionsColumnWidth || 100}px`,
         ...Object.values(attrsByName)
@@ -108,7 +108,7 @@ export default function TableHeaderGroup({ style, attrsByName, setAttrsByName, s
           .map((attr, index) =>
             <div
               key={index}
-              className={`header-cell-${attr.name} py-2 flex justify-between items-center relative pl-2`}
+              className={`header-cell-${attr.name} py-2 flex justify-between items-center  pl-2`}
               onMouseEnter={() => setFocusedIndex(index)}
             >
               <div className="header-name flex-grow text-[16px] hover:cursor-grab"
@@ -157,7 +157,7 @@ export default function TableHeaderGroup({ style, attrsByName, setAttrsByName, s
                       />
                       <ArrowUpwardRounded
                         className={`absolute inset-[4px]
-           transition-transform duration-300 ease-in-out transform ${attr.sort === 'desc' ? 'rotate-0 opacity-100' : '-rotate-90 opacity-0'
+                                    transition-transform duration-300 ease-in-out transform ${attr.sort === 'desc' ? 'rotate-0 opacity-100' : '-rotate-90 opacity-0'
                           }`}
                         style={{
                           fontSize: '16px'
@@ -193,12 +193,17 @@ export default function TableHeaderGroup({ style, attrsByName, setAttrsByName, s
                       }
                     />
                   </>}
-
-                <TbMinusVertical
-                  className="hover:cursor-col-resize hover:font-bold hover:text-blue-400 text-[25px]"
-                  onMouseDown={(e) => handleMouseDown(e, attr.name)}
-                />
               </div>
+
+              <div className={`column-separator h-full w-[5px] hover:cursor-col-resize hover:bg-[#4672b0] rounded-full flex items-center justify-center`}
+                onMouseDown={(e) => handleMouseDown(e, attr.name)}
+                onMouseEnter={() => setResizeIndex(index)}
+                onMouseLeave={() => setResizeIndex(-1)}
+              >
+                <div className={`h-full w-[1px] ${resizeIndex === index ? 'bg-transparent' : 'bg-gray-300'}`} />
+
+              </div>
+
             </div>
           )
       }

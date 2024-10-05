@@ -13,12 +13,6 @@
   outline: 2px solid #007bff;
 }
 
-/* Column separator */
-.column-separator {
-  background-color: #ddd;
-  width: 5px;
-}
-
 /* Body */
 .table-body {
   max-height: 70vh;

@@ -18,7 +18,8 @@ export default function Checkbox({ checked, onChange }: {
         peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300
         rounded-sm relative dark:border-gray-600 peer-checked:bg-[#1b4683]
         transition-all duration-300 ease-in-out`}>
-        <CheckRoundedIcon className='size-[14px] text-white opacity-100' />
+        <CheckRoundedIcon className='text-white opacity-100'
+          style={{ fontSize: '14px' }} />
       </div>
     </label>
   );

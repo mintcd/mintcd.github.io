@@ -17,7 +17,6 @@ import {
   FilterAltRounded, Download, HorizontalRuleRounded, ArrowUpwardRounded,
   SettingsRounded, MoreVertRounded,
 } from '@mui/icons-material';
-import { AttrProps, DataItem } from "@types.js";
 
 export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCreateItem, onExchangeItems }:
   {

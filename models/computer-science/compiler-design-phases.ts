@@ -59,4 +59,4 @@ export default [
     content: `Create the Control Flow Graph (CFG) for the optimized AST. Carefully deal with branch statements like IfStmt, ForStmt and WhileStmt.`,
     sections: []
   },
-] as Chapter[]
+]

@@ -1,10 +1,10 @@
-export type FilterAction = {
+type FilterAction = {
     name: string,
-    predicate?: 'contains' | 'is'
+    predicate?: 'contains' | 'is',
     candidate?: string
 }
 
-export type MenuState = "filter" | "sorts" | "column-visibility" | "download" | "settings" | "search" | ""
+type MenuState = "filter" | "sorts" | "column-visibility" | "download" | "settings" | "search" | ""
 
 type JsonObject<dataType> = {
     [key: string]: dataType
@@ -16,7 +16,7 @@ type Point = {
     z: number,
 }
 
-export type AttrProps = {
+type AttrProps = {
     name: string,
     type: 'text' | 'multiselect',
     display: string,

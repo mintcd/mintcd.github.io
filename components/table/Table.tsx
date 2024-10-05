@@ -76,7 +76,6 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
   };
-
   // Effects
   useEffect(() => {
     localStorage.setItem('attrsByName', JSON.stringify(attrsByName));
@@ -212,7 +211,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
 
       <div className="table-content">
         <TableHeaderGroup
-          attrsByName={filterObject(attrsByName, (key, value) => value.newWindow === false)}
+          attrsByName={filterObject(attrsByName, (_, value) => value.newWindow === false)}
           setAttrsByName={setAttrsByName}
           style={style} />
 

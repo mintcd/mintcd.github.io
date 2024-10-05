@@ -17,8 +17,6 @@ export default function TableHeaderGroup({ style, attrsByName, setAttrsByName }:
   const resizingRef = useRef({ startX: 0, startWidth: 0, attrName: '' });
   const [focusedIndex, setFocusedIndex] = useState(-1)
 
-  console.log(Object.values(attrsByName).map(value => value.order))
-
   const handleColumnDragStart = (e: React.DragEvent<HTMLDivElement>, draggedName: string) => {
     e.dataTransfer.setData('text/plain', draggedName);
   };

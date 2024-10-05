@@ -1,5 +1,5 @@
 import { Dropdown } from "@components/molecules";
-import { ArrowDownwardRounded, ArrowUpwardRounded, FilterAltRounded, HorizontalRuleRounded, MoreVertRounded } from "@mui/icons-material";
+import { ArrowDownwardRounded, ArrowUpwardRounded, AtmRounded, FilterAltRounded, HorizontalRuleRounded, MoreVertRounded } from "@mui/icons-material";
 import { useCallback, useRef, useState } from "react"
 import { TbMinusVertical } from "react-icons/tb";
 import { updateFilter } from "../functions";
@@ -102,102 +102,105 @@ export default function TableHeaderGroup({ style, attrsByName, setAttrsByName, s
       }}>
       <div className="options-header"></div>
       {
-        Object.values(attrsByName).sort((x, y) => x.order - y.order).map((attr, index) =>
-          <div
-            key={index}
-            className={`header-cell-${attr.name} py-2 flex justify-between items-center relative pl-2`}
-            onMouseEnter={() => setFocusedIndex(index)}
-          >
-            <div className="header-name flex-grow text-[16px] hover:cursor-grab"
-              draggable
-              onDragStart={(e) => handleColumnDragStart(e, attr.name)}
-              onDragOver={handleColumnDragOver}
-              onDrop={(e) => handleColumnDrop(e, attr.name)}
+        Object.values(attrsByName)
+          .filter(attr => !attr.hidden && !attr.newWindow)
+          .sort((x, y) => x.order - y.order)
+          .map((attr, index) =>
+            <div
+              key={index}
+              className={`header-cell-${attr.name} py-2 flex justify-between items-center relative pl-2`}
+              onMouseEnter={() => setFocusedIndex(index)}
             >
-              {attr.display}
-            </div>
+              <div className="header-name flex-grow text-[16px] hover:cursor-grab"
+                draggable
+                onDragStart={(e) => handleColumnDragStart(e, attr.name)}
+                onDragOver={handleColumnDragOver}
+                onDrop={(e) => handleColumnDrop(e, attr.name)}
+              >
+                {attr.display}
+              </div>
 
-            <div className="column-option flex items-center flex-nowrap">
-              {focusedIndex === index &&
-                <>
-                  <div
-                    className="relative size-[20px] hover:bg-gray-100 hover:rounded-full"
-                    onClick={() => {
-                      if (attr.sort === 'none') {
-                        setAttrsByName({ ...attrsByName, [attr.name]: { ...attrsByName[attr.name], sort: 'asc' } })
-                      }
-                      if (attr.sort === 'asc') {
-                        setAttrsByName({ ...attrsByName, [attr.name]: { ...attrsByName[attr.name], sort: 'desc' } })
-                      }
-                      if (attr.sort === 'desc') {
-                        setAttrsByName({ ...attrsByName, [attr.name]: { ...attrsByName[attr.name], sort: 'none' } })
-                      }
+              <div className="column-option flex items-center flex-nowrap">
+                {focusedIndex === index &&
+                  <>
+                    <div
+                      className="relative size-[20px] hover:bg-gray-100 hover:rounded-full"
+                      onClick={() => {
+                        if (attr.sort === 'none') {
+                          setAttrsByName({ ...attrsByName, [attr.name]: { ...attrsByName[attr.name], sort: 'asc' } })
+                        }
+                        if (attr.sort === 'asc') {
+                          setAttrsByName({ ...attrsByName, [attr.name]: { ...attrsByName[attr.name], sort: 'desc' } })
+                        }
+                        if (attr.sort === 'desc') {
+                          setAttrsByName({ ...attrsByName, [attr.name]: { ...attrsByName[attr.name], sort: 'none' } })
+                        }
 
-                    }}
-                  >
-                    <HorizontalRuleRounded
-                      className={`absolute inset-[4px]
-                              transition-transform duration-300 ease-in-out transform ${attr.sort === 'none' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'
-                        }`}
-                      style={{
-                        fontSize: '16px'
                       }}
-                    />
-                    <ArrowDownwardRounded
-                      className={`absolute inset-[4px]
+                    >
+                      <HorizontalRuleRounded
+                        className={`absolute inset-[4px]
+                              transition-transform duration-300 ease-in-out transform ${attr.sort === 'none' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'
+                          }`}
+                        style={{
+                          fontSize: '16px'
+                        }}
+                      />
+                      <ArrowDownwardRounded
+                        className={`absolute inset-[4px]
                                   transition-transform duration-300 ease-in-out 
                                   transform ${attr.sort === 'asc' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'
-                        }`}
-                      style={{
-                        fontSize: '16px'
-                      }}
-                    />
-                    <ArrowUpwardRounded
-                      className={`absolute inset-[4px]
+                          }`}
+                        style={{
+                          fontSize: '16px'
+                        }}
+                      />
+                      <ArrowUpwardRounded
+                        className={`absolute inset-[4px]
            transition-transform duration-300 ease-in-out transform ${attr.sort === 'desc' ? 'rotate-0 opacity-100' : '-rotate-90 opacity-0'
-                        }`}
-                      style={{
-                        fontSize: '16px'
-                      }}
+                          }`}
+                        style={{
+                          fontSize: '16px'
+                        }}
+                      />
+                    </div>
+                    <Dropdown
+                      toggleButton={<MoreVertRounded style={{ fontSize: '18px' }} />}
+                      content={
+                        <div className="absolute top-[10px] bg-white border shadow-md w-[150px]">
+                          <div className="p-2 hover:bg-gray-200 w-full flex items-center"
+                            onClick={() => setAttrsByName({ ...attrsByName, [attr.name]: { ...attrsByName[attr.name], sort: 'asc' } })}
+                          >
+                            <ArrowDownwardRounded className="mr-3" style={{ fontSize: '16px' }} />
+                            Sort ascending
+                          </div>
+                          <div className="p-2 hover:bg-gray-200 w-full flex items-center"
+                            onClick={() => setAttrsByName({ ...attrsByName, [attr.name]: { ...attrsByName[attr.name], sort: 'desc' } })}
+                          >
+                            <ArrowUpwardRounded className="mr-3" style={{ fontSize: '16px' }} />
+                            Sort descending
+                          </div>
+                          <div className="p-2 hover:bg-gray-200 w-full flex items-center"
+                            onClick={() => {
+                              setMenu()
+                              setAttrsByName(updateFilter(attrsByName, { name: attr.name }))
+                            }}
+                          >
+                            <FilterAltRounded className="mr-3" style={{ fontSize: '16px' }} />
+                            Filter
+                          </div>
+                        </div>
+                      }
                     />
-                  </div>
-                  <Dropdown
-                    toggleButton={<MoreVertRounded style={{ fontSize: '18px' }} />}
-                    content={
-                      <div className="absolute top-[10px] bg-white border shadow-md w-[150px]">
-                        <div className="p-2 hover:bg-gray-200 w-full flex items-center"
-                          onClick={() => setAttrsByName({ ...attrsByName, [attr.name]: { ...attrsByName[attr.name], sort: 'asc' } })}
-                        >
-                          <ArrowDownwardRounded className="mr-3" style={{ fontSize: '16px' }} />
-                          Sort ascending
-                        </div>
-                        <div className="p-2 hover:bg-gray-200 w-full flex items-center"
-                          onClick={() => setAttrsByName({ ...attrsByName, [attr.name]: { ...attrsByName[attr.name], sort: 'desc' } })}
-                        >
-                          <ArrowUpwardRounded className="mr-3" style={{ fontSize: '16px' }} />
-                          Sort descending
-                        </div>
-                        <div className="p-2 hover:bg-gray-200 w-full flex items-center"
-                          onClick={() => {
-                            setMenu()
-                            setAttrsByName(updateFilter(attrsByName, { name: attr.name }))
-                          }}
-                        >
-                          <FilterAltRounded className="mr-3" style={{ fontSize: '16px' }} />
-                          Filter
-                        </div>
-                      </div>
-                    }
-                  />
-                </>}
+                  </>}
 
-              <TbMinusVertical
-                className="hover:cursor-col-resize hover:font-bold hover:text-blue-400 text-[25px]"
-                onMouseDown={(e) => handleMouseDown(e, attr.name)}
-              />
+                <TbMinusVertical
+                  className="hover:cursor-col-resize hover:font-bold hover:text-blue-400 text-[25px]"
+                  onMouseDown={(e) => handleMouseDown(e, attr.name)}
+                />
+              </div>
             </div>
-          </div>
-        )
+          )
       }
     </div>
   )

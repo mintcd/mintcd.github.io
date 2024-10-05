@@ -23,6 +23,7 @@ export function updateFilter(attrsByName: AttrsByName, action: FilterAction)
       }
     }
   }
+  console.log(updatedAttrsByName)
   return updatedAttrsByName
 }
 

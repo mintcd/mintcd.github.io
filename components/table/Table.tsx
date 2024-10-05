@@ -17,7 +17,6 @@ import {
   SettingsRounded,
 } from '@mui/icons-material';
 import TableHeaderGroup from "./table-header-group/TableHeaderGroup.tsx";
-import { filterObject } from "@functions/array.ts";
 
 export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCreateItem, onExchangeItems }:
   {
@@ -211,7 +210,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
 
       <div className="table-content">
         <TableHeaderGroup
-          attrsByName={filterObject(attrsByName, (_, attr) => attr.newWindow === false && !attr.hidden)}
+          attrsByName={attrsByName}
           setAttrsByName={setAttrsByName}
           style={style}
           setMenu={() => setMenu('filter')}
@@ -222,7 +221,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
             <TableRow
               key={item.id}
               item={item}
-              attrsByName={filterObject(attrsByName, (_, attr) => !attr.hidden)}
+              attrsByName={attrsByName}
               style={style}
               onUpdate={onUpdateCell}
               onExchangeItems={onExchangeItems}

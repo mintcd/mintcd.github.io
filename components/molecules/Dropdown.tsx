@@ -5,7 +5,6 @@ import { useOnClickOutside } from 'usehooks-ts';
 export default function Dropdown({
   toggleButton,
   content,
-  ...props
 }: {
   toggleButton: ReactNode;
   content: ReactNode;
@@ -20,7 +19,7 @@ export default function Dropdown({
   useOnClickOutside(dropdownRef, () => setIsOpen(false));
 
   return (
-    <div className={`drop-down relative w-fit`} ref={dropdownRef} {...props}>
+    <div className={`drop-down relative w-fit`} ref={dropdownRef}>
       <span onClick={handleToggle} className="cursor-pointer">
         {toggleButton}
       </span>

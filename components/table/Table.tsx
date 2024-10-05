@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect, useCallback, useMemo, useReducer } from "react";
 import { useClickAway } from "@uidotdev/usehooks";
 import './table.css'
-import { FilterAction, menuState, AttrProps } from './types.ts'
 import { filterData, initializeAttrsByName, sortData, updateFilter } from "./functions.ts";
 import { exportToCSV, exportToJSON } from "@functions/document"
 
@@ -18,6 +17,7 @@ import {
   FilterAltRounded, Download, HorizontalRuleRounded, ArrowUpwardRounded,
   SettingsRounded, MoreVertRounded,
 } from '@mui/icons-material';
+import { AttrProps, DataItem } from "@types.js";
 
 export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCreateItem, onExchangeItems }:
   {
@@ -49,7 +49,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     attrName: '',
     direction: 'none',
   });
-  const [menu, setMenu] = useState<menuState>("")
+  const [menu, setMenu] = useState<MenuState>("")
 
   const menuRef = useClickAway(() => {
     setMenu("")
@@ -122,7 +122,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     document.removeEventListener('mouseup', handleMouseUp);
     resizingRef.current.attrName = '';
 
-  }, [attrsByName, handleMouseMove]);
+  }, [handleMouseMove]);
 
   const handleColumnDragStart = (e: React.DragEvent<HTMLDivElement>, draggedName: string) => {
     e.dataTransfer.setData('text/plain', draggedName);
@@ -209,7 +209,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
           </div>
         }
         {menu === 'filter' &&
-          <div className="p-4 shadow-lg space-y-2 w-[500px]">
+          <div className="table-filter flex p-4 shadow-lg w-[500px] space-x-2">
             {Object.keys(attrsByName)
               .filter(attrName => attrsByName[attrName]['filterEnabled'])
               .map((attrName) => (
@@ -228,8 +228,8 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
                     <div className="filter-options">
                       {
                         attrsByName[attrName].type === 'multiselect' &&
-                        <div>
-                          {attrsByName[attrName].display} is
+                        <div className="p-2">
+                          {attrsByName[attrName].display} <span className="italic"> is</span>
                           {attrsByName[attrName].suggestions?.map(suggestion => (
                             <div key={suggestion} className="w-[200px]">
                               <Checkbox checked={Boolean(attrsByName[attrName]['filter']['is']?.includes(suggestion))}

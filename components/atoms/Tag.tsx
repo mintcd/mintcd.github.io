@@ -13,7 +13,7 @@ export default function Tag({ value, onClick, onClose, style }:
 ) {
   return (
     <div
-      className={`tag m-1 pl-1 pr-2 py-[2px] rounded-full flex items-center h-fit`}
+      className={`tag pl-1 pr-2 py-[2px] rounded-full flex items-center h-fit`}
       style={{
         backgroundColor: style?.bgColor ?? '#cbd5e1'
       }}

@@ -30,7 +30,8 @@ export function updateFilter(attrsByName: { [key: string]: AttrProps }, action: 
 export function filterData(data: DataItem[], attrsByName: { [key: string]: AttrProps }): DataItem[] {
   return data.filter(item => (
     Object.keys(attrsByName).every((attrName) => {
-      if (attrsByName[attrName].filterEnabled === false) return true
+      if (attrsByName[attrName].filterEnabled === false
+        || item[attrName].length === 0) return true
 
       return Object.entries(attrsByName[attrName]['filter']).every(([predName, candidates]) => {
         if (predName === 'is') {

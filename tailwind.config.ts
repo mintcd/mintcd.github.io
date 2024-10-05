@@ -4,6 +4,7 @@ module.exports = {
     './pages/**/*.{ts,tsx,mdx}',
     './styles/**/*.{css, ts}',
     './components/**/*.{js, jsx,ts,tsx,mdx}',
+    './app/*.{ts,tsx,mdx}',
     './app/**/*.{ts,tsx,mdx}',
     `./public/**/*.html`,
   ],

@@ -215,7 +215,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
           setAttrsByName={setAttrsByName}
           style={style} />
 
-        <div className="table-body flex-grow text-[14px] text-gray-800">
+        <div className="table-body flex-grow text-gray-800">
           {paginatedData.map((item) => (
             <TableRow
               key={item.id}

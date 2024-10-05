@@ -108,6 +108,7 @@ export default function TableRow({ item, attrsByName, onUpdate, onExchangeItems,
               {attrs.some(attr => attr.newWindow) && (
                 !expanded ? (
                   <UnfoldMoreRounded
+
                     className="size-[18px] hover:cursor-pointer"
                     onClick={() => setExpanded(true)}
                   />

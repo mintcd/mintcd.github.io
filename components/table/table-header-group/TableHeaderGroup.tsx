@@ -134,19 +134,28 @@ export default function TableHeaderGroup({ style, attrsByName, setAttrsByName }:
                   }}
                 >
                   <HorizontalRuleRounded
-                    className={`absolute inset-0 m-auto size-[16px]
-             transition-transform duration-300 ease-in-out transform ${attr.sort === 'none' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'
+                    className={`absolute inset-0 m-auto
+                                transition-transform duration-300 ease-in-out transform ${attr.sort === 'none' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'
                       }`}
+                    style={{
+                      fontSize: '16px'
+                    }}
                   />
                   <ArrowDownwardRounded
-                    className={`absolute inset-0 m-auto size-[16px]
+                    className={`absolute inset-0 m-auto
              transition-transform duration-300 ease-in-out transform ${attr.sort === 'asc' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'
                       }`}
+                    style={{
+                      fontSize: '16px'
+                    }}
                   />
                   <ArrowUpwardRounded
-                    className={`absolute inset-0 m-auto size-[16px]
+                    className={`absolute inset-0 m-auto
              transition-transform duration-300 ease-in-out transform ${attr.sort === 'desc' ? 'rotate-0 opacity-100' : '-rotate-90 opacity-0'
                       }`}
+                    style={{
+                      fontSize: '16px'
+                    }}
                   />
                 </div>
               }

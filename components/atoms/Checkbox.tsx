@@ -21,7 +21,7 @@ export default function Checkbox({ checked, onChange }: {
         <div
           className={`opacity-100`}
         >
-          <CheckRoundedIcon className='text-[14px] text-white' />
+          <CheckRoundedIcon className='size-[14px] text-white' />
         </div>
       </div>
     </label>

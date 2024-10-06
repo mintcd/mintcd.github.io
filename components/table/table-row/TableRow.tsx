@@ -146,7 +146,7 @@ export default function TableRow({ item, attrsByName, onUpdate, onExchangeItems,
         {expandedAttrs.map((attr, index) => (
           <div className="my-2" key={attr.name}>
             <span className="text-[16px] font-bold">{attr.display}</span>
-            <TextCell itemId={item.id} attr={attr} initialValue={item[attr.name]} onUpdate={onUpdate} />
+            <TextCell itemId={item.id} attr={attr} value={item[attr.name]} onUpdate={onUpdate} />
             {index < expandedAttrs.length - 1 && <Divider />}
           </div>
         ))}

@@ -7,7 +7,6 @@ import { fetchData } from '@functions/database'
 import { getEdges } from '@functions/graph-analysis'
 
 export default function Mathematics() {
-  console.log("rendered")
   const [data, setData] = useState<Graph>({ vertices: [] })
 
   useEffect(() => {

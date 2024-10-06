@@ -1,4 +1,5 @@
 import { capitalizeFirstLetter, getTextWidth } from "@functions/text-analysis";
+import assert from "assert";
 
 export function updateFilter(attrsByName: AttrsByName, action: FilterAction)
   : AttrsByName {
@@ -7,23 +8,32 @@ export function updateFilter(attrsByName: AttrsByName, action: FilterAction)
   updatedAttrsByName[action.name]["filterEnabled"] = true
 
   if (action.predicate) {
-    let candidates = updatedAttrsByName[action.name]['filter'][action.predicate]
+    let candidates = updatedAttrsByName[action.name].filter[action.predicate]
     // If there is no such predicate, add it as a new one
     if (candidates === undefined) {
-      updatedAttrsByName[action.name]['filter'][action.predicate] = action.candidate ? [action.candidate] : []
+      if (action.predicate === 'is')
+        updatedAttrsByName[action.name].filter[action.predicate] = action.candidate ? [action.candidate] : []
+      if (action.predicate === 'contains')
+        updatedAttrsByName[action.name].filter[action.predicate] = action.candidate ? action.candidate : ""
     } else {
-      if (action.candidate) {
+      if (action.candidate !== undefined) {
         // If there is no such candidate, add it as a new one
+        if (action.predicate === 'is') {
+          if (!candidates.includes(action.candidate)) {
+            updatedAttrsByName[action.name].filter[action.predicate]?.push(action.candidate)
+          } else {
+            updatedAttrsByName[action.name].filter[action.predicate] =
+              (candidates as string[]).filter(candidate => candidate !== action.candidate)
+          }
+        }
 
-        if (!candidates.includes(action.candidate)) {
-          updatedAttrsByName[action.name]['filter'][action.predicate]?.push(action.candidate)
-        } else {
-          updatedAttrsByName[action.name]['filter'][action.predicate] = candidates.filter(candidate => candidate !== action.candidate)
+        if (action.predicate === 'contains') {
+
+          updatedAttrsByName[action.name].filter[action.predicate] = action.candidate || ''
         }
       }
     }
   }
-  console.log(updatedAttrsByName)
   return updatedAttrsByName
 }
 
@@ -33,7 +43,7 @@ export function filterData(data: DataItem[], attrsByName: { [key: string]: AttrP
       if (attrsByName[attrName].filterEnabled === false
         || item[attrName].length === 0) return true
 
-      return Object.entries(attrsByName[attrName]['filter']).every(([predName, candidates]) => {
+      return Object.entries(attrsByName[attrName].filter).every(([predName, candidates]) => {
         if (predName === 'is') {
           // If there are no candidates, return true
           if (candidates.length === 0) return true;
@@ -46,6 +56,12 @@ export function filterData(data: DataItem[], attrsByName: { [key: string]: AttrP
 
           // If item[attrName] is not an array, return false
           return false;
+        }
+
+        if (predName === 'contains') {
+          const value = item[attrName] as string
+          const candidate = candidates as string
+          return value.toLowerCase().includes(candidate.toLowerCase())
         }
 
         // If other predicates are added later, handle them here
@@ -99,7 +115,7 @@ export function initializeAttrsByName(attrs: AttrProps[], data: DataItem[]): { [
         }
         else if (attr.type === 'text') {
           return {
-            "contains": []
+            "contains": ""
           }
         }
         else {

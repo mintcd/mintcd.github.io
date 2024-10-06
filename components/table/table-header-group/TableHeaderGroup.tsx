@@ -167,20 +167,33 @@ export default function TableHeaderGroup({ style, attrsByName, setAttrsByName, s
                     <Dropdown
                       toggleButton={<MoreVertRounded style={{ fontSize: '18px' }} />}
                       content={
-                        <div className="absolute top-[10px] bg-white border shadow-md w-[150px]">
-                          <div className="p-2 hover:bg-gray-200 w-full flex items-center"
-                            onClick={() => setAttrsByName({ ...attrsByName, [attr.name]: { ...attrsByName[attr.name], sort: 'asc' } })}
+                        <div className="w-[175px]">
+                          <div className="p-2 hover:bg-gray-200 flex items-center"
+                            onClick={() => setAttrsByName({
+                              ...attrsByName,
+                              [attr.name]:
+                              {
+                                ...attrsByName[attr.name],
+                                sort: attrsByName[attr.name].sort === 'asc' ? 'none' : 'asc'
+                              }
+                            })}
                           >
                             <ArrowDownwardRounded className="mr-3" style={{ fontSize: '16px' }} />
                             Sort ascending
                           </div>
-                          <div className="p-2 hover:bg-gray-200 w-full flex items-center"
-                            onClick={() => setAttrsByName({ ...attrsByName, [attr.name]: { ...attrsByName[attr.name], sort: 'desc' } })}
+                          <div className="p-2 hover:bg-gray-200 flex items-center"
+                            onClick={() => setAttrsByName({
+                              ...attrsByName, [attr.name]: {
+                                ...attrsByName[attr.name],
+                                sort: attrsByName[attr.name].sort === 'desc' ? 'none' : 'desc'
+                              }
+                            })}
                           >
                             <ArrowUpwardRounded className="mr-3" style={{ fontSize: '16px' }} />
                             Sort descending
                           </div>
-                          <div className="p-2 hover:bg-gray-200 w-full flex items-center"
+
+                          <div className="p-2 hover:bg-gray-200 flex items-center"
                             onClick={() => {
                               setMenu()
                               setAttrsByName(updateFilter(attrsByName, { name: attr.name }))

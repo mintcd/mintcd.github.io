@@ -25,8 +25,8 @@ export default function Dropdown({
       </span>
 
       <div
-        className={`absolute z-[10] mt-2 w-fit bg-white border border-gray-200 shadow-lg transition-all duration-300 ease-out 
-          ${isOpen ? 'translate-y-0 opacity-100' : 'translate-y-[-10px] opacity-0 pointer-events-none'}`}
+        className={`absolute z-[10] mt-2 w-fit bg-white border border-gray-200 shadow-lg rounded-lg
+          transition-all duration-300 ease-out ${isOpen ? 'translate-y-0 opacity-100' : 'translate-y-[-10px] opacity-0 pointer-events-none'}`}
       >
         {content}
       </div>

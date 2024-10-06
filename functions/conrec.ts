@@ -42,9 +42,6 @@ export function triangleProcess(A: Point, B: Point, C: Point, levels: number[], 
   const levelIndex = maxAbsDiffs.findIndex(diff => diff === minOfMaxAbsDiffs) as number
   const level = levels[levelIndex]
 
-  // Level test
-  // console.log(A.z, B.z, C.z, level) 
-
   const diff = { A: A.z - level, B: B.z - level, C: C.z - level }
   const state = {
     A: {

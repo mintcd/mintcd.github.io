@@ -1,6 +1,10 @@
 'use client'
 
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+/**
+ * TextField with suggestions, preview and bracket autocompletion
+ */
+
+import { ChangeEvent, ReactElement, useEffect, useRef, useState } from "react";
 import { getAllIndices } from "@functions/text-analysis";
 import Latex from "@components/latex";
 import { getCaretCoordinates } from "@functions/elements";
@@ -8,17 +12,30 @@ import { getCaretCoordinates } from "@functions/elements";
 export default function TextField({
   type,
   onUpdate,
-  initialValue,
-  updateOnEnter = true
+  value,
+  updateOnEnter = true,
+  style,
+  render
 
 }: {
   type: "text" | "latex";
   onUpdate: (value: string) => void;
-  initialValue?: string;
+  value?: string;
   updateOnEnter?: boolean;
+  style?: {
+    width?: number | 'fit',
+    height?: number | 'fit',
+    border?: string
+  },
+  render?: (value: string) => ReactElement
 }) {
-  const [oldValue, setOldValue] = useState("")
-  const [editingValue, setEditingValue] = useState(initialValue || "");
+
+  const [editing, setEditing] = useState(false)
+
+  const [lastChangedValue, setLastChangedValue] = useState("")
+  const [editingValue, setEditingValue] = useState(value || "");
+
+
   const [latexOpen, setLatexOpen] = useState<'inline' | 'newline' | 'none'>('none');
   const [previewPosition, setPreviewPosition] = useState<{ top: number; left: number } | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -31,14 +48,16 @@ export default function TextField({
         setEditingValue(editingValue + "\n");
       } else {
         onUpdate(editingValue);
+        setEditing(false)
       }
     }
   };
 
   function handleChange(e: ChangeEvent<HTMLTextAreaElement>) {
-    setOldValue(editingValue)
+    setLastChangedValue(editingValue)
     setEditingValue(e.target.value)
   }
+
 
   useEffect(() => {
     const textarea = textareaRef.current;
@@ -55,13 +74,22 @@ export default function TextField({
       textarea.setSelectionRange(length, length);
       textarea.focus();
     }
-  }, [initialValue])
+  }, [value, editing])
 
   useEffect(() => {
     const textarea = textareaRef.current;
-    if (textarea)
-      textarea.style.height = `${textarea.scrollHeight}px`;
-  }, [editingValue])
+    if (textarea) {
+      // Reset the height to auto to calculate based on new content
+      textarea.style.height = "auto";
+
+      // Calculate the height based on scrollHeight and adjust for line height
+      const scrollHeight = textarea.scrollHeight;
+      const lineHeight = parseInt(getComputedStyle(textarea).lineHeight, 10) || 16;
+
+      // If the difference between height and scrollHeight is less than the line height, set it directly
+      textarea.style.height = `${scrollHeight - lineHeight}px`;
+    }
+  });
 
   useEffect(() => {
     const textarea = textareaRef.current;
@@ -91,16 +119,28 @@ export default function TextField({
   }, [editingValue, latexOpen, latexValue, type]);
 
   return (
-    <div className="text-field">
-      <textarea
-        placeholder=""
-        ref={textareaRef}
-        className="w-full p-0 focus:outline-none border-none resize-none bg-inherit"
-        value={editingValue}
-        onChange={handleChange}
-        onKeyDown={handleKeyDown}
-        autoFocus
-      />
+    <div className={`text-field w-full min-h-[1.5rem] rounded-sm flex items-center`}
+      onClick={() => setEditing(true)}
+      style={{
+        width: typeof style?.width === 'number' ? style?.width : 'fit',
+        height: typeof style?.height === 'number' ? style?.height : 'fit',
+        border: style?.border ? `1px solid ${style?.border}` : 'none'
+      }}>
+      {editing ?
+        <textarea
+          aria-label="text-field-input"
+          placeholder=""
+          ref={textareaRef}
+          className="w-full p-0 focus:outline-none border-none resize-none bg-inherit"
+          value={editingValue}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          autoFocus
+        /> :
+        <div>
+          {editingValue}
+        </div>
+      }
 
       {latexOpen !== 'none' && (
         <div style={{

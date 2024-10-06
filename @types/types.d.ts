@@ -4,8 +4,6 @@ type FilterAction = {
     candidate?: string
 }
 
-type MenuState = "filter" | "sorts" | "column-visibility" | "download" | "settings" | "search" | ""
-
 type JsonObject<dataType> = {
     [key: string]: dataType
 }
@@ -29,7 +27,8 @@ type AttrProps = {
     sort: 'none' | 'asc' | 'desc',
     suggestions: string[],
     filter: {
-        [predicate in 'contains' | 'is']?: string[] | undefined
+        'contains'?: string | undefined,
+        'is'?: string[] | undefined,
     }
     filterEnabled: boolean
     color: {

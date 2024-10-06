@@ -6,18 +6,18 @@ import { useEffect, useState } from "react";
 export default function TextCell({
   itemId,
   attr,
-  initialValue,
+  value,
   onUpdate,
   focused,
 }: {
   itemId: number;
   attr: AttrProps;
-  initialValue: string;
-  onUpdate: (itemId: number, attrName: string, value: string) => void;
+  value: string;
+  onUpdate: (itemId: number, attrName: string, editingValue: string) => void;
   focused?: boolean;
 }) {
   const [cellState, setCellState] = useState(focused ? 'editing' : 'noEdit')
-  const [value, setValue] = useState(initialValue || "");
+  const [editingValue, setEditingValue] = useState(value);
 
   const ref = useClickAway(() => {
     if (cellState === 'editing') {
@@ -25,8 +25,8 @@ export default function TextCell({
     }
   }) as any;
 
-  function handleUpdate(value: string) {
-    onUpdate(itemId, attr.name, value);
+  function handleUpdate(editingValue: string) {
+    onUpdate(itemId, attr.name, editingValue);
     setCellState("noEdit");
   }
 
@@ -42,15 +42,15 @@ export default function TextCell({
           className="min-h-[3rem] cursor-pointer"
           onClick={() => {
             setCellState("editing");
-            setValue(initialValue);
+            setEditingValue(value);
           }}
         >
-          <Latex>{String(initialValue)}</Latex>
+          <Latex>{String(value)}</Latex>
         </div>
       )}
       {cellState === 'editing' && (
         <TextField
-          initialValue={value}
+          value={editingValue}
           onUpdate={handleUpdate}
           type={attr.useLatex ? 'latex' : 'text'}
         />

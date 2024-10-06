@@ -30,7 +30,7 @@ export default function MultiSelectCell({ itemId, attr, values, onUpdate, sugges
   }, [focused])
 
   return (
-    <div className="table-multiselect-cell flex flex-wrap space-x-2 w-full h-full"
+    <div className="table-multiselect-cell flex flex-wrap w-full h-full"
       ref={ref}
       onClick={() => {
         if (cellState === "noEdit")

@@ -84,10 +84,10 @@ export default function TextField({
 
       // Calculate the height based on scrollHeight and adjust for line height
       const scrollHeight = textarea.scrollHeight;
-      const lineHeight = parseInt(getComputedStyle(textarea).lineHeight, 10) || 16;
+      // const lineHeight = parseInt(getComputedStyle(textarea).lineHeight, 10) || 16;
 
       // If the difference between height and scrollHeight is less than the line height, set it directly
-      textarea.style.height = `${scrollHeight - lineHeight}px`;
+      textarea.style.height = `${scrollHeight}px`;
     }
   });
 

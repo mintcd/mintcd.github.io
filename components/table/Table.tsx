@@ -17,7 +17,6 @@ import {
   SettingsRounded,
 } from '@mui/icons-material';
 import TableHeaderGroup from "./table-header-group/TableHeaderGroup.tsx";
-import Latex from "@components/latex/";
 
 export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCreateItem, onExchangeItems }:
   {
@@ -25,7 +24,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     upToDate?: boolean,
     data: DataItem[],
     attrs: AttrProps[],
-    onUpdateCell: (itemId: number, attrName: string, value: number | string | string[]) => void,
+    onUpdateCell: (items: UpdatedItem | UpdatedItem[]) => Promise<void>,
     onCreateItem: () => void,
     onExchangeItems: (id1: number, id2: number) => void
   }) {
@@ -112,8 +111,6 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     setProcessedData(processedData);
 
   }, [data, attrsByName]);
-
-  // console.log(attrsByName)
 
   return (
     <div className="table-container flex flex-col shadow-md relative">
@@ -269,8 +266,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
               attrsByName={attrsByName}
               style={style}
               onUpdate={onUpdateCell}
-              onExchangeItems={onExchangeItems}
-
+            // onExchangeItems={onExchangeItems}
             />
           ))}
         </div>

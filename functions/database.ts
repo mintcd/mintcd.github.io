@@ -39,18 +39,31 @@ export async function fetchData({
 
 export async function exchangeItems(table: string, id1: number, id2: number) {
   // Assign a temporary ID
-  await updateItem(table, id1, { id: 9999 });
+  await updateOne(table, id1, { id: 9999 });
 
   // Update the second item with the first item's ID
-  await updateItem(table, id2, { id: id1 });
+  await updateOne(table, id2, { id: id1 });
 
   // Finally, update the temporary ID item with the second item's ID
-  await updateItem(table, 9999, { id: id2 });
+  await updateOne(table, 9999, { id: id2 });
 }
 
+export async function update(table: string, items: { id: number; attrValue: JsonObject<any>; } | { id: number; attrValue: JsonObject<any>; }[]) {
+  if (!Array.isArray(items)) {
+    // Here, TypeScript knows 'items' is not an array, so 'items.id' is safe to access
+    await updateOne(table, items.id, items.attrValue);
+  } else {
+    // Now TypeScript knows 'items' is an array
+    await updateMany(table, items);
+  }
+}
 
-export async function updateItem(table: string, itemId: number, attrValue: JsonObject<any>) {
-  const { data, error } = await supabase
+export async function reorder(table: string, sourceId: number, targetId: number) {
+
+}
+
+export async function updateOne(table: string, itemId: number, attrValue: JsonObject<any>) {
+  const { error } = await supabase
     .from(table)
     .update(attrValue)
     .match({ id: itemId })
@@ -58,8 +71,22 @@ export async function updateItem(table: string, itemId: number, attrValue: JsonO
   if (error) {
     throw new Error(error.message);
   }
-  return data
 }
+
+export async function updateMany(table: string, items: UpdatedItem[], sequential: boolean = true) {
+  if (sequential) {
+    // Sequential execution: Await each updateOne call one by one
+    for (const item of items) {
+      console.log(item)
+      await updateOne(table, item.id, item.attrValue);
+    }
+  } else {
+    // Parallel execution: Use Promise.all to run updates in parallel
+    const promises = items.map(item => updateOne(table, item.id, item.attrValue));
+    await Promise.all(promises);
+  }
+}
+
 
 export async function createItem(table: string, data: DataItem[]) {
   // Find the smallest available ID

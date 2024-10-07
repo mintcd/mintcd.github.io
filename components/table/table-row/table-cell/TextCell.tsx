@@ -13,7 +13,7 @@ export default function TextCell({
   itemId: number;
   attr: AttrProps;
   value: string;
-  onUpdate: (itemId: number, attrName: string, editingValue: string) => void;
+  onUpdate: (items: UpdatedItem) => void;
   focused?: boolean;
 }) {
   const [cellState, setCellState] = useState(focused ? 'editing' : 'noEdit')
@@ -26,7 +26,10 @@ export default function TextCell({
   }) as any;
 
   function handleUpdate(editingValue: string) {
-    onUpdate(itemId, attr.name, editingValue);
+    onUpdate({
+      id: itemId,
+      attrValue: { [attr.name]: editingValue }
+    })
     setCellState("noEdit");
   }
 

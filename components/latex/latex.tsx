@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Latex from 'react-latex-next';
 import 'katex/dist/katex.min.css';
 
 export default function MyLatex({ children }: { children: string }) {
 
+  const latexRef = useRef(null)
   const alphabet: string[] = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i));
   const macros: Record<string, string> = {}
 
@@ -26,7 +27,7 @@ export default function MyLatex({ children }: { children: string }) {
   const preprocessedChildren = preprocessItemize(children.replace(/\n/g, '<br/>'));
 
   return (
-    <div className='latex-container font-modern'>
+    <div className='latex-container font-modern' ref={latexRef}>
       <Latex macros={macros}>{String(preprocessedChildren)}</Latex>
     </div>
   );

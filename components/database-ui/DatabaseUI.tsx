@@ -1,9 +1,10 @@
 'use client'
 
 import Table from '@components/table'
-import { createItem, exchangeItems, fetchData, updateItem } from '@functions/database';
+import { createItem, exchangeItems, fetchData, update, updateOne } from '@functions/database';
 import { useCallback, useEffect, useState } from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
+import { toObject } from '@functions/array';
 
 
 export default function DatabaseUI({ table }: {
@@ -39,23 +40,42 @@ export default function DatabaseUI({ table }: {
     })
   }
 
-  const handleUpdate = useCallback(async (itemId: number, attrName: string, value: number | string | string[]) => {
+  const handleUpdate = useCallback(async (items: UpdatedItem | UpdatedItem[]) => {
     setUpToDate(false)
     if (!authorized) return;
-    const index = data.findIndex(item => item.id === itemId); // Find the correct index based on itemId
+    let updatedData: DataItem[]
 
-    if (index !== -1) {
-      // Create a new array with the updated item
-      const updatedData = data.map((item, i) =>
-        i === index ? { ...item, [attrName]: value } : item
-      );
-      setData(updatedData); // Update the state with the new array
+    if (Array.isArray(items)) {
+      const updatedItemIds = new Set(items.map(item => item.id))
+      const updatedItemsById = toObject(items, 'id')
+
+      updatedData = data.map((item) => {
+        if (updatedItemIds.has(item.id)) {
+          const updatedFields = updatedItemsById[item.id].attrValue
+          return { ...item, [Object.keys(updatedFields)[0]]: Object.values(updatedFields)[0] }
+        }
+        return item
+      });
+    } else {
+      updatedData = data.map((item) => {
+        if (item.id === items.id) {
+          return { ...item, [Object.keys(items.attrValue)[0]]: Object.values(items.attrValue)[0] }
+        }
+        return item
+      });
+
     }
-    await updateItem(table, itemId, { [attrName]: value }).then(() => {
+
+    setData(updatedData);
+
+    await update(table, items).then(() => {
       setUpToDate(true)
     });
 
   }, [authorized, data, table]);
+
+
+
 
   async function handleExchange(id1: number, id2: number) {
     setUpToDate(false)

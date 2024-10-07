@@ -1,3 +1,8 @@
+type ComponentStyle = {
+    width?: number,
+    border?: number
+}
+
 type FilterAction = {
     name: string,
     predicate?: 'contains' | 'is',
@@ -14,27 +19,6 @@ type Point = {
     z: number,
 }
 
-type AttrProps = {
-    name: string,
-    type: 'text' | 'multiselect',
-    display: string,
-    useLatex: boolean,
-    referencing: string,
-    width: number,
-    order: number,
-    newWindow: boolean,
-    hidden: boolean,
-    sort: 'none' | 'asc' | 'desc',
-    suggestions: string[],
-    filter: {
-        'contains'?: string | undefined,
-        'is'?: string[] | undefined,
-    }
-    filterEnabled: boolean
-    color: {
-        [tag: string]: string
-    }
-}
 
 type AttrsByName = { [name: string]: AttrProps }
 

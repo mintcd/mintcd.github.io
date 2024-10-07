@@ -4,13 +4,13 @@ import { useClickAway } from "@uidotdev/usehooks";
 import { DragIndicatorOutlined, UnfoldMoreRounded, UnfoldLessRounded } from "@mui/icons-material";
 import TextCell from "./table-cell/TextCell";
 import { Divider } from "@mui/material";
+import { range } from "lodash";
 
-export default function TableRow({ item, attrsByName, onUpdate, onExchangeItems, style }:
+export default function TableRow({ item, attrsByName, onUpdate, style }:
   {
     item: DataItem,
     attrsByName: AttrsByName,
-    onUpdate: (itemId: number, attr: string, value: string | string[]) => void,
-    onExchangeItems: (id1: number, id2: number) => void,
+    onUpdate: (items: UpdatedItem | UpdatedItem[]) => Promise<void>,
     style?: {
       optionsColumnWidth?: number,
       cellMinWidth?: number
@@ -35,7 +35,7 @@ export default function TableRow({ item, attrsByName, onUpdate, onExchangeItems,
 
   // Handlers
   const handleDragStart = (e: React.DragEvent<HTMLElement>, id: number) => {
-    e.dataTransfer.setData('draggedItemId', id.toString()); // Store the dragged item's id in the dataTransfer object
+    e.dataTransfer.setData('sourceId', id.toString()); // Store the dragged item's id in the dataTransfer object
     setDraggingItemId(id); // Track the dragged item
   };
 
@@ -47,11 +47,34 @@ export default function TableRow({ item, attrsByName, onUpdate, onExchangeItems,
   const handleDrop = (e: React.DragEvent<HTMLElement>, targetId: number) => {
     e.preventDefault();
     setDraggedOver(false);
-    const draggedItemId = parseInt(e.dataTransfer.getData('draggedItemId'), 10); // Retrieve the dragged item's id
-    if (draggedItemId !== targetId) {
-      onExchangeItems(draggedItemId, targetId); // Call the provided function to exchange items
+
+    const sourceId = parseInt(e.dataTransfer.getData('sourceId'), 10); // Retrieve the dragged item's id
+
+    if (sourceId !== targetId) {
+      let updatedItems: UpdatedItem[]
+      if (sourceId < targetId) {
+        updatedItems = [
+          // Get a temporary id for source item
+          { id: sourceId, attrValue: { id: 9999 } },
+          ...range(sourceId + 1, targetId + 1, 1).map(
+            id => ({ id: id, attrValue: { id: id - 1 } })
+          ),
+          { id: 9999, attrValue: { id: targetId } }
+        ]
+      } else {
+        updatedItems = [
+          // Get a temporary id for source item
+          { id: sourceId, attrValue: { id: 9999 } },
+          ...range(sourceId - 1, targetId - 1, -1).map(
+            id => ({ id: id, attrValue: { id: id + 1 } })
+          ),
+          { id: 9999, attrValue: { id: targetId } }
+        ]
+      }
+      onUpdate(updatedItems)
     }
   };
+
 
   const handleDragOver = (e: React.DragEvent<HTMLElement>) => {
     e.preventDefault(); // Allow the drop event to occur

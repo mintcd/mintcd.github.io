@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "process": "tsc models/knowledge-graph.ts  && ts-node scripts/process-graph.ts"
+    "lint": "next lint"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
@@ -31,7 +30,7 @@
     "jsdom": "^25.0.1",
     "katex": "^0.16.10",
     "lodash": "^4.17.21",
-    "next": "^14.2.14",
+    "next": "^15.0.0-canary.179",
     "punycode": "^2.3.1",
     "react": "^18.3.1",
     "react-color": "^2.19.3",
@@ -50,6 +49,7 @@
     "@types/cytoscape": "^3.21.4",
     "@types/d3-force": "^3.0.10",
     "@types/dagre-d3": "^0.6.6",
+    "@types/katex": "^0.16.7",
     "@types/lodash": "^4.17.7",
     "@types/node": "^22.7.4",
     "@types/react": "^18",

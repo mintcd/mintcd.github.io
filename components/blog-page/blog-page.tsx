@@ -2,7 +2,7 @@
 
 import { TextField } from "@components/atoms"
 import Latex from "@components/latex"
-import { fetchData, updateItem } from "@functions/database"
+import { fetchData, updateOne } from "@functions/database"
 import Markdown from 'react-markdown'
 
 export default function BlogPage({ title }: {
@@ -11,7 +11,7 @@ export default function BlogPage({ title }: {
 
   async function handleUpdate(content: string) {
     await fetchData({ table: 'blog', })
-    await updateItem("blog", 1, { content: content })
+    await updateOne("blog", 1, { content: content })
   }
 
   return (

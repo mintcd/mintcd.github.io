@@ -6,7 +6,7 @@ export default function TableCell({ itemId, attr, value, onUpdate, suggestions, 
     itemId: number,
     attr: AttrProps,
     value: string | string[],
-    onUpdate: (itemId: number, attr: string, value: string | string[]) => void,
+    onUpdate: (items: UpdatedItem) => void,
     suggestions?: string[],
     focused?: boolean,
     onClick?: () => void

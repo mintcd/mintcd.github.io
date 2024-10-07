@@ -2,6 +2,11 @@ type TableProperties = {
   itemsPerPage: number
 }
 
+type TableStyle = {
+  optionsColumnWidth?: number;
+  cellMinWidth?: number;
+}
+
 type MenuState = "filter" | "sorts" | "column-visibility" | "download" | "settings" | "search" | undefined
 
 type AttrProps = {

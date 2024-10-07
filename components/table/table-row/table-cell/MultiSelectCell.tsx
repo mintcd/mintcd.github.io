@@ -9,7 +9,7 @@ export default function MultiSelectCell({ itemId, attr, values, onUpdate, sugges
     itemId: number
     attr: AttrProps
     values: string[],
-    onUpdate: (itemId: number, attr: string, value: string[]) => void
+    onUpdate: (items: UpdatedItem) => void
     suggestions: string[],
     focused?: boolean
   }
@@ -45,7 +45,12 @@ export default function MultiSelectCell({ itemId, attr, values, onUpdate, sugges
             onClick={handleTagClick}
             onClose={(e) => {
               e.stopPropagation(); // Prevent event from reaching the parent
-              onUpdate(itemId, attr.name, values.filter((_, i) => i !== index));
+              onUpdate({
+                id: itemId,
+                attrValue: {
+                  [attr.name]: values.filter((_, i) => i !== index)
+                }
+              })
             }}
             style={{
               bgColor: attr.color[value]
@@ -63,7 +68,12 @@ export default function MultiSelectCell({ itemId, attr, values, onUpdate, sugges
           suggestions={suggestions}
           onSubmit={(newValue) => {
             if (newValue && cellState === 'editing') {
-              if (!values.includes(newValue)) onUpdate(itemId, attr.name, [...values, newValue]);
+              if (!values.includes(newValue)) {
+                onUpdate({
+                  id: itemId,
+                  attrValue: { [attr.name]: [...values, newValue] }
+                });
+              }
               setCellState('noEdit');
             }
           }}

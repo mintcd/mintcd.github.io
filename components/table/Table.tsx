@@ -14,7 +14,7 @@ import {
   AddRounded, NavigateNextRounded,
   NavigateBeforeRounded, ViewColumnRounded,
   FilterAltRounded, Download,
-  SettingsRounded,
+  SettingsRounded, FormatListBulletedRounded
 } from '@mui/icons-material';
 import TableHeaderGroup from "./table-header-group/TableHeaderGroup.tsx";
 
@@ -59,7 +59,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
   const paginatedData = processedData.slice(startIndex, endIndex);
   const totalPages = useMemo(() => {
     return Math.ceil(processedData.length / tableProperties.itemsPerPage);
-  }, [processedData]);
+  }, [processedData, tableProperties.itemsPerPage]);
 
   // Handlers
   function handleFilter(action: FilterAction) {
@@ -90,14 +90,16 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
 
   useEffect(() => {
     // Refetch suggestions every time data changes
-    let newAttrsByName = { ...attrsByName }
-    Object.values(attrsByName).forEach(attr => {
-      newAttrsByName[attr.name].suggestions = Array.from(new Set(data.flatMap(item => attr.referencing
-        ? item[attr.referencing]
-        : item[attr.name])))
-        .sort()
+    setAttrsByName(attrsByName => {
+      let newAttrsByName = { ...attrsByName }
+      Object.values(attrsByName).forEach(attr => {
+        newAttrsByName[attr.name].suggestions = Array.from(new Set(data.flatMap(item => attr.referencing
+          ? item[attr.referencing]
+          : item[attr.name])))
+          .sort()
+      })
+      return newAttrsByName
     })
-    setAttrsByName(newAttrsByName)
   }, [data])
 
   useEffect(() => {
@@ -124,15 +126,16 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
           ref={menuRef}
         >
           <div className="table-menu-icons flex space-x-3">
-            <ViewColumnRounded className="text-[#023e8a] text-[20px]"
+            <ViewColumnRounded className="icon"
               onClick={() => setMenu(menu === "column-visibility" ? undefined : "column-visibility")} />
-            <Download className="text-[#023e8a] text-[20px]"
-              onClick={() => setMenu(menu === "download" ? undefined : "download")} />
-            <FilterAltRounded className="text-[#023e8a] text-[20px]"
+            <FormatListBulletedRounded className="icon" />
+            <FilterAltRounded className="icon"
               onClick={() => setMenu(menu === "filter" ? undefined : "filter")} />
-            <SettingsRounded className="text-[#023e8a] text-[20px] mr-2"
+            <SettingsRounded className="icon"
               onClick={() => setMenu(menu === "settings" ? undefined : "settings")}
             />
+            <Download className="icon"
+              onClick={() => setMenu(menu === "download" ? undefined : "download")} />
           </div>
 
           <div className="table-menu-dropdown absolute top-[20px] right-0 z-10 bg-white border border-gray-300"

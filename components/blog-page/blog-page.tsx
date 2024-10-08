@@ -4,7 +4,7 @@ import SuggestedPostCard from './SuggestedPostCard';
 import Tag from './Tag';
 import AuthorAvatar from './AuthorAvatar';
 import AuthorAttribution from './AuthorAttribution';
-// import { sanitize } from 'isomorphic-dompurify';
+import Image from 'next/image';
 
 export default function SinglePost() {
   const post: Post = {
@@ -23,7 +23,7 @@ export default function SinglePost() {
   return (
     <>
 
-      <img
+      <Image
         width={1400}
         height={720}
         className="mb-5 h-[720px] w-full bg-no-repeat object-cover object-center"

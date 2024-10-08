@@ -1,7 +1,7 @@
 'use client'
 
 import Table from '@components/table'
-import { createItem, exchangeItems, fetchData, update, updateOne } from '@functions/database';
+import { createItem, exchangeItems, fetchData, update, supabase } from '@functions/database';
 import { useCallback, useEffect, useState } from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
 import { toObject } from '@functions/array';
@@ -16,6 +16,7 @@ export default function DatabaseUI({ table }: {
   const [attrs, setAttrs] = useState<AttrProps[]>([]);
   const [loading, setLoading] = useState(true);
   const [authorized, setAuthorized] = useState(false);
+
 
   async function handleCreate() {
     setUpToDate(false)

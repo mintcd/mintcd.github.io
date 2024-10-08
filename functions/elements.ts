@@ -1,32 +1,37 @@
-export function getCaretCoordinates(input: HTMLInputElement | HTMLTextAreaElement) {
+import { getTextWidth, breakLines } from "./text-analysis";
 
+export function getCaretCoordinates(input: HTMLInputElement | HTMLTextAreaElement,
+  fontSize: number = 14,
+  fontFamily: string = "Arial"
+) {
   const { selectionStart } = input;
 
-  // Create a temporary span to measure the width of the text
-  const span = document.createElement("span");
-  const text = input.value.substring(0, selectionStart || 0);
+  if (selectionStart === null) return { top: 0, left: 0, height: fontSize };
+  const inputRect = input.getBoundingClientRect();
+  // Split the text up to the caret position into lines based on the width of the input
+  const text = input.value.slice(0, selectionStart);
+  const lines = breakLines(text, inputRect.width, fontSize, fontFamily);
+
+  // The current line is the last one in the array
+  const currentLine = lines[lines.length - 1];
+  const textWidth = getTextWidth(currentLine);
+
+  // Get the styles applied to the input element
   const computedStyle = window.getComputedStyle(input);
 
-  // Set the span's font styles to match the input
-  span.style.font = computedStyle.font;
-  span.style.whiteSpace = "pre"; // Keep whitespaces
-  span.textContent = text || ' '; // Add a space for empty text to show the caret position
+  // Calculate padding, line height, and scroll offset
+  const paddingLeft = parseFloat(computedStyle.paddingLeft);
+  const paddingTop = parseFloat(computedStyle.paddingTop);
+  const lineHeight = parseFloat(computedStyle.lineHeight) || fontSize; // default to fontSize if line height is not set
+  const scrollLeft = input.scrollLeft;
+  const scrollTop = input.scrollTop;
 
-  // Append the span to the body to calculate its dimensions
-  document.body.appendChild(span);
-
-  const { offsetWidth, offsetHeight } = span;
-  const coordinates = {
-    top: input.getBoundingClientRect().top + window.scrollY,
-    left: input.getBoundingClientRect().left + window.scrollX + offsetWidth
-  };
-
-  // Clean up the temporary span
-  document.body.removeChild(span);
+  // Calculate the vertical position by multiplying line height by the number of lines
+  const topOffset = paddingTop + lineHeight * (lines.length - 1);
 
   return {
-    top: coordinates.top,
-    left: coordinates.left,
-    height: offsetHeight
+    top: inputRect.top + topOffset - scrollTop,
+    left: inputRect.left + paddingLeft + textWidth - scrollLeft,
+    height: lineHeight
   };
 }

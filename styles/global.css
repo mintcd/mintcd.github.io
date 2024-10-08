@@ -2,44 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* @font-face {
-  font-family: "Computer Modern";
-  src: url('https://mirrors.ctan.org/fonts/cm-unicode/fonts/otf/cmunss.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Computer Modern";
-  src: url('https://mirrors.ctan.org/fonts/cm-unicode/fonts/otf/cmunsx.otf') format('opentype');
-  font-weight: bold;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Computer Modern";
-  src: url('https://mirrors.ctan.org/fonts/cm-unicode/fonts/otf/cmunsi.otf') format('opentype');
-  font-weight: normal;
-  font-style: italic; /* Use only one style */
-/* } */
-
-/* @font-face {
-  font-family: "Computer Modern";
-  src: url('https://mirrors.ctan.org/fonts/cm-unicode/fonts/otf/cmunbxo.otf') format('opentype');
-  font-weight: bold;
-  font-style: italic; /* Use only one style */
-/* } */
-
-
-@keyframes progress-animation {
-  0% {
-    background-position: 0% 0;
-  }
-
-  100% {
-    background-position: 100% 0;
-  }
-}
 /* For WebKit based browsers */
 ::-webkit-scrollbar {
   width: 8px;
@@ -61,4 +23,18 @@
 ::-webkit-scrollbar-thumb:hover {
   background-color: #555;
   /* Color of the scrollbar thumb on hover */
+}
+
+@layer base {
+  h2 {
+    @apply mb-4 mt-2 text-3xl font-bold leading-tight tracking-tighter text-zinc-700 dark:text-zinc-300;
+  }
+
+  h3 {
+    @apply mb-4 mt-2 text-xl font-semibold leading-snug tracking-tight text-zinc-700 dark:text-zinc-300;
+  }
+
+  p {
+    @apply pb-4 leading-relaxed tracking-normal text-zinc-600 last-of-type:pb-0 dark:text-zinc-400;
+  }
 }

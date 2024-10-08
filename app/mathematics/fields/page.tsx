@@ -7,6 +7,6 @@ export default function Fields() {
   }
 
   return (
-    <BlogPage title="test" />
+    <BlogPage />
   )
 }

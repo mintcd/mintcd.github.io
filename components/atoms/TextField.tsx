@@ -15,19 +15,24 @@ export default function TextField({
   value,
   updateOnEnter = true,
   style,
-  render
-
+  render,
+  suggestion,
+  onKeyDown
 }: {
   type: "text" | "latex";
-  onUpdate: (value: string) => void;
+  onUpdate?: (value: string) => void;
   value?: string;
   updateOnEnter?: boolean;
   style?: {
-    width?: number | 'fit',
-    height?: number | 'fit',
+    width?: number | Percentage,
+    height?: number | Percentage,
     border?: string
   },
-  render?: (value: string) => ReactElement
+  render?: (text: string) => ReactElement,
+  suggestion?: (text: string) => ReactElement
+  onKeyDown?: (keys: string[],
+    setValue: (value: string) => void,
+    selectedText: [number, number]) => void,
 }) {
 
   const [editing, setEditing] = useState(false)
@@ -47,7 +52,7 @@ export default function TextField({
         e.preventDefault();
         setEditingValue(editingValue + "\n");
       } else {
-        onUpdate(editingValue);
+        onUpdate && onUpdate(editingValue);
         setEditing(false)
       }
     }
@@ -119,11 +124,15 @@ export default function TextField({
   }, [editingValue, latexOpen, latexValue, type]);
 
   return (
-    <div className={`text-field w-full min-h-[1.5rem] rounded-sm flex items-center`}
+    <div className={`text-field min-h-[1.5rem] rounded-sm`}
       onClick={() => setEditing(true)}
+      onBlur={() => {
+        onUpdate && onUpdate(value || '')
+        setEditing(false)
+      }}
       style={{
-        width: typeof style?.width === 'number' ? style?.width : 'fit',
-        height: typeof style?.height === 'number' ? style?.height : 'fit',
+        width: style?.width ? style?.width : 'auto',
+        height: style?.height ? style?.height : 'auto',
         border: style?.border ? `1px solid ${style?.border}` : 'none'
       }}>
       {editing ?
@@ -131,7 +140,11 @@ export default function TextField({
           aria-label="text-field-input"
           placeholder=""
           ref={textareaRef}
-          className="w-full p-0 focus:outline-none border-none resize-none bg-inherit"
+          style={{
+            height: '100%',
+            width: '100%'
+          }}
+          className="p-0 focus:outline-none border-none resize-none bg-inherit"
           value={editingValue}
           onChange={handleChange}
           onKeyDown={handleKeyDown}

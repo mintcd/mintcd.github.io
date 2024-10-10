@@ -5,6 +5,8 @@ import { DragIndicatorOutlined, UnfoldMoreRounded, UnfoldLessRounded } from "@mu
 import TextCell from "./table-cell/TextCell";
 import { Divider } from "@mui/material";
 
+import "../../table.css"
+
 export default function TableRow({ item, attrsByName, onUpdate, style, listeners }:
   {
     item: DataItem,
@@ -69,12 +71,13 @@ export default function TableRow({ item, attrsByName, onUpdate, style, listeners
               <span
                 className={`${draggingItemId === item.id ? 'opacity-50' : 'opacity-100'} transition-opacity`}
               >
-                <DragIndicatorOutlined className="size-[18px] hover:cursor-grab" {...listeners} />              </span>
+                <DragIndicatorOutlined className="icon hover:cursor-grab" {...listeners} />
+              </span>
 
               {attrs.some(attr => attr.newWindow) && (
                 !expanded ? (
                   <UnfoldMoreRounded
-                    className="size-[18px] hover:cursor-pointer"
+                    className="icon"
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation(); // Prevent drag event
@@ -83,7 +86,7 @@ export default function TableRow({ item, attrsByName, onUpdate, style, listeners
                   />
                 ) : (
                   <UnfoldLessRounded
-                    className="size-[18px] hover:cursor-pointer"
+                    className="icon"
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation(); // Prevent drag event

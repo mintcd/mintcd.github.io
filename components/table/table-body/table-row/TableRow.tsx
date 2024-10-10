@@ -20,7 +20,7 @@ export default function TableRow({ item, attrsByName, onUpdate, style, listeners
 
   const attrs = Object.values(attrsByName)
 
-  const regularAttrs = attrs.filter(attr => attr.newWindow === false)
+  const regularAttrs = attrs.filter(attr => attr.newWindow === false && attr.hidden === false)
   const expandedAttrs = attrs.filter(attr => attr.newWindow === true)
 
   const [hovered, setHovered] = useState(false);

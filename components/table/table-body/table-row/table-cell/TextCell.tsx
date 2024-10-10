@@ -57,6 +57,7 @@ export default function TextCell({
           onUpdate={handleUpdate}
           type={attr.useLatex ? 'latex' : 'text'}
           preview={(value: string, selection: [number, number]) => <Latex>{String(value)}</Latex>}
+          focused={true}
         />
 
       )}

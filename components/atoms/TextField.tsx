@@ -15,6 +15,7 @@ export default function TextField({
   value,
   updateOnEnter = true,
   style,
+  focused,
   render,
   suggestion,
   preview,
@@ -29,6 +30,7 @@ export default function TextField({
     height?: number | Percentage,
     border?: string
   },
+  focused?: boolean;
   render?: (text: string) => ReactElement,
   suggestion?: (text: string) => ReactElement,
   preview?: (value: string, selection: [number, number]) => ReactElement,
@@ -37,7 +39,7 @@ export default function TextField({
     selectedText: [number, number]) => void,
 }) {
 
-  const [editing, setEditing] = useState(false);
+  const [editing, setEditing] = useState(focused || false);
   const [lastChangedValue, setLastChangedValue] = useState("");
   const [editingValue, setEditingValue] = useState(value || "");
   const [latexOpen, setLatexOpen] = useState<"inline" | "newline" | "none">(

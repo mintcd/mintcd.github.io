@@ -75,29 +75,57 @@ export default function DatabaseUI({ table }: {
 
   }, [authorized, data, table]);
 
-
-
-
-  async function handleExchange(id1: number, id2: number) {
+  function handleReorder(rangedItems: DataItem[], direction: 'up' | 'down') {
+    // Create a new array to store updated data
     setUpToDate(false)
-    if (!authorized) return;
-    setData(prevData => {
-      const newData = prevData.map(item => {
-        if (item.id === id1) {
-          return { ...item, id: id2 };
-        }
-        if (item.id === id2) {
-          return { ...item, id: id1 };
-        }
-        return item;
-      });
-      return newData.sort((x, y) => x.id - y.id);
-    });
 
-    await exchangeItems(table, id1, id2).then(() => {
-      setUpToDate(true)
-    });
+    const newRangedItems = [...rangedItems] as DataItem[]
+    if (direction === 'up') {
+      const { id, ...sourceData } = rangedItems[0]
+      newRangedItems.forEach((item, index) => {
+        if (index === rangedItems.length - 1) {
+          // Update the target item with the source data
+          newRangedItems[index] = { id: item.id, ...sourceData };
+        } else {
+          // Shift attributes up
+          const { id, ...nextData } = rangedItems[index + 1];
+          newRangedItems[index] = { id: item.id, ...nextData };
+        }
+      })
+    } else {
+      const { id, ...sourceData } = rangedItems[rangedItems.length - 1]
+
+      newRangedItems.forEach((item, index) => {
+        console.log(item, index)
+        if (index === 0) {
+          // Update the target item with the source data
+          newRangedItems[index] = { id: item.id, ...sourceData };
+        } else {
+          // Shift attributes up
+          const { id, ...prevData } = rangedItems[index - 1];
+          newRangedItems[index] = { id: item.id, ...prevData };
+        }
+      });
+    }
+
+    setData(data.map(item => {
+      const updatedItem = newRangedItems.find(newRangedItem => newRangedItem.id === item.id)
+      return updatedItem ? { id: item.id, ...updatedItem } : item
+    }))
+
+    Promise.all(newRangedItems.map((item) => {
+      const { id, ...attributes } = item;
+      return supabase.from(table).update(attributes).eq('id', id); // Return the promise
+    }))
+      .then((results) => {
+        setUpToDate(true)
+      })
+      .catch((error) => {
+        // Handle the error properly here
+        throw new Error(error.message);
+      });
   }
+
 
   useEffect(() => {
     if (window.localStorage.getItem("timeKeyGot")) setAuthorized(true);
@@ -132,6 +160,6 @@ export default function DatabaseUI({ table }: {
       attrs={attrs}
       onUpdateCell={handleUpdate}
       onCreateItem={handleCreate}
-      onExchangeItems={handleExchange} />
+      onReorder={handleReorder} />
   );
 }

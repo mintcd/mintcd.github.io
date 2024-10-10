@@ -58,8 +58,51 @@ export async function update(table: string, items: { id: number; attrValue: Json
   }
 }
 
-export async function reorder(table: string, sourceId: number, targetId: number) {
+export async function reorder(table: string, data: DataItem[], sourceId: number, targetId: number) {
+  if (sourceId === targetId) return false;
 
+  // Find the source item data without the ID
+  const sourceItem = data.find(item => item.id === sourceId);
+  if (!sourceItem) return false;
+  const { id, ...sourceData } = sourceItem;
+
+  // Create a new array to store updated data
+  const newData = [...data];
+
+  if (sourceId < targetId) {
+    newData.forEach((item, index) => {
+      if (item.id === targetId) {
+        // Update the target item with the source data
+        newData[index] = { id: item.id, ...sourceData };
+      } else {
+        // Shift attributes down
+        const { id, ...nextData } = data[index + 1];
+        newData[index] = { id: item.id, ...nextData };
+      }
+    });
+  } else {
+    newData.forEach((item, index) => {
+      if (item.id === targetId) {
+        // Update the target item with the source data
+        newData[index] = { id: item.id, ...sourceData };
+      } else {
+        // Shift attributes up
+        const { id, ...prevData } = data[index + 1];
+        newData[index] = { id: item.id, ...prevData };
+      }
+    });
+  }
+
+  // Update the database with the new data
+  for (const item of newData) {
+    const { id, ...attributes } = item;
+    const { error } = await supabase.from(table).update(attributes).eq('id', id);
+
+    if (error) {
+      throw new Error(`Failed to update item with id ${id}: ${error.message}`);
+    }
+  }
+  return true;
 }
 
 export async function updateOne(table: string, itemId: number, attrValue: JsonObject<any>) {

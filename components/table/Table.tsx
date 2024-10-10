@@ -8,7 +8,6 @@ import { exportToCSV, exportToJSON } from "@functions/document"
 
 import { Dropdown } from "@components/molecules";
 import { Checkbox, TextField } from "@components/atoms";
-import TableRow from "./table-row/TableRow";
 
 import {
   AddRounded, NavigateNextRounded,
@@ -17,8 +16,9 @@ import {
   SettingsRounded, FormatListBulletedRounded
 } from '@mui/icons-material';
 import TableHeaderGroup from "./table-header-group/TableHeaderGroup.tsx";
+import TableBody from "./table-body/TableBody.tsx";
 
-export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCreateItem, onExchangeItems }:
+export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCreateItem, onReorder }:
   {
     name?: string,
     upToDate?: boolean,
@@ -26,7 +26,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     attrs: AttrProps[],
     onUpdateCell: (items: UpdatedItem | UpdatedItem[]) => Promise<void>,
     onCreateItem: () => void,
-    onExchangeItems: (id1: number, id2: number) => void
+    onReorder: (rangedItems: DataItem[], direction: 'up' | 'down') => void
   }) {
 
   // Constants
@@ -261,18 +261,13 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
           setMenu={() => setMenu('filter')}
         />
 
-        <div className="table-body flex-grow text-gray-800" ref={bodyRef}>
-          {paginatedData.map((item) => (
-            <TableRow
-              key={item.id}
-              item={item}
-              attrsByName={attrsByName}
-              style={style}
-              onUpdate={onUpdateCell}
-            // onExchangeItems={onExchangeItems}
-            />
-          ))}
-        </div>
+        <TableBody
+          paginatedData={paginatedData}
+          attrsByName={attrsByName}
+          onUpdateCell={onUpdateCell}
+          style={style}
+          onReorder={onReorder}
+        />
       </div>
 
       <div className="table-footer flex items-center justify-between text-[#023e8a]">

@@ -4,9 +4,8 @@ import { useClickAway } from "@uidotdev/usehooks";
 import { DragIndicatorOutlined, UnfoldMoreRounded, UnfoldLessRounded } from "@mui/icons-material";
 import TextCell from "./table-cell/TextCell";
 import { Divider } from "@mui/material";
-import { range } from "lodash";
 
-export default function TableRow({ item, attrsByName, onUpdate, style }:
+export default function TableRow({ item, attrsByName, onUpdate, style, listeners }:
   {
     item: DataItem,
     attrsByName: AttrsByName,
@@ -14,7 +13,8 @@ export default function TableRow({ item, attrsByName, onUpdate, style }:
     style?: {
       optionsColumnWidth?: number,
       cellMinWidth?: number
-    }
+    },
+    listeners?: any
   }
 ) {
 
@@ -32,56 +32,6 @@ export default function TableRow({ item, attrsByName, onUpdate, style }:
   const ref = useClickAway(() => {
     setFocusedCell(-1);
   }) as any;
-
-  // Handlers
-  const handleDragStart = (e: React.DragEvent<HTMLElement>, id: number) => {
-    e.dataTransfer.setData('sourceId', id.toString()); // Store the dragged item's id in the dataTransfer object
-    setDraggingItemId(id); // Track the dragged item
-  };
-
-  const handleDragEnd = () => {
-    setDraggingItemId(null); // Reset dragging item when drag ends
-    setDraggedOver(false); // Reset the drag-over state
-  };
-
-  const handleDrop = (e: React.DragEvent<HTMLElement>, targetId: number) => {
-    e.preventDefault();
-    setDraggedOver(false);
-
-    const sourceId = parseInt(e.dataTransfer.getData('sourceId'), 10); // Retrieve the dragged item's id
-
-    if (sourceId !== targetId) {
-      let updatedItems: UpdatedItem[]
-      if (sourceId < targetId) {
-        updatedItems = [
-          // Get a temporary id for source item
-          { id: sourceId, attrValue: { id: 9999 } },
-          ...range(sourceId + 1, targetId + 1, 1).map(
-            id => ({ id: id, attrValue: { id: id - 1 } })
-          ),
-          { id: 9999, attrValue: { id: targetId } }
-        ]
-      } else {
-        updatedItems = [
-          // Get a temporary id for source item
-          { id: sourceId, attrValue: { id: 9999 } },
-          ...range(sourceId - 1, targetId - 1, -1).map(
-            id => ({ id: id, attrValue: { id: id + 1 } })
-          ),
-          { id: 9999, attrValue: { id: targetId } }
-        ]
-      }
-      onUpdate(updatedItems)
-    }
-  };
-
-
-  const handleDragOver = (e: React.DragEvent<HTMLElement>) => {
-    e.preventDefault(); // Allow the drop event to occur
-    if (!draggedOver) {
-      setDraggedOver(true); // Set drag-over state only when it's not already set
-    }
-  };
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -101,9 +51,6 @@ export default function TableRow({ item, attrsByName, onUpdate, style }:
   return (
     <div
       className={`table-row ${draggedOver && 'border-2 border-blue-400'} transition-all duration-200 ease-in-out`} // Smooth visual feedback for dragging
-      onDrop={(e) => handleDrop(e, item.id)}
-      onDragOver={handleDragOver}
-      onDragLeave={() => setDraggedOver(false)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       ref={ref}
@@ -120,28 +67,32 @@ export default function TableRow({ item, attrsByName, onUpdate, style }:
           {hovered && (
             <div className="p-2">
               <span
-                draggable
-                onDragStart={(e) => handleDragStart(e, item.id)}
-                onDragEnd={handleDragEnd} // Reset dragging state after the drag ends
                 className={`${draggingItemId === item.id ? 'opacity-50' : 'opacity-100'} transition-opacity`}
               >
-                <DragIndicatorOutlined className="size-[18px] hover:cursor-grab" />
-              </span>
+                <DragIndicatorOutlined className="size-[18px] hover:cursor-grab" {...listeners} />              </span>
 
               {attrs.some(attr => attr.newWindow) && (
                 !expanded ? (
                   <UnfoldMoreRounded
-
                     className="size-[18px] hover:cursor-pointer"
-                    onClick={() => setExpanded(true)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation(); // Prevent drag event
+                      setExpanded(true);
+                    }}
                   />
                 ) : (
                   <UnfoldLessRounded
                     className="size-[18px] hover:cursor-pointer"
-                    onClick={() => setExpanded(false)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation(); // Prevent drag event
+                      setExpanded(false);
+                    }}
                   />
                 )
               )}
+
             </div>
           )}
         </div>

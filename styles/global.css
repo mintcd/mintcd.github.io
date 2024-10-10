@@ -38,3 +38,15 @@
     @apply pb-4 leading-relaxed tracking-normal text-zinc-600 last-of-type:pb-0 dark:text-zinc-400;
   }
 }
+
+.icon {
+  width: 20px;
+  height: 20px;
+  color: #023e8a;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.icon:hover {
+  background-color: #f0f0f0; /* Set your desired background color here */
+}

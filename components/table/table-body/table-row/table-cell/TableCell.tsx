@@ -15,9 +15,8 @@ export default function TableCell({ itemId, attr, value, onUpdate, suggestions, 
 
   return (
     <div className={`table-cell
-            transition duration-300
             p-2
-            hover:bg-blue-100 hover:rounded-sm
+            hover:bg-blue-100 rounded-md
             ${focused ? 'border-2 border-blue-400 shadow-lg' : 'border border-transparent'}`}
       onClick={onClick}>
       {

@@ -115,7 +115,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
   }, [data, attrsByName]);
 
   return (
-    <div className="table-container flex flex-col shadow-md relative">
+    <div className="table-container flex flex-col relative">
 
       <div className="table-extension flex justify-between h-[20px]">
         <div className="sync-state mx-[20px] italic">
@@ -253,7 +253,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
         </div>
       </div>
 
-      <div className="table-content">
+      <div className="table-content rounded-md shadow-md">
         <TableHeaderGroup
           attrsByName={attrsByName}
           setAttrsByName={setAttrsByName}
@@ -271,19 +271,22 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
       </div>
 
       <div className="table-footer flex items-center justify-between text-[#023e8a]">
-        <AddRounded className={` cursor-pointer text-[20px]`}
-          onClick={onCreateItem} />
+        <div className="flex items-center rounded-md hover:bg-[#f0f0f0] py-1 px-2 cursor-pointer">
+          <AddRounded className={`icon`}
+            onClick={onCreateItem} />
+          <span>New </span>
+        </div>
+
         <div className="pagination-controls flex items-center justify-end">
           <NavigateBeforeRounded
-            className="hover:cursor-pointer"
+            className="icon"
             onClick={() => handlePageChange(currentPage > 1 ? currentPage - 1 : currentPage)}
           />
           <span className="pagination-info">
             {(currentPage - 1) * tableProperties.itemsPerPage + 1} - {Math.min(currentPage * tableProperties.itemsPerPage, processedData.length)} of {processedData.length}
           </span>
-
           <NavigateNextRounded
-            className="hover:cursor-pointer"
+            className="icon"
             onClick={() => handlePageChange(currentPage !== totalPages ? currentPage + 1 : currentPage)}
           />
         </div>

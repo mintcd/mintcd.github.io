@@ -271,9 +271,9 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
       </div>
 
       <div className="table-footer flex items-center justify-between text-[#023e8a]">
-        <div className="flex items-center rounded-md hover:bg-[#f0f0f0] py-1 px-2 cursor-pointer">
-          <AddRounded className={`icon`}
-            onClick={onCreateItem} />
+        <div className="flex items-center rounded-md hover:bg-[#f0f0f0] py-1 px-2 cursor-pointer"
+          onClick={onCreateItem}>
+          <AddRounded className={`icon`} />
           <span>New </span>
         </div>
 

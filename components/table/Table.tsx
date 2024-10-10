@@ -1,38 +1,32 @@
 'use client'
 
 import { useState, useEffect, useMemo, useRef } from "react";
-import { useClickAway } from "@uidotdev/usehooks";
 import './table.css'
 import { filterData, initializeAttrsByName, sortData, updateFilter } from "./functions.ts";
-import { exportToCSV, exportToJSON } from "@functions/document"
 
-import { Dropdown } from "@components/molecules";
-import { Checkbox, TextField } from "@components/atoms";
 
 import {
   AddRounded, NavigateNextRounded,
-  NavigateBeforeRounded, ViewColumnRounded,
-  FilterAltRounded, Download,
-  SettingsRounded, FormatListBulletedRounded
+  NavigateBeforeRounded
 } from '@mui/icons-material';
 import TableHeaderGroup from "./table-header-group/TableHeaderGroup.tsx";
 import TableBody from "./table-body/TableBody.tsx";
+import TableExtension from "./table-extension/TableExtension.tsx";
+import { exportToCSV, exportToJSON } from "@functions/document.ts";
 
 export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCreateItem, onReorder }:
   {
-    name?: string,
+    name: string,
     upToDate?: boolean,
     data: DataItem[],
     attrs: AttrProps[],
     onUpdateCell: (items: UpdatedItem | UpdatedItem[]) => Promise<void>,
     onCreateItem: () => void,
-    onReorder: (rangedItems: DataItem[], direction: 'up' | 'down') => void
+    onReorder: (rangedItems: DataItem[], direction: 'up' | 'down') => void,
   }) {
 
   // Constants
   const style = { cellMinWidth: 100, optionsColumnWidth: 75 }
-
-  const bodyRef = useRef(null)
 
   // States
   // Convert attrs to object for better retrieval
@@ -49,10 +43,6 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
   const [processedData, setProcessedData] = useState(data)
   const [menu, setMenu] = useState<MenuState>(undefined)
 
-  const menuRef = useClickAway(() => {
-    setMenu(undefined)
-  }) as any
-
   // Derived values
   const startIndex = (currentPage - 1) * tableProperties.itemsPerPage;
   const endIndex = Math.min(startIndex + tableProperties.itemsPerPage, processedData.length);
@@ -62,6 +52,12 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
   }, [processedData, tableProperties.itemsPerPage]);
 
   // Handlers
+  function handlePagination(itemsPerPage: number) {
+    setTableProperties({
+      ...tableProperties,
+      itemsPerPage: itemsPerPage
+    })
+  }
   function handleFilter(action: FilterAction) {
     console.log(action)
     menu !== "filter" && setMenu("filter")
@@ -75,6 +71,10 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     const newAttrsByName = { ...attrsByName }
     newAttrsByName[columnName] = { ...newAttrsByName[columnName], hidden: !attrsByName[columnName].hidden }
     setAttrsByName(newAttrsByName)
+  }
+
+  function handleDownload(fileType: 'json' | 'csv') {
+    fileType === 'json' ? exportToJSON(data, name) : exportToCSV(Object.keys(attrsByName), data, name)
   }
 
   const handlePageChange = (page: number) => {
@@ -117,141 +117,16 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
   return (
     <div className="table-container flex flex-col relative">
 
-      <div className="table-extension flex justify-between h-[20px]">
-        <div className="sync-state mx-[20px] italic">
-          {upToDate ? "All changes saved." : "Processing..."}
-        </div>
-
-        <div className="table-menu"
-          ref={menuRef}
-        >
-          <div className="table-menu-icons flex space-x-3">
-            <ViewColumnRounded className="icon"
-              onClick={() => setMenu(menu === "column-visibility" ? undefined : "column-visibility")} />
-            <FormatListBulletedRounded className="icon" />
-            <FilterAltRounded className="icon"
-              onClick={() => setMenu(menu === "filter" ? undefined : "filter")} />
-            <SettingsRounded className="icon"
-              onClick={() => setMenu(menu === "settings" ? undefined : "settings")}
-            />
-            <Download className="icon"
-              onClick={() => setMenu(menu === "download" ? undefined : "download")} />
-          </div>
-
-          <div className="table-menu-dropdown absolute top-[20px] right-0 z-10 bg-white border border-gray-300"
-          >
-            {menu === 'column-visibility' &&
-              <div className="column-visibility-menu p-4 w-48 shadow-lg space-y-2">
-                {Object.values(attrsByName).map(attr => (
-                  !attr.newWindow &&
-                  <div key={attr.name} className="flex justify-between items-center">
-                    <span className="text-gray-800">{attrsByName[attr.name].display}</span>
-                    <Checkbox
-                      checked={!attrsByName[attr.name].hidden}
-                      onChange={() => handleColumnAppearance(attr.name)}
-                    />
-                  </div>
-                ))
-                }
-              </div>
-            }
-            {menu === 'download' &&
-              <div className="p-4 w-48 shadow-lg space-y-2">
-                <button onClick={() => exportToCSV(Object.keys(attrs), data, name)} >Export to CSV</button>
-                <button onClick={() => exportToJSON(data, name)} >Export to JSON</button>
-              </div>
-            }
-            {menu === 'filter' &&
-              <div className="table-filter flex p-4 shadow-lg w-[500px] space-x-2">
-                {Object.keys(attrsByName)
-                  .filter(attrName => attrsByName[attrName]['filterEnabled'])
-                  .map((attrName) => (
-                    <Dropdown
-                      key={attrName}
-                      toggleButton={
-                        <span className=" bg-slate-300 rounded-full py-[2px] px-[8px]">
-                          {attrsByName[attrName].display}
-                          {function () {
-                            const candidates = Object.entries(attrsByName[attrName].filter)
-                              .flatMap(([_, candidates]) => {
-                                if (candidates.length === 0) return []
-                                return candidates
-                              })
-                            return candidates.length > 0 ? ": " + candidates.join(", ") : ""
-                          }()}
-                        </span>
-                      }
-                      content={
-                        <div className="filter-options">
-                          {
-                            attrsByName[attrName].type === 'multiselect' &&
-                            <div className="p-2">
-                              {attrsByName[attrName].display} <span className="italic"> is</span>
-                              {attrsByName[attrName].suggestions?.map(suggestion => (
-                                <div key={suggestion} className="w-[200px]">
-                                  <Checkbox checked={Boolean(attrsByName[attrName]['filter']['is']?.includes(suggestion))}
-                                    onChange={() => handleFilter({
-                                      name: attrName,
-                                      predicate: "is",
-                                      candidate: suggestion
-                                    })} />
-                                  <span className="mx-2">
-                                    {suggestion}
-                                  </span>
-                                </div>
-                              ))}
-                            </div>
-                          }
-                          {
-                            attrsByName[attrName].type === 'text' &&
-                            <div className="p-2 w-[200px]">
-                              {attrsByName[attrName].display} <span className="italic"> contains</span>
-                              <TextField
-                                type='text'
-                                value={attrsByName[attrName].filter['contains'] || ""}
-                                onUpdate={(value) => {
-                                  handleFilter({
-                                    name: attrName,
-                                    predicate: "contains",
-                                    candidate: value
-                                  })
-                                }}
-                                style={{ border: '#4672b0' }}
-                              />
-                            </div>
-                          }
-                        </div>
-                      }
-                    />
-                  ))}
-
-              </div>
-            }
-            {menu === 'settings' &&
-              <div className="p-4 w-48 bg-white border border-gray-300 shadow-lg flex justify-between">
-                <div className="whitespace-nowrap">
-                  Items per page
-                </div>
-                <TextField
-                  type='text'
-                  value={String(tableProperties.itemsPerPage)}
-                  onUpdate={(value) => setTableProperties({
-                    ...tableProperties,
-                    itemsPerPage: function () {
-                      const parsedValue = parseInt(value)
-                      if (typeof parsedValue === 'number' && parsedValue > 0) {
-                        return parsedValue
-                      }
-                      return tableProperties.itemsPerPage
-                    }()
-                  })}
-                  style={{ width: 20, border: '#4672b0' }}
-                />
-              </div>
-            }
-          </div>
-        </div>
-      </div>
+      <TableExtension
+        upToDate={upToDate}
+        attrsByName={attrsByName}
+        handleDownload={handleDownload}
+        handleColumnAppearance={handleColumnAppearance}
+        handleFilter={handleFilter}
+        tableProperties={tableProperties}
+        handlePagination={handlePagination}
+        setTableProperties={setTableProperties}
+      />
 
       <div className="table-content rounded-md shadow-md">
         <TableHeaderGroup

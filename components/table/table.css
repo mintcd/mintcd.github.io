@@ -1,5 +1,17 @@
 /* Table container */
 
+@media (max-width: 600px) {
+  .table-content {
+    display: block; /* Change to block for stacking */
+  }
+  .table-row {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem; /* Spacing between cards */
+  }
+}
+
+
 
 .table-body::-webkit-scrollbar {
   height: 10px; /* Scrollbar height */

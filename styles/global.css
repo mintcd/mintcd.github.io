@@ -40,8 +40,7 @@
 }
 
 .icon {
-  width: 18px;
-  height: 18px;
+  font-size: 18px;
   color: #023e8a;
   cursor: pointer;
   border-radius: 50%;

@@ -20,6 +20,12 @@ export default function DatabaseUI({ table }: {
 
   async function handleCreate() {
     setUpToDate(false)
+    // If there is item whose name is empty, do not create
+    if (data.some(item => item.name.length === 0)) {
+      setUpToDate(true)
+      return
+    }
+
     const currentIds = data.map(item => item.id).sort((x: number, y: number) => x - y);
     let newId = 1;
 

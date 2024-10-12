@@ -3,22 +3,28 @@ import { useClickAway } from "@uidotdev/usehooks";
 import {
   ViewColumnRounded,
   FilterAltRounded, Download,
-  SettingsRounded, FormatListBulletedRounded
+  SettingsRounded, FormatListBulletedRounded,
+  SearchOffOutlined,
+  SearchOutlined
 } from '@mui/icons-material';
 import { Dropdown } from "@components/molecules";
 import { Checkbox, TextField } from "@components/atoms";
+import Autocomplete from "@components/autocomplete/Autocomplete";
+import Latex from "@components/latex";
 
-export default function TableExtension({ upToDate, attrsByName, handleDownload, tableProperties, handleColumnAppearance, handleFilter, handlePagination }: {
+export default function TableExtension({ upToDate, attrsByName, handleDownload, tableProperties, handleColumnAppearance, handleFilter, handlePagination, handleSearch, handleSort }: {
   upToDate?: boolean,
   attrsByName: AttrsByName,
   tableProperties: TableProperties,
-  setTableProperties: (newTableProperties: TableProperties) => void,
-  handleDownload: (fileType: 'json' | 'csv') => void,
-  handleColumnAppearance: (columnName: string) => void,
-  handleFilter: (action: FilterAction) => void,
-  handlePagination: (itemsPerPage: number) => void
+  handleSort?: (attrName: string, direction: 'asc' | 'desc') => void
+  handleDownload?: (fileType: 'json' | 'csv') => void,
+  handleColumnAppearance?: (columnName: string) => void,
+  handleFilter?: (action: FilterAction) => void,
+  handlePagination?: (itemsPerPage: number) => void,
+  handleSearch?: (searchString: string) => void
 }) {
   const [menu, setMenu] = useState<MenuState>(undefined)
+  const [searchValue, setSearchValue] = useState("")
 
   const menuRef = useClickAway(() => {
     setMenu(undefined)
@@ -26,30 +32,47 @@ export default function TableExtension({ upToDate, attrsByName, handleDownload, 
 
 
   return (
-    <div className="table-extension flex justify-between h-[20px]">
-      <div className="sync-state mx-[20px] italic">
+    <div className="table-extension flex justify-between">
+      <span className="sync-state mx-[20px] italic flex items-center">
         {upToDate ? "All changes saved." : "Processing..."}
-      </div>
+      </span>
+
+
+      {
+        handleSearch &&
+        <div className="search-box border border-gray-700 h-auto py-1 px-2 rounded-full flex items-center">
+          <SearchOutlined className="icon" />
+          <Autocomplete
+            suggestions={attrsByName.name.suggestions}
+            onSubmit={(value) => handleSearch(value)}
+            maxDisplay={5}
+            render={(suggestion) => <Latex>{String(suggestion)}</Latex>}
+            freeSolo
+          />
+        </div>
+      }
 
       <div className="table-menu"
         ref={menuRef}
       >
         <div className="table-menu-icons flex space-x-3">
-          <ViewColumnRounded className="icon"
-            onClick={() => setMenu(menu === "column-visibility" ? undefined : "column-visibility")} />
-          <FormatListBulletedRounded className="icon" />
-          <FilterAltRounded className="icon"
-            onClick={() => setMenu(menu === "filter" ? undefined : "filter")} />
-          <SettingsRounded className="icon"
+          {handleColumnAppearance && <ViewColumnRounded className="icon"
+            onClick={() => setMenu(menu === "column-visibility" ? undefined : "column-visibility")}
+          />}
+          {handleSort && <FormatListBulletedRounded className="icon" />}
+          {handleFilter && <FilterAltRounded className="icon"
+            onClick={() => setMenu(menu === "filter" ? undefined : "filter")} />}
+          {handlePagination && <SettingsRounded className="icon"
             onClick={() => setMenu(menu === "settings" ? undefined : "settings")}
-          />
-          <Download className="icon"
-            onClick={() => setMenu(menu === "download" ? undefined : "download")} />
+          />}
+          {handleDownload && <Download className="icon"
+            onClick={() => setMenu(menu === "download" ? undefined : "download")}
+          />}
         </div>
 
         <div className="table-menu-dropdown absolute top-[20px] right-0 z-10 bg-white border border-gray-300"
         >
-          {menu === 'column-visibility' &&
+          {menu === 'column-visibility' && handleColumnAppearance &&
             <div className="column-visibility-menu p-4 w-48 shadow-lg space-y-2">
               {Object.values(attrsByName).map(attr => (
                 !attr.newWindow &&
@@ -64,13 +87,13 @@ export default function TableExtension({ upToDate, attrsByName, handleDownload, 
               }
             </div>
           }
-          {menu === 'download' &&
+          {menu === 'download' && handleDownload &&
             <div className="p-4 w-48 shadow-lg space-y-2">
               <button onClick={() => handleDownload('csv')} >Export to CSV</button>
               <button onClick={() => handleDownload('json')} >Export to JSON</button>
             </div>
           }
-          {menu === 'filter' &&
+          {menu === 'filter' && handleFilter &&
             <div className="table-filter flex p-4 shadow-lg w-[500px] space-x-2">
               {Object.keys(attrsByName)
                 .filter(attrName => attrsByName[attrName]['filterEnabled'])
@@ -136,7 +159,7 @@ export default function TableExtension({ upToDate, attrsByName, handleDownload, 
 
             </div>
           }
-          {menu === 'settings' &&
+          {menu === 'settings' && handlePagination &&
             <div className="p-4 w-48 bg-white border border-gray-300 shadow-lg flex justify-between">
               <div className="whitespace-nowrap">
                 Items per page

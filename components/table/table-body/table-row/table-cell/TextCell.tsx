@@ -42,7 +42,7 @@ export default function TextCell({
     <div className={`table-text-cell`} ref={ref}>
       {cellState === 'noEdit' && (
         <div
-          className="min-h-[3rem] cursor-pointer"
+          className="min-h-[1.5rem] cursor-pointer"
           onClick={() => {
             setCellState("editing");
             setEditingValue(value);

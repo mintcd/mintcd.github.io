@@ -28,7 +28,7 @@ export default function MyLatex({ children }: { children: string }) {
 
   return (
     <div className='latex-container font-modern' ref={latexRef}>
-      <Latex macros={macros}>{String(preprocessedChildren)}</Latex>
+      <Latex macros={macros}>{preprocessedChildren}</Latex>
     </div>
   );
 };

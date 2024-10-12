@@ -10,8 +10,8 @@ export default function Autocomplete({
   placeholder,
   value,
   freeSolo,
-  icon = true,
-  renderedSuggestion,
+  icon = false,
+  render,
   maxDisplay,
   onSubmit
 }: {
@@ -24,7 +24,7 @@ export default function Autocomplete({
   maxDisplay?: number,
   style?: CSSProperties,
   onSubmit: (selectedValue: string) => void
-  renderedSuggestion?: (suggestion: string) => ReactNode
+  render?: (suggestion: string) => ReactNode
 }): ReactElement {
   const [inputValue, setInputValue] = useState(value || '');
   const [submittedValue, setSubmittedValue] = useState(value || '')
@@ -73,7 +73,7 @@ export default function Autocomplete({
         setActiveSuggestionIndex(-1);
         onSubmit(selectedSuggestion)
       } else if (freeSolo) {
-        if (inputValue && inputValue.length !== 0) onSubmit(inputValue);
+        onSubmit(inputValue);
       }
     }
   };
@@ -101,7 +101,7 @@ export default function Autocomplete({
 
   return (
     <div className="relative" style={style} ref={ref}>
-      <div className={`flex border border-${style?.border ? style.border : focused && 'blue-400'} relative z-[1]`}>
+      <div className={`flex ${style?.border && `border border-${style?.border}`}  relative z-[1]`}>
         <input
           type="text"
           autoFocus={autoFocus}
@@ -137,7 +137,7 @@ export default function Autocomplete({
               onClick={() => handleSuggestionClick(suggestion)}
               className={`p-2 cursor-pointer ${index === activeSuggestionIndex ? 'bg-gray-200' : 'hover:bg-gray-200'}`}
             >
-              {suggestion}
+              {render ? render(suggestion) : suggestion}
             </li>
           ))}
         </ul>

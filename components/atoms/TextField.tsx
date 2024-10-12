@@ -5,7 +5,7 @@
  */
 
 import { ChangeEvent, ReactElement, useEffect, useRef, useState } from "react";
-import { getAllIndices } from "@functions/text-analysis";
+import { getAllIndices, breakLines } from "@functions/text-analysis";
 import Latex from "@components/latex";
 import { getCaretCoordinates } from "@functions/elements";
 
@@ -13,6 +13,7 @@ export default function TextField({
   type,
   onUpdate,
   value,
+  placeholder,
   updateOnEnter = true,
   style,
   focused,
@@ -24,12 +25,9 @@ export default function TextField({
   type: "text" | "latex";
   onUpdate?: (value: string) => void;
   value?: string;
+  placeholder?: string;
   updateOnEnter?: boolean;
-  style?: {
-    width?: number | Percentage,
-    height?: number | Percentage,
-    border?: string
-  },
+  style?: Style;
   focused?: boolean;
   render?: (text: string) => ReactElement,
   suggestion?: (text: string) => ReactElement,
@@ -83,6 +81,11 @@ export default function TextField({
     }
   }, [latexOpen])
 
+  function handleChange(e: ChangeEvent<HTMLTextAreaElement>) {
+    setLastChangedValue(editingValue);
+    setEditingValue(e.target.value);
+  }
+
   // Whenever editing changes, update the caret position
   useEffect(() => {
     textareaRef.current?.setSelectionRange(editingValue.length, editingValue.length);
@@ -96,23 +99,6 @@ export default function TextField({
       setCaretPosition(null); // Reset caret position after setting it
     }
   }, [caretPosition]);
-
-  function handleChange(e: ChangeEvent<HTMLTextAreaElement>) {
-    setLastChangedValue(editingValue);
-    setEditingValue(e.target.value);
-  }
-
-  useEffect(() => {
-    const textarea = textareaRef.current;
-    if (textarea) {
-      // Reset the height to auto to calculate based on new content
-      textarea.style.height = "auto";
-
-      // Calculate the height based on scrollHeight and adjust for line height
-      const scrollHeight = textarea.scrollHeight;
-      textarea.style.height = `${scrollHeight}px`;
-    }
-  });
 
   // Preview processing
   useEffect(() => {
@@ -143,34 +129,37 @@ export default function TextField({
   }, [editingValue, latexOpen, latexValue, type]);
 
   return (
-    <div className={`text-field min-h-[1.5rem] rounded-sm`}
+    <div className={`text-field min-h-[1.5rem] rounded-sm flex items-center`}
       onClick={() => setEditing(true)}
       // onBlur={() => {
       //   onUpdate && onUpdate(value || '')
       //   setEditing(false)
       // }}
       style={{
-        width: style?.width ? style?.width : 'auto',
-        height: style?.height ? style?.height : 'auto',
-        border: style?.border ? `1px solid ${style?.border}` : 'none'
+        width: style?.width,
+        height: style?.height,
+        border: style?.border,
+        padding: style?.padding
       }}>
       {editing ?
         <textarea
           aria-label="text-field-input"
-          placeholder=""
           ref={textareaRef}
           style={{
-            height: '100%',
-            width: '100%'
+            height: breakLines(editingValue, style?.width || 100).length * 21,
+            width: '100%',
+            padding: 0
           }}
-          className="p-0 focus:outline-none border-none resize-none bg-inherit"
-          value={editingValue}
+          className="focus:outline-none border-none resize-none bg-inherit"
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           autoFocus
-        /> :
+          value={editingValue}
+        />
+
+        :
         <div>
-          {editingValue}
+          {editingValue === '' ? placeholder : editingValue}
         </div>
       }
 

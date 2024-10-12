@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import './table.css'
 import { filterData, initializeAttrsByName, sortData, updateFilter } from "./functions.ts";
+import { useMediaQuery } from "@uidotdev/usehooks";
 
 
 import {
@@ -13,6 +14,7 @@ import TableHeaderGroup from "./table-header-group/TableHeaderGroup.tsx";
 import TableBody from "./table-body/TableBody.tsx";
 import TableExtension from "./table-extension/TableExtension.tsx";
 import { exportToCSV, exportToJSON } from "@functions/document.ts";
+import TableCell from "./table-body/table-row/table-cell/TableCell.tsx";
 
 export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCreateItem, onReorder }:
   {
@@ -30,6 +32,8 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
 
   // States
   // Convert attrs to object for better retrieval
+  const isMobileDevice = useMediaQuery("only screen and (max-width : 768px)");
+
   const [attrsByName, setAttrsByName] = useState(() => {
     const storedAttrsByName = localStorage.getItem('attrsByName')
     if (storedAttrsByName) return JSON.parse(storedAttrsByName) as { [key: string]: AttrProps }
@@ -42,6 +46,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
   const [currentPage, setCurrentPage] = useState(1);
   const [processedData, setProcessedData] = useState(data)
   const [menu, setMenu] = useState<MenuState>(undefined)
+  const [searchString, setSearchString] = useState("")
 
   // Derived values
   const startIndex = (currentPage - 1) * tableProperties.itemsPerPage;
@@ -52,6 +57,10 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
   }, [processedData, tableProperties.itemsPerPage]);
 
   // Handlers
+  function handleSearch(searchString: string) {
+    setSearchString(searchString)
+  }
+
   function handlePagination(itemsPerPage: number) {
     setTableProperties({
       ...tableProperties,
@@ -105,6 +114,10 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
   useEffect(() => {
     let processedData = filterData(data, attrsByName)
 
+    processedData = processedData.filter(item => item.name === searchString)
+
+    console.log(processedData)
+
     // Apply sorting
     Object.values(attrsByName).forEach(prop => {
       processedData = sortData(processedData, prop.name, prop.sort)
@@ -112,60 +125,92 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
 
     setProcessedData(processedData);
 
-  }, [data, attrsByName]);
+  }, [data, attrsByName, searchString]);
 
   return (
-    <div className="table-container flex flex-col relative">
-
-      <TableExtension
-        upToDate={upToDate}
-        attrsByName={attrsByName}
-        handleDownload={handleDownload}
-        handleColumnAppearance={handleColumnAppearance}
-        handleFilter={handleFilter}
-        tableProperties={tableProperties}
-        handlePagination={handlePagination}
-        setTableProperties={setTableProperties}
-      />
-
-      <div className="table-content rounded-md shadow-md">
-        <TableHeaderGroup
+    isMobileDevice
+      ?
+      <div>
+        <TableExtension
+          upToDate={upToDate}
           attrsByName={attrsByName}
-          setAttrsByName={setAttrsByName}
-          style={style}
-          setMenu={() => setMenu('filter')}
+          tableProperties={tableProperties}
+          handleSearch={handleSearch}
         />
-
-        <TableBody
-          paginatedData={paginatedData}
-          attrsByName={attrsByName}
-          onUpdateCell={onUpdateCell}
-          style={style}
-          onReorder={onReorder}
-        />
-      </div>
-
-      <div className="table-footer flex items-center justify-between text-[#023e8a]">
+        <div>
+          {Object.entries(processedData[0]).map(([key, value]) => (
+            <div className="grid grid-cols-[55px,1fr] border-b border-b-gray-300"
+              key={key}>
+              <div className="p-2">
+                {attrsByName[key].display}
+              </div>
+              <TableCell
+                itemId={processedData[0].id}
+                attr={attrsByName[key]}
+                onUpdate={onUpdateCell}
+                value={value}
+              />
+            </div>
+          ))}
+        </div>
         <div className="flex items-center rounded-md hover:bg-[#f0f0f0] py-1 px-2 cursor-pointer"
           onClick={onCreateItem}>
           <AddRounded className={`icon`} />
           <span>New </span>
         </div>
 
-        <div className="pagination-controls flex items-center justify-end">
-          <NavigateBeforeRounded
-            className="icon"
-            onClick={() => handlePageChange(currentPage > 1 ? currentPage - 1 : currentPage)}
+      </div>
+      :
+      <div className="table-container flex flex-col relative">
+        <TableExtension
+          upToDate={upToDate}
+          attrsByName={attrsByName}
+          handleDownload={handleDownload}
+          handleColumnAppearance={handleColumnAppearance}
+          handleFilter={handleFilter}
+          tableProperties={tableProperties}
+          handlePagination={handlePagination}
+          handleSearch={handleSearch}
+        />
+
+        <div className="table-content rounded-md shadow-md">
+          <TableHeaderGroup
+            attrsByName={attrsByName}
+            setAttrsByName={setAttrsByName}
+            style={style}
+            setMenu={() => setMenu('filter')}
           />
-          <span className="pagination-info">
-            {(currentPage - 1) * tableProperties.itemsPerPage + 1} - {Math.min(currentPage * tableProperties.itemsPerPage, processedData.length)} of {processedData.length}
-          </span>
-          <NavigateNextRounded
-            className="icon"
-            onClick={() => handlePageChange(currentPage !== totalPages ? currentPage + 1 : currentPage)}
+
+          <TableBody
+            paginatedData={paginatedData}
+            attrsByName={attrsByName}
+            onUpdateCell={onUpdateCell}
+            style={style}
+            onReorder={onReorder}
           />
         </div>
+
+        <div className="table-footer flex items-center justify-between text-[#023e8a]">
+          <div className="flex items-center rounded-md hover:bg-[#f0f0f0] py-1 px-2 cursor-pointer"
+            onClick={onCreateItem}>
+            <AddRounded className={`icon`} />
+            <span>New </span>
+          </div>
+
+          <div className="pagination-controls flex items-center justify-end">
+            <NavigateBeforeRounded
+              className="icon"
+              onClick={() => handlePageChange(currentPage > 1 ? currentPage - 1 : currentPage)}
+            />
+            <span className="pagination-info">
+              {(currentPage - 1) * tableProperties.itemsPerPage + 1} - {Math.min(currentPage * tableProperties.itemsPerPage, processedData.length)} of {processedData.length}
+            </span>
+            <NavigateNextRounded
+              className="icon"
+              onClick={() => handlePageChange(currentPage !== totalPages ? currentPage + 1 : currentPage)}
+            />
+          </div>
+        </div>
       </div>
-    </div>
   );
 }

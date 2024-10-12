@@ -85,6 +85,14 @@ export default function TextField({
     setLastChangedValue(editingValue);
     setEditingValue(e.target.value);
   }
+  // Update height based on editingValue
+  useEffect(() => {
+    const textarea = textareaRef.current;
+
+    if (textarea) {
+      textarea.style.height = `${breakLines(editingValue, textarea.scrollWidth).length * 21}px`;
+    }
+  }, [editingValue]);
 
   // Whenever editing changes, update the caret position
   useEffect(() => {
@@ -146,9 +154,8 @@ export default function TextField({
           aria-label="text-field-input"
           ref={textareaRef}
           style={{
-            height: breakLines(editingValue, style?.width || 100).length * 21,
+            padding: 0,
             width: '100%',
-            padding: 0
           }}
           className="focus:outline-none border-none resize-none bg-inherit"
           onChange={handleChange}

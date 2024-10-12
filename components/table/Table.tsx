@@ -117,8 +117,6 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     if (searchString !== undefined)
       processedData = processedData.filter(item => item.name === searchString)
 
-    console.log(processedData)
-
     // Apply sorting
     Object.values(attrsByName).forEach(prop => {
       processedData = sortData(processedData, prop.name, prop.sort)

@@ -43,20 +43,26 @@ export function filterOnQuery(query: string, data: Term[], keys: string[] = ['na
 export function breakLines(text: string, width: number, fontSize: number = 16, fontFamily: string = "Arial"): string[] {
 
   const lines: string[] = [];
-  let currentLine = text.split(` `)[0];
+  const endlineSplits = text.split('\n')
 
-  for (let i = 1; i < text.split(` `).length; i++) {
-    const word = text.split(` `)[i];
-    const testLine = currentLine + ` ` + word;
-    const testWidth = getTextWidth(testLine, fontSize, fontFamily);
+  endlineSplits.forEach(line => {
+    const words = line.split(" ")
+    let currentLine = "";
+    words.forEach(word => {
+      const testLine = currentLine + word + ` `;
+      const testWidth = getTextWidth(testLine, fontSize, fontFamily);
 
-    if (testWidth <= width) {
-      currentLine = testLine;
-    } else {
-      lines.push(currentLine);
-      currentLine = word;
-    }
-  }
-  lines.push(currentLine);
+      if (testWidth <= width) {
+        currentLine = testLine;
+      } else {
+        lines.push(currentLine);
+        currentLine = word;
+      }
+    })
+    lines.push(currentLine)
+  })
+
+  console.log(lines)
+
   return lines
 }

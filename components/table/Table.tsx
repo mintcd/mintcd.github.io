@@ -72,8 +72,8 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     menu !== "filter" && setMenu("filter")
     const updatedAttrsByName = updateFilter(attrsByName, action)
     // Enable the filter
-    console.log(updatedAttrsByName)
     setAttrsByName(updatedAttrsByName)
+    setCurrentPage(1)
   }
 
   function handleColumnAppearance(columnName: string) {

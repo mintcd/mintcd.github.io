@@ -170,7 +170,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
           handleFilter={handleFilter}
           tableProperties={tableProperties}
           handlePagination={handlePagination}
-          handleSearch={handleSearch}
+        // handleSearch={handleSearch}
         />
 
         <div className="table-content rounded-md shadow-md">

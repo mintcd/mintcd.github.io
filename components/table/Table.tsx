@@ -46,7 +46,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
   const [currentPage, setCurrentPage] = useState(1);
   const [processedData, setProcessedData] = useState(data)
   const [menu, setMenu] = useState<MenuState>(undefined)
-  const [searchString, setSearchString] = useState("")
+  const [searchString, setSearchString] = useState<string | undefined>(undefined)
 
   // Derived values
   const startIndex = (currentPage - 1) * tableProperties.itemsPerPage;
@@ -114,7 +114,8 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
   useEffect(() => {
     let processedData = filterData(data, attrsByName)
 
-    processedData = processedData.filter(item => item.name === searchString)
+    if (searchString !== undefined)
+      processedData = processedData.filter(item => item.name === searchString)
 
     console.log(processedData)
 

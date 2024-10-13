@@ -24,6 +24,7 @@ export default function TableExtension({ upToDate, attrsByName, handleDownload, 
   handleSearch?: (searchString: string) => void
 }) {
   const [menu, setMenu] = useState<MenuState>(undefined)
+  const [searchValue, setSearchValue] = useState("")
 
   const menuRef = useClickAway(() => {
     setMenu(undefined)
@@ -42,8 +43,13 @@ export default function TableExtension({ upToDate, attrsByName, handleDownload, 
         <div className="search-box border border-gray-700 h-auto py-1 px-2 rounded-full flex items-center">
           <SearchOutlined className="icon" />
           <Autocomplete
+            value={searchValue}
             suggestions={attrsByName.name.suggestions}
-            onSubmit={(value) => handleSearch(value)}
+            onSubmit={(value) => {
+              setSearchValue(value)
+              handleSearch(value)
+            }}
+            style={{ width: 150, height: '1.5rem', textOverflow: 'ellipsis' }}
             maxDisplay={5}
             render={(suggestion) => <Latex>{String(suggestion)}</Latex>}
             freeSolo
@@ -138,7 +144,6 @@ export default function TableExtension({ upToDate, attrsByName, handleDownload, 
                           <div className="p-2 w-[200px]">
                             {attrsByName[attrName].display} <span className="italic"> contains</span>
                             <TextField
-                              type='text'
                               value={attrsByName[attrName].filter['contains'] || ""}
                               onUpdate={(value) => {
                                 handleFilter({
@@ -164,7 +169,6 @@ export default function TableExtension({ upToDate, attrsByName, handleDownload, 
                 Items per page
               </div>
               <TextField
-                type='text'
                 value={String(tableProperties.itemsPerPage)}
                 onUpdate={(value) => handlePagination(parseInt(value) || tableProperties.itemsPerPage)}
                 style={{ width: 20, border: '#4672b0' }}

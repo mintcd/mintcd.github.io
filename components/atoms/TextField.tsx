@@ -5,14 +5,14 @@
  * The elements in a text field are a textarea and a container
  */
 
-import { ChangeEvent, ReactElement, useEffect, useRef, useState } from "react";
+import { ChangeEvent, CSSProperties, ReactElement, ReactNode, useEffect, useRef, useState } from "react";
 import { getAllIndices, breakLines } from "@functions/text-analysis";
 import Latex from "@components/atoms/latex";
 import { getCaretCoordinates } from "@functions/elements";
 
 export default function TextField({
-  type,
   onUpdate,
+  onChange,
   listeners,
   value,
   placeholder,
@@ -22,27 +22,31 @@ export default function TextField({
   render,
   suggestion,
   preview,
-  onKeyDown
+  onKeyDown,
+  onFocus
 }: {
-  type: "text" | "latex";
   onUpdate?: (value: string) => void;
+  onChange?: (value: string) => void;
   listeners?: Listeners
   value?: string;
   placeholder?: string;
   updateOnEnter?: boolean;
-  style?: Style;
+  style?: CSSProperties;
   focused?: boolean;
-  render?: (text: string) => ReactElement,
+  render?: (text: string) => ReactNode,
   suggestion?: (text: string) => ReactElement,
   preview?: (value: string, selection: [number, number]) => ReactElement,
   onKeyDown?: (keys: string[],
     setValue: (value: string) => void,
     selectedText: [number, number]) => void,
+  onFocus?: () => void
 }) {
 
   const [editing, setEditing] = useState(focused || false);
-  const [lastChangedValue, setLastChangedValue] = useState("");
   const [editingValue, setEditingValue] = useState(value || "");
+
+  const [lastChangedValue, setLastChangedValue] = useState("");
+
   const [latexOpen, setLatexOpen] = useState<"inline" | "newline" | "none">(
     "none"
   );
@@ -50,6 +54,7 @@ export default function TextField({
     top: number;
     left: number;
   } | null>(null);
+
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [latexValue, setLatexValue] = useState("");
   const [caretPosition, setCaretPosition] = useState<number | null>(null);
@@ -77,6 +82,11 @@ export default function TextField({
   };
 
   useEffect(() => {
+    setEditingValue(value || "");
+    setEditing(focused)
+  }, [value, focused]);
+
+  useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
       const caretCoordinates = getCaretCoordinates(textarea)
@@ -87,17 +97,16 @@ export default function TextField({
   function handleChange(e: ChangeEvent<HTMLTextAreaElement>) {
     setLastChangedValue(editingValue);
     setEditingValue(e.target.value);
+    onChange && onChange(editingValue);
   }
   // Update height based on editingValue
   useEffect(() => {
     const textarea = textareaRef.current;
 
     if (textarea) {
-      console.log(editingValue)
-      textarea.style.height = `${breakLines(editingValue, textarea.scrollWidth).length * 50}px`;
-      console.log(textarea.style.height)
+      textarea.style.height = `${breakLines(editingValue, textarea.scrollWidth).length * 21}px`;
     }
-  }, [editingValue]);
+  });
 
   // Whenever editing changes, update the caret position
   useEffect(() => {
@@ -117,33 +126,37 @@ export default function TextField({
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
-      if (type === 'latex') {
-        const dollarIndices = getAllIndices(editingValue, '$')
+      const dollarIndices = getAllIndices(editingValue, '$')
 
-        if (dollarIndices.length % 2 === 1 && editingValue.slice(editingValue.length - 1) === '$') {
-          if (latexOpen === 'none') {
-            setLatexOpen('inline')
-            setEditingValue(prev => prev + "$")
-          }
-        }
-
-        if (editingValue.slice(editingValue.length - 1) !== '$') {
-          setLatexOpen('none')
-          setLatexValue('')
-        }
-
-        if (latexOpen === 'inline') {
-          if (latexValue === '') textarea.setSelectionRange(textarea.value.length - 1, textarea.value.length - 1);
-          setLatexValue(editingValue.substring(dollarIndices.at(dollarIndices.length - 2) as number,
-            dollarIndices.at(dollarIndices.length - 1) as number + 1))
+      if (dollarIndices.length % 2 === 1 && editingValue.slice(editingValue.length - 1) === '$') {
+        if (latexOpen === 'none') {
+          setLatexOpen('inline')
+          setEditingValue(prev => prev + "$")
         }
       }
+
+      if (editingValue.slice(editingValue.length - 1) !== '$') {
+        setLatexOpen('none')
+        setLatexValue('')
+      }
+
+      if (latexOpen === 'inline') {
+        if (latexValue === '') textarea.setSelectionRange(textarea.value.length - 1, textarea.value.length - 1);
+        setLatexValue(editingValue.substring(dollarIndices.at(dollarIndices.length - 2) as number,
+          dollarIndices.at(dollarIndices.length - 1) as number + 1))
+      }
     }
-  }, [editingValue, latexOpen, latexValue, type]);
+  }, [editingValue, latexOpen, latexValue]);
+
+  console.log(editingValue)
+
 
   return (
-    <div className={`text-field min-h-[1.5rem] rounded-sm flex items-center`}
-      onClick={() => setEditing(true)}
+    <div className={`text-field min-h-[1.5rem] min-w-[100px] rounded-sm`} {...listeners}
+      onClick={(e) => {
+        setEditing(true)
+        listeners?.onClick?.(e)
+      }}
       style={{
         width: style?.width,
         height: style?.height,
@@ -167,11 +180,12 @@ export default function TextField({
           // }}
           autoFocus
           value={editingValue}
+          onFocus={onFocus}
         />
         :
-        <div>
+        <>
           {render ? render(editingValue) : editingValue}
-        </div>
+        </>
       }
 
       {latexOpen !== 'none' && editing && (

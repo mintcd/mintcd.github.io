@@ -47,7 +47,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
   const [currentPage, setCurrentPage] = useState(1);
   const [processedData, setProcessedData] = useState(data)
   const [menu, setMenu] = useState<MenuState>(undefined)
-  const [searchString, setSearchString] = useState<string | undefined>(undefined)
+  const [searchString, setSearchString] = useState<string>("")
 
   // Derived values
   const startIndex = (currentPage - 1) * tableProperties.itemsPerPage;
@@ -92,6 +92,8 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     setCurrentPage(page);
   };
 
+
+
   // Effects
   useEffect(() => {
     //Store attrsByName every time it changes
@@ -113,19 +115,20 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
   }, [data])
 
   useEffect(() => {
-    let processedData = filterData(data, attrsByName)
+    let processedData = [...data]
 
-    if (searchString !== undefined)
+    if (isMobileDevice) {
       processedData = processedData.filter(item => item.name === searchString)
-
-    // Apply sorting
-    Object.values(attrsByName).forEach(prop => {
-      processedData = sortData(processedData, prop.name, prop.sort)
-    })
-
+    } else {
+      processedData = filterData(data, attrsByName)
+      // Apply sorting
+      Object.values(attrsByName).forEach(prop => {
+        processedData = sortData(processedData, prop.name, prop.sort)
+      })
+    }
+    console.log(processedData)
     setProcessedData(processedData);
-
-  }, [data, attrsByName, searchString]);
+  }, [data, attrsByName, searchString, isMobileDevice]);
 
   return (
     isMobileDevice
@@ -137,12 +140,12 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
           tableProperties={tableProperties}
           handleSearch={handleSearch}
         />
-        <div>
+        {/* <div>
           {processedData.length > 0 ?
             Object.entries(processedData[0]).map(([key, value]) => (
-              <div className="grid grid-cols-[55px,1fr] border-b border-b-gray-300"
+              <div className="grid grid-cols-[70px,1fr] border-b border-b-gray-300 rounded-md"
                 key={key}>
-                <div className="p-2">
+                <div className="p-2 border-r border-r-gray-300">
                   {attrsByName[key].display}
                 </div>
                 <TableCell
@@ -155,7 +158,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
             )) :
             <div className="text-center italic"> No item found </div>
           }
-        </div>
+        </div> */}
         <div className="flex items-center rounded-md hover:bg-[#f0f0f0] py-1 px-2 cursor-pointer"
           onClick={onCreateItem}>
           <AddRounded className={`icon`} />

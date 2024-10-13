@@ -1,10 +1,23 @@
-import React, { useEffect, useRef, useState } from 'react';
-import Latex from 'react-latex-next';
-import 'katex/dist/katex.min.css';
+'use client'
 
-export default function MyLatex({ children }: { children: string }) {
+import renderLatex, { Macros } from './renderLatex';
+import './Latex.css'
 
-  const latexRef = useRef(null)
+export interface LatexProps {
+  children: string | string[];
+  delimiters?: Delimiter[];
+  strict?: boolean;
+  macros?: Macros
+}
+
+const defaultDelimiters = [
+  { left: '$$', right: '$$', display: true },
+  { left: '\\(', right: '\\)', display: false },
+  { left: '$', right: '$', display: false },
+  { left: '\\[', right: '\\]', display: true },
+]
+
+export default function Latex({ children }: { children: string }) {
   const alphabet: string[] = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i));
   const macros: Record<string, string> = {}
 
@@ -26,9 +39,8 @@ export default function MyLatex({ children }: { children: string }) {
   // Preprocess the input string to handle newlines
   const preprocessedChildren = preprocessItemize(children.replace(/\n/g, '<br/>'));
 
+  const renderedLatex = renderLatex(preprocessedChildren, defaultDelimiters, false, macros);
   return (
-    <div className='latex-container font-modern' ref={latexRef}>
-      <Latex macros={macros}>{preprocessedChildren}</Latex>
-    </div>
-  );
-};
+    <span className="latex" dangerouslySetInnerHTML={{ __html: renderedLatex }} />
+  )
+}

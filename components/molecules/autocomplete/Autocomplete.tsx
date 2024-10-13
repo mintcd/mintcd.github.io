@@ -2,6 +2,7 @@ import { CSSProperties, ReactElement, useState, useEffect, useRef, ReactNode } f
 import { useClickAway } from "@uidotdev/usehooks";
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import zIndices from '@styles/z-indices';
+import TextField from '@components/atoms/TextField';
 
 export default function Autocomplete({
   suggestions,
@@ -27,7 +28,6 @@ export default function Autocomplete({
   render?: (suggestion: string) => ReactNode
 }): ReactElement {
   const [inputValue, setInputValue] = useState(value || '');
-  const [submittedValue, setSubmittedValue] = useState(value || '')
   const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
   const [focused, setFocused] = useState(false);
@@ -38,22 +38,15 @@ export default function Autocomplete({
     setFocused(false);
   }) as any;
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setInputValue(value);
-
-    if (value) {
-      const filtered = suggestions.filter(suggestion =>
-        suggestion.toLowerCase().includes(value.toLowerCase())
-      );
-      setFilteredSuggestions(filtered);
-    } else {
-      setFilteredSuggestions(freeSolo ? [] : suggestions);
-    }
-    setActiveSuggestionIndex(-1);
+  const handleSuggestionClick = (suggestion: string) => {
+    setInputValue(suggestion);
+    setFilteredSuggestions([]);
+    setFocused(false)
+    if (onSubmit) onSubmit(suggestion);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
       setActiveSuggestionIndex(prevIndex =>
@@ -71,8 +64,10 @@ export default function Autocomplete({
         setInputValue(selectedSuggestion);
         setFilteredSuggestions([]);
         setActiveSuggestionIndex(-1);
+        setFocused(false);
         onSubmit(selectedSuggestion)
       } else if (freeSolo) {
+        setFocused(false);
         onSubmit(inputValue);
       }
     }
@@ -87,39 +82,29 @@ export default function Autocomplete({
     }
   }, [activeSuggestionIndex]);
 
-  const handleSuggestionClick = (suggestion: string) => {
-    setInputValue(suggestion);
-    setSubmittedValue(suggestion);
-    setFilteredSuggestions([]);
-    if (onSubmit) onSubmit(suggestion);
-  };
 
   useEffect(() => {
     setInputValue(value || '');
-    setSubmittedValue(value || '');
   }, [value])
 
   return (
-    <div className="relative" style={style} ref={ref}>
-      <div className={`flex ${style?.border && `border border-${style?.border}`}  relative z-[1]`}>
-        <input
-          type="text"
-          autoFocus={autoFocus}
-          className={`${!freeSolo && 'caret-transparent'} w-full focus:outline-none bg-inherit`}
-          onFocus={() => {
-            if (!freeSolo) setFilteredSuggestions(suggestions);
-            setFocused(true);
-          }}
-          value={freeSolo ? inputValue : submittedValue}
-          onChange={freeSolo ? handleInputChange : undefined}
-          onKeyDown={handleKeyDown}
-          placeholder={placeholder}
-          readOnly={!freeSolo}
-        />
-        {icon && <KeyboardArrowDownRoundedIcon
-          className={`transform transition-transform duration-300 ${focused ? 'rotate-180' : 'rotate-0'}`}
-        />}
-      </div>
+    <div className="autocomplete relative" style={style} ref={ref}>
+      <TextField
+        style={{ width: '100%' }}
+        value={inputValue}
+        focused={focused}
+        onFocus={() => setFocused(true)}
+        onChange={(value) => {
+          setFilteredSuggestions(
+            suggestions.filter(suggestion => suggestion.includes(value))
+          );
+        }}
+        onUpdate={(value) => {
+          onSubmit(value)
+          setFocused(false)
+        }}
+        render={render}
+      />
 
       {focused && (
         <ul
@@ -128,6 +113,7 @@ export default function Autocomplete({
             maxHeight: maxDisplay ? `${maxDisplay * 2.5}rem` : 'auto',
             zIndex: zIndices.autoComplete
           }}
+          onKeyDown={handleKeyDown}
         >
 
           {filteredSuggestions.map((suggestion, index) => (

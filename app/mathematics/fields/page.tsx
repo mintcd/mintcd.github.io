@@ -1,4 +1,4 @@
-import BlogPage from "@components/blog-page/blog-page"
+import BlogPage from "@components/pages/blog-page"
 
 export default function Fields() {
 

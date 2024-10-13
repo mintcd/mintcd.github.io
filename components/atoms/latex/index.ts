@@ -1,1 +1,3 @@
-export { default } from "./latex"
+import Latex from './Latex';
+
+export default Latex;

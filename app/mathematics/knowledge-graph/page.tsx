@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 
-import KnowledgeGraph from '@components/graph'
+import KnowledgeGraph from '@components/organisms/graph'
 import { fetchData } from '@functions/database'
 import { getEdges } from '@functions/graph-analysis'
 

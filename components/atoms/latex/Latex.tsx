@@ -1,7 +1,6 @@
 'use client'
 
 import renderLatex, { Macros } from './renderLatex';
-import './Latex.css'
 
 export interface LatexProps {
   children: string | string[];

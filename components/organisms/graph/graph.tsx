@@ -8,7 +8,7 @@ import { drag } from 'd3-drag';
 import { forceSimulation, forceLink, forceCenter, forceCollide } from 'd3-force';
 
 import { getEdges, initiateLayout, getVerticesOfTopic } from '@functions/graph-analysis';
-import { useZoomBehavior } from '@components/graph/behaviors';
+import { useZoomBehavior } from './behaviors';
 import GraphNode from './graph-node';
 import GraphLink from './graph-link';
 import GraphStyles from './styles';

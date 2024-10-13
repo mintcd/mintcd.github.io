@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import helpers from '@components/utils/helpers';
+import helpers from '@components/pages/blog-page/utils/helpers';
 
 export default function PostCard({ post }: { post: Post }) {
   return (

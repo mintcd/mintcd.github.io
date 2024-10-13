@@ -62,7 +62,7 @@ export function breakLines(text: string, width: number, fontSize: number = 16, f
     lines.push(currentLine)
   })
 
-  console.log(lines)
+  // console.log(lines)
 
   return lines
 }

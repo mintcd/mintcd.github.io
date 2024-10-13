@@ -8,7 +8,8 @@ import { useMediaQuery } from "@uidotdev/usehooks";
 
 import {
   AddRounded, NavigateNextRounded,
-  NavigateBeforeRounded
+  NavigateBeforeRounded,
+  Dvr
 } from '@mui/icons-material';
 import TableHeaderGroup from "./table-header-group/TableHeaderGroup.tsx";
 import TableBody from "./table-body/TableBody.tsx";
@@ -137,20 +138,23 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
           handleSearch={handleSearch}
         />
         <div>
-          {Object.entries(processedData[0]).map(([key, value]) => (
-            <div className="grid grid-cols-[55px,1fr] border-b border-b-gray-300"
-              key={key}>
-              <div className="p-2">
-                {attrsByName[key].display}
+          {processedData.length > 0 ?
+            Object.entries(processedData[0]).map(([key, value]) => (
+              <div className="grid grid-cols-[55px,1fr] border-b border-b-gray-300"
+                key={key}>
+                <div className="p-2">
+                  {attrsByName[key].display}
+                </div>
+                <TableCell
+                  itemId={processedData[0].id}
+                  attr={attrsByName[key]}
+                  onUpdate={onUpdateCell}
+                  value={value}
+                />
               </div>
-              <TableCell
-                itemId={processedData[0].id}
-                attr={attrsByName[key]}
-                onUpdate={onUpdateCell}
-                value={value}
-              />
-            </div>
-          ))}
+            )) :
+            <div className="text-center italic"> No item found </div>
+          }
         </div>
         <div className="flex items-center rounded-md hover:bg-[#f0f0f0] py-1 px-2 cursor-pointer"
           onClick={onCreateItem}>

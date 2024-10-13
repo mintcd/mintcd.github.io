@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { BsChevronDown, BsChevronUp } from 'react-icons/bs';
-import Latex from '@components/latex';
+import Latex from '@components/atoms/latex';
 
 export default function StatementContent({ statement }: { statement: Vertex | undefined }) {
   return (

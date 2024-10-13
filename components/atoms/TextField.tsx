@@ -2,21 +2,23 @@
 
 /**
  * TextField with suggestions, preview and bracket autocompletion
+ * The elements in a text field are a textarea and a container
  */
 
 import { ChangeEvent, ReactElement, useEffect, useRef, useState } from "react";
 import { getAllIndices, breakLines } from "@functions/text-analysis";
-import Latex from "@components/latex";
+import Latex from "@components/atoms/latex";
 import { getCaretCoordinates } from "@functions/elements";
 
 export default function TextField({
   type,
   onUpdate,
+  listeners,
   value,
   placeholder,
   updateOnEnter = true,
   style,
-  focused,
+  focused = false,
   render,
   suggestion,
   preview,
@@ -24,6 +26,7 @@ export default function TextField({
 }: {
   type: "text" | "latex";
   onUpdate?: (value: string) => void;
+  listeners?: Listeners
   value?: string;
   placeholder?: string;
   updateOnEnter?: boolean;
@@ -90,7 +93,9 @@ export default function TextField({
     const textarea = textareaRef.current;
 
     if (textarea) {
-      textarea.style.height = `${breakLines(editingValue, textarea.scrollWidth).length * 21}px`;
+      console.log(editingValue)
+      textarea.style.height = `${breakLines(editingValue, textarea.scrollWidth).length * 50}px`;
+      console.log(textarea.style.height)
     }
   }, [editingValue]);
 
@@ -139,10 +144,6 @@ export default function TextField({
   return (
     <div className={`text-field min-h-[1.5rem] rounded-sm flex items-center`}
       onClick={() => setEditing(true)}
-      // onBlur={() => {
-      //   onUpdate && onUpdate(value || '')
-      //   setEditing(false)
-      // }}
       style={{
         width: style?.width,
         height: style?.height,
@@ -160,17 +161,20 @@ export default function TextField({
           className="focus:outline-none border-none resize-none bg-inherit"
           onChange={handleChange}
           onKeyDown={handleKeyDown}
+          // onBlur={() => {
+          //   onUpdate && onUpdate(value || '')
+          //   setEditing(false)
+          // }}
           autoFocus
           value={editingValue}
         />
-
         :
         <div>
-          {editingValue === '' ? placeholder : editingValue}
+          {render ? render(editingValue) : editingValue}
         </div>
       }
 
-      {latexOpen !== 'none' && (
+      {latexOpen !== 'none' && editing && (
         <div className="preview"
           style={{
             position: 'fixed',

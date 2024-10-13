@@ -13,7 +13,7 @@ import TimelineOppositeContent, {
 
 import ExpandMoreOutlinedIcon from '@mui/icons-material/ExpandMoreOutlined';
 
-import Latex from '@components/latex'
+import Latex from '@components/atoms/latex'
 import { ShowChart, ShowChartSharp } from '@mui/icons-material'
 
 export default function SubjectNotes({ data }: { data: Chapter[] }) {

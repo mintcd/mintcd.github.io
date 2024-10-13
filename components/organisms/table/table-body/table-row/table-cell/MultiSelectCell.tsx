@@ -1,6 +1,6 @@
 import Tag from '@components/atoms/Tag';
-import Latex from '@components/latex';
-import Autocomplete from '@components/autocomplete/Autocomplete';
+import Latex from '@components/atoms/latex';
+import Autocomplete from '@components/molecules/autocomplete/Autocomplete';
 import { useEffect, useState } from 'react';
 import { useClickAway } from "@uidotdev/usehooks";
 

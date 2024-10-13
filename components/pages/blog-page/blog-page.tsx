@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import ArrowLeft from '@components/icons/ArrowLeft';
+import ArrowLeft from '@components/atoms/icons/ArrowLeft';
 import SuggestedPostCard from './SuggestedPostCard';
 import Tag from './Tag';
 import AuthorAvatar from './AuthorAvatar';

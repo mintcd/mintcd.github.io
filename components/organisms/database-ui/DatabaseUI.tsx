@@ -1,6 +1,6 @@
 'use client'
 
-import Table from '@components/table'
+import Table from '@components/organisms/table'
 import { createItem, exchangeItems, fetchData, update, supabase } from '@functions/database';
 import { useCallback, useEffect, useState } from 'react';
 import CircularProgress from '@mui/material/CircularProgress';

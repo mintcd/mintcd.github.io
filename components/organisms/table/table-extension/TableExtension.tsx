@@ -9,8 +9,8 @@ import {
 } from '@mui/icons-material';
 import { Dropdown } from "@components/molecules";
 import { Checkbox, TextField } from "@components/atoms";
-import Autocomplete from "@components/autocomplete/Autocomplete";
-import Latex from "@components/latex";
+import Autocomplete from "@components/molecules/autocomplete/Autocomplete";
+import Latex from "@components/atoms/latex";
 
 export default function TableExtension({ upToDate, attrsByName, handleDownload, tableProperties, handleColumnAppearance, handleFilter, handlePagination, handleSearch, handleSort }: {
   upToDate?: boolean,
@@ -24,7 +24,6 @@ export default function TableExtension({ upToDate, attrsByName, handleDownload, 
   handleSearch?: (searchString: string) => void
 }) {
   const [menu, setMenu] = useState<MenuState>(undefined)
-  const [searchValue, setSearchValue] = useState("")
 
   const menuRef = useClickAway(() => {
     setMenu(undefined)

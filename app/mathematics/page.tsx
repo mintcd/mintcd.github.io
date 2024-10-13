@@ -1,4 +1,3 @@
-import KnowledgeGraph from "@components/graph";
 import graphData from "@models/knowledge-graph";
 
 export default function Mathematics() {

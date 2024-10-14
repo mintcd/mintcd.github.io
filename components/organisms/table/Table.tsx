@@ -69,7 +69,6 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     })
   }
   function handleFilter(action: FilterAction) {
-    console.log(action)
     menu !== "filter" && setMenu("filter")
     const updatedAttrsByName = updateFilter(attrsByName, action)
     // Enable the filter
@@ -126,7 +125,6 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
         processedData = sortData(processedData, prop.name, prop.sort)
       })
     }
-    console.log(processedData)
     setProcessedData(processedData);
   }, [data, attrsByName, searchString, isMobileDevice]);
 
@@ -153,6 +151,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
                   attr={attrsByName[key]}
                   onUpdate={onUpdateCell}
                   value={value}
+                  suggestions={attrsByName[key].suggestions}
                 />
               </div>
             )) :

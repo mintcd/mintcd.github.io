@@ -1,4 +1,4 @@
-import Latex from '@components/atoms/latex';
+import Latex from '@components/nuclears/latex';
 import { breakLinesForCircle } from '@functions/graph-analysis';
 import { statementProps } from '@styles/statement-props';
 

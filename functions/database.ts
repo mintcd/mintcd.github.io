@@ -120,7 +120,7 @@ export async function updateMany(table: string, items: UpdatedItem[], sequential
   if (sequential) {
     // Sequential execution: Await each updateOne call one by one
     for (const item of items) {
-      console.log(item)
+      // console.log(item)
       await updateOne(table, item.id, item.attrValue);
     }
   } else {

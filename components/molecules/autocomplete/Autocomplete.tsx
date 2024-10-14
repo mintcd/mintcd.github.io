@@ -1,8 +1,8 @@
-import { CSSProperties, ReactElement, useState, useEffect, useRef, ReactNode } from 'react';
+import { CSSProperties, ReactElement, useState, useEffect, useRef, ReactNode, useMemo } from 'react';
 import { useClickAway } from "@uidotdev/usehooks";
-import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import zIndices from '@styles/z-indices';
-import TextField from '@components/atoms/TextField';
+import TextField from '@components/nuclears/TextField';
+import Fuse from 'fuse.js';
 
 export default function Autocomplete({
   suggestions,
@@ -12,7 +12,8 @@ export default function Autocomplete({
   value,
   freeSolo,
   icon = false,
-  render,
+  renderSuggestion,
+  renderDropper,
   maxDisplay,
   onSubmit
 }: {
@@ -25,7 +26,8 @@ export default function Autocomplete({
   maxDisplay?: number,
   style?: CSSProperties,
   onSubmit: (selectedValue: string) => void
-  render?: (suggestion: string) => ReactNode
+  renderSuggestion?: (value: string) => ReactNode
+  renderDropper?: (value: string) => ReactNode
 }): ReactElement {
   const [inputValue, setInputValue] = useState(value || '');
   const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
@@ -37,6 +39,11 @@ export default function Autocomplete({
   const ref = useClickAway(() => {
     setFocused(false);
   }) as any;
+
+  const fuse = useMemo(() => new Fuse(suggestions, {
+    shouldSort: true,
+    threshold: 0.5,
+  }), [suggestions]);
 
   const handleSuggestionClick = (suggestion: string) => {
     setInputValue(suggestion);
@@ -88,22 +95,26 @@ export default function Autocomplete({
   }, [value])
 
   return (
-    <div className="autocomplete relative" style={style} ref={ref}>
+    <div className="autocomplete relative" style={style} ref={ref} onKeyDown={handleKeyDown}>
       <TextField
-        style={{ width: '100%' }}
+        style={{ width: style?.width, height: style?.height }}
         value={inputValue}
         focused={focused}
         onFocus={() => setFocused(true)}
         onChange={(value) => {
           setFilteredSuggestions(
-            suggestions.filter(suggestion => suggestion.includes(value))
+            suggestions.filter(suggestion => suggestion.toLowerCase().includes(value.toLowerCase()))
           );
+          // console.log(fuse.search(value).map(({ item }) => item))
+          // setFilteredSuggestions(
+          //   fuse.search(value).map(({ item }) => item)
+          // );
         }}
         onUpdate={(value) => {
           onSubmit(value)
           setFocused(false)
         }}
-        render={render}
+        render={renderDropper}
       />
 
       {focused && (
@@ -113,7 +124,6 @@ export default function Autocomplete({
             maxHeight: maxDisplay ? `${maxDisplay * 2.5}rem` : 'auto',
             zIndex: zIndices.autoComplete
           }}
-          onKeyDown={handleKeyDown}
         >
 
           {filteredSuggestions.map((suggestion, index) => (
@@ -123,7 +133,7 @@ export default function Autocomplete({
               onClick={() => handleSuggestionClick(suggestion)}
               className={`p-2 cursor-pointer ${index === activeSuggestionIndex ? 'bg-gray-200' : 'hover:bg-gray-200'}`}
             >
-              {render ? render(suggestion) : suggestion}
+              {renderSuggestion ? renderSuggestion(suggestion) : suggestion}
             </li>
           ))}
         </ul>

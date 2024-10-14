@@ -16,7 +16,7 @@ import TipsAndUpdatesRoundedIcon from '@mui/icons-material/TipsAndUpdatesRounded
 import NotificationsActiveRoundedIcon from '@mui/icons-material/NotificationsActiveRounded'
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 
-import Latex from '@components/atoms/latex'
+import Latex from '@components/nuclears/latex'
 import { statementProps } from '@styles/statement-props'
 
 export default function SubjectMap({ data }: { data: Chapter[] }) {

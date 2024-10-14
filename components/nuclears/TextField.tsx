@@ -7,9 +7,8 @@
 
 import { ChangeEvent, CSSProperties, ReactElement, ReactNode, useEffect, useRef, useState } from "react";
 import { getAllIndices, breakLines } from "@functions/text-analysis";
-import Latex from "@components/atoms/latex";
+import Latex from "@components/nuclears/latex";
 import { getCaretCoordinates } from "@functions/elements";
-
 export default function TextField({
   onUpdate,
   onChange,
@@ -79,7 +78,31 @@ export default function TextField({
         setEditing(false);
       }
     }
+    if (e.ctrlKey) {
+      const textarea = textareaRef.current;
+      if (!textarea) return
+      const start = textarea.selectionStart
+      const end = textarea.selectionEnd;
+
+      if (e.key === "i" || e.key === "I") {
+        // Handle Ctrl + I for italics
+        setEditingValue(editingValue.slice(0, start) +
+          `<em>${editingValue.slice(start, end)}</em>` +
+          editingValue.slice(end)
+        )
+
+      } else if (e.key === "b" || e.key === "B") {
+        // Handle Ctrl + B for bold
+
+      }
+    }
   };
+
+  function handleChange(e: ChangeEvent<HTMLTextAreaElement>) {
+    setLastChangedValue(editingValue);
+    setEditingValue(e.target.value);
+    onChange && onChange(editingValue);
+  }
 
   useEffect(() => {
     setEditingValue(value || "");
@@ -94,23 +117,32 @@ export default function TextField({
     }
   }, [latexOpen])
 
-  function handleChange(e: ChangeEvent<HTMLTextAreaElement>) {
-    setLastChangedValue(editingValue);
-    setEditingValue(e.target.value);
-    onChange && onChange(editingValue);
-  }
+
   // Update height based on editingValue
   useEffect(() => {
     const textarea = textareaRef.current;
 
     if (textarea) {
-      textarea.style.height = `${breakLines(editingValue, textarea.scrollWidth).length * 21}px`;
+      const height = typeof style?.height === 'number' ? style.height : Infinity;
+      textarea.style.height = `${Math.min(height, breakLines(editingValue, textarea.scrollWidth).length * 21)}px`;
     }
+
   });
 
   // Whenever editing changes, update the caret position
   useEffect(() => {
-    textareaRef.current?.setSelectionRange(editingValue.length, editingValue.length);
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.setSelectionRange(editingValue.length, editingValue.length);
+
+      const caretCoordinates = getCaretCoordinates(textarea);
+      textarea.scrollTop = caretCoordinates.top - textarea.clientHeight / 2;
+      textarea.scrollLeft = caretCoordinates.left - textarea.clientWidth / 2;
+
+      // Alternative: Ensure the entire textarea is scrolled into view
+      textarea.scrollIntoView({ block: "nearest", inline: "nearest" });
+    }
+
   }, [editing])
 
   useEffect(() => {
@@ -148,11 +180,8 @@ export default function TextField({
     }
   }, [editingValue, latexOpen, latexValue]);
 
-  console.log(editingValue)
-
-
   return (
-    <div className={`text-field min-h-[1.5rem] min-w-[100px] rounded-sm`} {...listeners}
+    <div className={`text-field min-h-[21px] min-w-[100px] rounded-sm`} {...listeners}
       onClick={(e) => {
         setEditing(true)
         listeners?.onClick?.(e)
@@ -171,7 +200,7 @@ export default function TextField({
             padding: 0,
             width: '100%',
           }}
-          className="focus:outline-none border-none resize-none bg-inherit"
+          className="focus:outline-none border-none resize-none bg-inherit textarea-no-scrollbar"
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           // onBlur={() => {
@@ -183,9 +212,9 @@ export default function TextField({
           onFocus={onFocus}
         />
         :
-        <>
+        <div className="h-full overflow-ellipsis">
           {render ? render(editingValue) : editingValue}
-        </>
+        </div>
       }
 
       {latexOpen !== 'none' && editing && (

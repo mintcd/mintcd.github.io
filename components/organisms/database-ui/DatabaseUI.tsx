@@ -102,7 +102,7 @@ export default function DatabaseUI({ table }: {
       const { id, ...sourceData } = rangedItems[rangedItems.length - 1]
 
       newRangedItems.forEach((item, index) => {
-        console.log(item, index)
+        // console.log(item, index)
         if (index === 0) {
           // Update the target item with the source data
           newRangedItems[index] = { id: item.id, ...sourceData };

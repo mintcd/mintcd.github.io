@@ -1,0 +1,1 @@
+Components that have some functionalities

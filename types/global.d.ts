@@ -7,3 +7,5 @@ type Listeners = {
   onMouseLeave?: React.MouseEventHandler<HTMLElement>;
   // onKeyDown?: React.MouseEventHandler<HTMLElement>;
 };
+
+type CSSProperties = React.CSSProperties

@@ -1,7 +1,7 @@
 'use client'
 
 import data from '@models/computer-science/compiler-design-phases';
-import Latex from '@components/atoms/latex';
+import Latex from '@components/nuclears/latex';
 import { useState } from 'react';
 
 export default function SubjectNotes() {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useClickAway } from "@uidotdev/usehooks";
 import {
   ViewColumnRounded,
@@ -8,9 +8,9 @@ import {
   SearchOutlined
 } from '@mui/icons-material';
 import { Dropdown } from "@components/molecules";
-import { Checkbox, TextField } from "@components/atoms";
+import { Checkbox, TextField } from "@components/nuclears";
 import Autocomplete from "@components/molecules/autocomplete/Autocomplete";
-import Latex from "@components/atoms/latex";
+import Latex from "@components/nuclears/latex";
 
 export default function TableExtension({ upToDate, attrsByName, handleDownload, tableProperties, handleColumnAppearance, handleFilter, handlePagination, handleSearch, handleSort }: {
   upToDate?: boolean,
@@ -30,7 +30,6 @@ export default function TableExtension({ upToDate, attrsByName, handleDownload, 
     setMenu(undefined)
   }) as any
 
-
   return (
     <div className="table-extension flex justify-between">
       <span className="sync-state mx-[20px] italic flex items-center">
@@ -49,9 +48,10 @@ export default function TableExtension({ upToDate, attrsByName, handleDownload, 
               setSearchValue(value)
               handleSearch(value)
             }}
-            style={{ width: 150, height: '1.5rem', textOverflow: 'ellipsis' }}
+            style={{ width: 150, height: 21 }}
             maxDisplay={5}
-            render={(suggestion) => <Latex>{String(suggestion)}</Latex>}
+            renderSuggestion={(suggestion) => <Latex>{String(suggestion)}</Latex>}
+            renderDropper={(value) => <Latex style={{ width: 150, height: 21 }}>{String(value)}</Latex>}
             freeSolo
           />
         </div>

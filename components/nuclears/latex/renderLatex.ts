@@ -4,8 +4,6 @@ import katex from 'katex';
 import splitAtDelimiters from './splitAtDelimiters';
 import 'katex/dist/katex.min.css';
 
-export type Macros = { [name: string]: string };
-
 export default function renderLatexInTextAsHTMLString(
   text: string,
   delimiters: Delimiter[],

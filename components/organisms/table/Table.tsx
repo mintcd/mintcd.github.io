@@ -140,7 +140,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
           tableProperties={tableProperties}
           handleSearch={handleSearch}
         />
-        {/* <div>
+        <div>
           {processedData.length > 0 ?
             Object.entries(processedData[0]).map(([key, value]) => (
               <div className="grid grid-cols-[70px,1fr] border-b border-b-gray-300 rounded-md"
@@ -158,7 +158,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
             )) :
             <div className="text-center italic"> No item found </div>
           }
-        </div> */}
+        </div>
         <div className="flex items-center rounded-md hover:bg-[#f0f0f0] py-1 px-2 cursor-pointer"
           onClick={onCreateItem}>
           <AddRounded className={`icon`} />

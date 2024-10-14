@@ -1,5 +1,6 @@
 type TableProperties = {
-  itemsPerPage: number
+  itemsPerPage: number,
+  currentPage: number,
 }
 
 type TableStyle = {

@@ -7,7 +7,7 @@
 
 import { ChangeEvent, CSSProperties, ReactElement, ReactNode, useEffect, useRef, useState } from "react";
 import { getAllIndices, breakLines } from "@functions/text-analysis";
-import Latex from "@components/nuclears/latex";
+import Latex from "@components/atoms/latex";
 import { getCaretCoordinates } from "@functions/elements";
 export default function TextField({
   onUpdate,
@@ -181,14 +181,14 @@ export default function TextField({
   }, [editingValue, latexOpen, latexValue]);
 
   return (
-    <div className={`text-field min-h-[21px] min-w-[100px] rounded-sm`} {...listeners}
+    <div className={`text-field rounded-sm`} {...listeners}
       onClick={(e) => {
         setEditing(true)
         listeners?.onClick?.(e)
       }}
       style={{
-        width: style?.width,
-        height: style?.height,
+        width: style?.width || '100%',
+        height: style?.height || 21,
         border: style?.border,
         padding: style?.padding
       }}>

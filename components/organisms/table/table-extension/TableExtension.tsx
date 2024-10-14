@@ -10,7 +10,7 @@ import {
 import { Dropdown } from "@components/molecules";
 import { Checkbox, TextField } from "@components/nuclears";
 import Autocomplete from "@components/molecules/autocomplete/Autocomplete";
-import Latex from "@components/nuclears/latex";
+import Latex from "@components/atoms/latex";
 
 export default function TableExtension({ upToDate, attrsByName, handleDownload, tableProperties, handleColumnAppearance, handleFilter, handlePagination, handleSearch, handleSort }: {
   upToDate?: boolean,
@@ -32,7 +32,7 @@ export default function TableExtension({ upToDate, attrsByName, handleDownload, 
 
   return (
     <div className="table-extension flex justify-between">
-      <span className="sync-state mx-[20px] italic flex items-center">
+      <span className="sync-state italic flex items-center w-[150px]">
         {upToDate ? "All changes saved." : "Processing..."}
       </span>
 
@@ -48,11 +48,11 @@ export default function TableExtension({ upToDate, attrsByName, handleDownload, 
               setSearchValue(value)
               handleSearch(value)
             }}
+            addable={false}
             style={{ width: 150, height: 21 }}
             maxDisplay={5}
             renderSuggestion={(suggestion) => <Latex>{String(suggestion)}</Latex>}
             renderDropper={(value) => <Latex style={{ width: 150, height: 21 }}>{String(value)}</Latex>}
-            freeSolo
           />
         </div>
       }

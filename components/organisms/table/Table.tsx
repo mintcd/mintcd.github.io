@@ -30,32 +30,39 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
 
   // Constants
   const style = { cellMinWidth: 100, optionsColumnWidth: 75 }
-
-  // States
-  // Convert attrs to object for better retrieval
   const isMobileDevice = useMediaQuery("only screen and (max-width : 768px)");
 
+  // States
   const [attrsByName, setAttrsByName] = useState(() => {
     const storedAttrsByName = localStorage.getItem('attrsByName')
     if (storedAttrsByName) return JSON.parse(storedAttrsByName) as { [key: string]: AttrProps }
     return initializeAttrsByName(attrs, data)
   })
-
-  const [tableProperties, setTableProperties] = useState<TableProperties>({
-    itemsPerPage: 10
-  })
-  const [currentPage, setCurrentPage] = useState(1);
-  const [processedData, setProcessedData] = useState(data)
-  const [menu, setMenu] = useState<MenuState>(undefined)
   const [searchString, setSearchString] = useState<string>("")
+  const [tableProperties, setTableProperties] = useState<TableProperties>({
+    itemsPerPage: 10,
+    currentPage: 1
+  })
+  const [menu, setMenu] = useState<MenuState>(undefined)
 
-  // Derived values
-  const startIndex = (currentPage - 1) * tableProperties.itemsPerPage;
-  const endIndex = Math.min(startIndex + tableProperties.itemsPerPage, processedData.length);
-  const paginatedData = processedData.slice(startIndex, endIndex);
+  // Dependent values
+
+  const processedDesktopData = useMemo(() => {
+    let processedData = filterData(data, attrsByName)
+    // Apply sorting
+    Object.values(attrsByName).forEach(prop => {
+      processedData = sortData(processedData, prop.name, prop.sort)
+    })
+    return processedData
+  }, [data, attrsByName])
+
+  const processedMobileData = useMemo(() => data.filter(item => item.name === searchString), [searchString, data])
+  const startIndex = (tableProperties.currentPage - 1) * tableProperties.itemsPerPage;
+  const endIndex = Math.min(startIndex + tableProperties.itemsPerPage, processedDesktopData.length);
+  const paginatedData = processedDesktopData.slice(startIndex, endIndex);
   const totalPages = useMemo(() => {
-    return Math.ceil(processedData.length / tableProperties.itemsPerPage);
-  }, [processedData, tableProperties.itemsPerPage]);
+    return Math.ceil(processedDesktopData.length / tableProperties.itemsPerPage);
+  }, [processedDesktopData, tableProperties.itemsPerPage]);
 
   // Handlers
   function handleSearch(searchString: string) {
@@ -73,7 +80,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     const updatedAttrsByName = updateFilter(attrsByName, action)
     // Enable the filter
     setAttrsByName(updatedAttrsByName)
-    setCurrentPage(1)
+    setTableProperties(prev => ({ ...prev, currentPage: 1 }))
   }
 
   function handleColumnAppearance(columnName: string) {
@@ -86,14 +93,21 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     fileType === 'json' ? exportToJSON(data, name) : exportToCSV(Object.keys(attrsByName), data, name)
   }
 
-  const handlePageChange = (page: number) => {
-    if (page < 1 || page > totalPages) return;
-    setCurrentPage(page);
+  const handlePageChange = (direction: 'back' | 'next') => {
+    if (direction === 'back' && tableProperties.currentPage > 1) {
+      setTableProperties(prev => ({ ...prev, currentPage: prev.currentPage - 1 }))
+    }
+
+    if (direction === 'next' && tableProperties.currentPage < totalPages) {
+      setTableProperties(prev => ({ ...prev, currentPage: prev.currentPage + 1 }))
+    }
   };
 
-
-
   // Effects
+  useEffect(() => {
+    setTableProperties((prev) => ({ ...prev, currentPage: 1 }))
+  }, [tableProperties.itemsPerPage])
+
   useEffect(() => {
     //Store attrsByName every time it changes
     localStorage.setItem('attrsByName', JSON.stringify(attrsByName));
@@ -113,21 +127,6 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     })
   }, [data])
 
-  useEffect(() => {
-    let processedData = [...data]
-
-    if (isMobileDevice) {
-      processedData = processedData.filter(item => item.name === searchString)
-    } else {
-      processedData = filterData(data, attrsByName)
-      // Apply sorting
-      Object.values(attrsByName).forEach(prop => {
-        processedData = sortData(processedData, prop.name, prop.sort)
-      })
-    }
-    setProcessedData(processedData);
-  }, [data, attrsByName, searchString, isMobileDevice]);
-
   return (
     isMobileDevice
       ?
@@ -139,17 +138,20 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
           handleSearch={handleSearch}
         />
         <div>
-          {processedData.length > 0 ?
-            Object.entries(processedData[0]).map(([key, value]) => (
+          {processedMobileData.length > 0 ?
+            Object.entries(processedMobileData[0]).map(([key, value]) => (
               <div className="grid grid-cols-[70px,1fr] border-b border-b-gray-300 rounded-md"
                 key={key}>
                 <div className="p-2 border-r border-r-gray-300">
                   {attrsByName[key].display}
                 </div>
                 <TableCell
-                  itemId={processedData[0].id}
+                  itemId={processedMobileData[0].id}
                   attr={attrsByName[key]}
-                  onUpdate={onUpdateCell}
+                  onUpdate={(item) => {
+                    onUpdateCell(item)
+                    if (key === 'name') setSearchString(item.attrValue.name)
+                  }}
                   value={value}
                   suggestions={attrsByName[key].suggestions}
                 />
@@ -175,7 +177,6 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
           handleFilter={handleFilter}
           tableProperties={tableProperties}
           handlePagination={handlePagination}
-        // handleSearch={handleSearch}
         />
 
         <div className="table-content rounded-md shadow-md">
@@ -197,7 +198,10 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
 
         <div className="table-footer flex items-center justify-between text-[#023e8a]">
           <div className="flex items-center rounded-md hover:bg-[#f0f0f0] py-1 px-2 cursor-pointer"
-            onClick={onCreateItem}>
+            onClick={() => {
+              onCreateItem()
+              setSearchString("")
+            }}>
             <AddRounded className={`icon`} />
             <span>New </span>
           </div>
@@ -205,14 +209,14 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
           <div className="pagination-controls flex items-center justify-end">
             <NavigateBeforeRounded
               className="icon"
-              onClick={() => handlePageChange(currentPage > 1 ? currentPage - 1 : currentPage)}
+              onClick={() => handlePageChange('back')}
             />
             <span className="pagination-info">
-              {(currentPage - 1) * tableProperties.itemsPerPage + 1} - {Math.min(currentPage * tableProperties.itemsPerPage, processedData.length)} of {processedData.length}
+              {(tableProperties.currentPage - 1) * tableProperties.itemsPerPage + 1} - {Math.min(tableProperties.currentPage * tableProperties.itemsPerPage, processedDesktopData.length)} of {processedDesktopData.length}
             </span>
             <NavigateNextRounded
               className="icon"
-              onClick={() => handlePageChange(currentPage !== totalPages ? currentPage + 1 : currentPage)}
+              onClick={() => handlePageChange('next')}
             />
           </div>
         </div>

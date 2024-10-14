@@ -5,7 +5,7 @@ import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import { filterOnQuery } from '@functions/text-analysis'
 import { GoSearch } from 'react-icons/go';
 import Fuse from 'fuse.js';
-import Latex from '@components/nuclears/latex';
+import Latex from '@components/atoms/latex';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 export default function Terminology({ data, field }: { data: Term[], field?: Field | 'all-fields' }) {

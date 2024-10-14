@@ -1,5 +1,5 @@
 import Tag from '@components/nuclears/Tag';
-import Latex from '@components/nuclears/latex';
+import Latex from '@components/atoms/latex';
 import Autocomplete from '@components/molecules/autocomplete/Autocomplete';
 import { useEffect, useState } from 'react';
 import { useClickAway } from "@uidotdev/usehooks";
@@ -64,7 +64,7 @@ export default function MultiSelectCell({ itemId, attr, values, onUpdate, sugges
           icon={false}
           autoFocus
           style={{ border: 'none' }}
-          freeSolo
+          addable
           suggestions={suggestions}
           onSubmit={(newValue) => {
             if (newValue && cellState === 'editing') {

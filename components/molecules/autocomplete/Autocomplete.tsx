@@ -10,7 +10,7 @@ export default function Autocomplete({
   style,
   placeholder,
   value,
-  freeSolo,
+  addable = true, // Accept new values rather than suggestions
   icon = false,
   renderSuggestion,
   renderDropper,
@@ -21,7 +21,7 @@ export default function Autocomplete({
   placeholder?: string,
   value?: string
   autoFocus?: boolean
-  freeSolo?: boolean,
+  addable?: boolean,
   icon?: boolean,
   maxDisplay?: number,
   style?: CSSProperties,
@@ -31,7 +31,7 @@ export default function Autocomplete({
 }): ReactElement {
   const [inputValue, setInputValue] = useState(value || '');
   const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
-  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(addable ? -1 : 0);
   const [focused, setFocused] = useState(false);
 
   const suggestionRefs = useRef<(HTMLLIElement | null)[]>([]); // Reference to each suggestion item
@@ -48,6 +48,7 @@ export default function Autocomplete({
   const handleSuggestionClick = (suggestion: string) => {
     setInputValue(suggestion);
     setFilteredSuggestions([]);
+    setActiveSuggestionIndex(addable ? -1 : 0)
     setFocused(false)
     if (onSubmit) onSubmit(suggestion);
   };
@@ -62,7 +63,7 @@ export default function Autocomplete({
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       setActiveSuggestionIndex(prevIndex =>
-        prevIndex > 0 ? prevIndex - 1 : filteredSuggestions.length - 1
+        prevIndex > -1 ? prevIndex - 1 : filteredSuggestions.length - 1
       );
     } else if (e.key === 'Enter') {
       e.preventDefault()
@@ -70,10 +71,10 @@ export default function Autocomplete({
         const selectedSuggestion = filteredSuggestions[activeSuggestionIndex];
         setInputValue(selectedSuggestion);
         setFilteredSuggestions([]);
-        setActiveSuggestionIndex(-1);
+        setActiveSuggestionIndex(0);
         setFocused(false);
         onSubmit(selectedSuggestion)
-      } else if (freeSolo) {
+      } else if (addable) {
         setFocused(false);
         onSubmit(inputValue);
       }
@@ -103,12 +104,12 @@ export default function Autocomplete({
         onFocus={() => setFocused(true)}
         onChange={(value) => {
           setFilteredSuggestions(
-            suggestions.filter(suggestion => suggestion.toLowerCase().includes(value.toLowerCase()))
+            [
+              ...suggestions.filter(suggestion => suggestion === ""),
+              ...fuse.search(value).map(({ item }) => item)
+
+            ]
           );
-          // console.log(fuse.search(value).map(({ item }) => item))
-          // setFilteredSuggestions(
-          //   fuse.search(value).map(({ item }) => item)
-          // );
         }}
         onUpdate={(value) => {
           onSubmit(value)

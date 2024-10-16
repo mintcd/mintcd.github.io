@@ -10,7 +10,6 @@ import { getAllIndices, breakLines } from "@functions/text-analysis";
 import Latex from "@components/atoms/latex";
 import { getCaretCoordinates } from "@functions/elements";
 export default function TextField({
-  className,
   onUpdate,
   onChange,
   mode = "viewed",

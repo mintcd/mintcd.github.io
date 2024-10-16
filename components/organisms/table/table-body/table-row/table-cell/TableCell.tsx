@@ -15,7 +15,8 @@ export default function TableCell({ itemId, attr, value, onUpdate, suggestions, 
     <div className={`table-cell
             p-2
             hover:bg-blue-100 rounded-md
-            ${focused ? 'border-2 border-blue-400 shadow-lg' : 'border border-transparent'}`}
+            // ${focused ? 'border-2 border-blue-400 shadow-lg' : 'border border-transparent'}`
+    }
     >
       {
         attr.type === 'text' &&

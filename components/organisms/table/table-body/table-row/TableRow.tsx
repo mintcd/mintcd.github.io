@@ -56,7 +56,7 @@ export default function TableRow(props: Props) {
         key={item.id}
         className={`regular-cell-group grid py-[10px] hover:border-gray-300`}
         style={{
-          gridTemplateColumns: [`${100}px`,
+          gridTemplateColumns: [`${75}px`,
           ...regularAttrs.sort((x, y) => x.order - y.order).map((attr) => `${Math.max(attr.width || 0)}px`)].join(' '),
         }}
       >

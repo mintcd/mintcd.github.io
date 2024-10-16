@@ -107,7 +107,6 @@ function DraggableRow({
       <TableRow
         item={item}
         attrsByName={attrsByName}
-        style={style}
         onUpdate={onUpdate}
         listeners={listeners}
       />

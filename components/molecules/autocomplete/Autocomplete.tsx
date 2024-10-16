@@ -1,12 +1,12 @@
 import { CSSProperties, ReactElement, useState, useEffect, useRef, ReactNode, useMemo } from 'react';
-import { useClickAway } from "@uidotdev/usehooks";
 import zIndices from '@styles/z-indices';
 import TextField from '@components/nuclears/TextField';
 import Fuse from 'fuse.js';
 
 export default function Autocomplete({
+  className,
   suggestions,
-  autoFocus = false,
+  mode = "viewed",
   style,
   placeholder,
   value,
@@ -17,7 +17,9 @@ export default function Autocomplete({
   maxDisplay,
   onSubmit
 }: {
-  suggestions: string[]
+  className?: string
+  suggestions: string[],
+  mode?: Mode,
   placeholder?: string,
   value?: string
   autoFocus?: boolean
@@ -32,13 +34,11 @@ export default function Autocomplete({
   const [inputValue, setInputValue] = useState(value || '');
   const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(addable ? -1 : 0);
-  const [focused, setFocused] = useState(false);
+
+  const [_mode, setMode] = useState<"viewed" | "editing">(mode);
 
   const suggestionRefs = useRef<(HTMLLIElement | null)[]>([]); // Reference to each suggestion item
 
-  const ref = useClickAway(() => {
-    setFocused(false);
-  }) as any;
 
   const fuse = useMemo(() => new Fuse(suggestions, {
     shouldSort: true,
@@ -49,7 +49,7 @@ export default function Autocomplete({
     setInputValue(suggestion);
     setFilteredSuggestions([]);
     setActiveSuggestionIndex(addable ? -1 : 0)
-    setFocused(false)
+    setMode("viewed")
     if (onSubmit) onSubmit(suggestion);
   };
 
@@ -72,10 +72,10 @@ export default function Autocomplete({
         setInputValue(selectedSuggestion);
         setFilteredSuggestions([]);
         setActiveSuggestionIndex(0);
-        setFocused(false);
+        setMode("viewed");
         onSubmit(selectedSuggestion)
       } else if (addable) {
-        setFocused(false);
+        setMode("viewed");
         onSubmit(inputValue);
       }
     }
@@ -96,12 +96,12 @@ export default function Autocomplete({
   }, [value])
 
   return (
-    <div className="autocomplete relative" style={style} ref={ref} onKeyDown={handleKeyDown}>
+    <div className="autocomplete relative min-w-[100px]" style={style} onKeyDown={handleKeyDown}>
       <TextField
         style={{ width: style?.width, height: style?.height }}
         value={inputValue}
-        focused={focused}
-        onFocus={() => setFocused(true)}
+        mode={mode}
+        onFocus={() => setMode("editing")}
         onChange={(value) => {
           setFilteredSuggestions(
             [
@@ -113,12 +113,12 @@ export default function Autocomplete({
         }}
         onUpdate={(value) => {
           onSubmit(value)
-          setFocused(false)
+          setMode("viewed")
         }}
         render={renderDropper}
       />
 
-      {focused && (
+      {_mode && (
         <ul
           className="absolute bg-white rounded mt-1 min-w-[150px] overflow-y-auto shadow-sm"
           style={{

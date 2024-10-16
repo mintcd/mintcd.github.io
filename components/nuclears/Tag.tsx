@@ -6,16 +6,15 @@ export default function Tag({ value, onClick, onClose, style }:
     value: ReactElement,
     onClick: (event: React.MouseEvent) => void,
     onClose: (event: React.MouseEvent) => void,
-    style?: {
-      bgColor?: string
-    }
+    style?: CSSProperties
   }
 ) {
   return (
     <div
-      className={`tag px-1 py-[1px] mx-2 my-1 rounded-full flex space-x-1 items-center h-fit`}
+      className={`tag px-1 py-[1px] my-1 rounded-full flex space-x-1 items-center h-fit`}
       style={{
-        backgroundColor: style?.bgColor ?? '#cbd5e1'
+        ...style,
+        backgroundColor: style?.backgroundColor ?? '#cbd5e1'
       }}
       onClick={onClick} // Prevent editing state change
     >

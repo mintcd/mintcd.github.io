@@ -5,20 +5,15 @@ import { DragIndicatorOutlined, UnfoldMoreRounded, UnfoldLessRounded } from "@mu
 import TextCell from "./table-cell/TextCell";
 import { Divider } from "@mui/material";
 
-import "../../table.css"
+type Props = DefaultComponentProps & {
+  item: DataItem,
+  attrsByName: AttrsByName,
+  onUpdate: (items: UpdatedItem | UpdatedItem[]) => Promise<void>
+}
 
-export default function TableRow({ item, attrsByName, onUpdate, style, listeners }:
-  {
-    item: DataItem,
-    attrsByName: AttrsByName,
-    onUpdate: (items: UpdatedItem | UpdatedItem[]) => Promise<void>,
-    style?: {
-      optionsColumnWidth?: number,
-      cellMinWidth?: number
-    },
-    listeners?: any
-  }
-) {
+
+export default function TableRow(props: Props) {
+  const { item, attrsByName, onUpdate, listeners } = props;
 
   const attrs = Object.values(attrsByName)
 
@@ -61,7 +56,7 @@ export default function TableRow({ item, attrsByName, onUpdate, style, listeners
         key={item.id}
         className={`regular-cell-group grid py-[10px] hover:border-gray-300`}
         style={{
-          gridTemplateColumns: [`${style?.optionsColumnWidth || 100}px`,
+          gridTemplateColumns: [`${100}px`,
           ...regularAttrs.sort((x, y) => x.order - y.order).map((attr) => `${Math.max(attr.width || 0)}px`)].join(' '),
         }}
       >
@@ -110,7 +105,9 @@ export default function TableRow({ item, attrsByName, onUpdate, style, listeners
             suggestions={attr.suggestions}
             onUpdate={onUpdate}
             focused={focusedCell === index}
-            onClick={() => setFocusedCell(index)}
+            listeners={{
+              onClick: () => setFocusedCell(index)
+            }}
           />
 
         ))}

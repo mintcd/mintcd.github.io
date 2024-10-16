@@ -6,6 +6,7 @@ export default function TextCell({
   attr,
   value,
   onUpdate,
+  focused
 }: {
   itemId: number;
   attr: AttrProps;

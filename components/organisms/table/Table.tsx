@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useMemo, useRef } from "react";
-import './table.css'
 import { filterData, initializeAttrsByName, sortData, updateFilter } from "./functions.ts";
 import { useMediaQuery } from "@uidotdev/usehooks";
 

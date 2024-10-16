@@ -10,20 +10,23 @@ import { getAllIndices, breakLines } from "@functions/text-analysis";
 import Latex from "@components/atoms/latex";
 import { getCaretCoordinates } from "@functions/elements";
 export default function TextField({
+  className,
   onUpdate,
   onChange,
+  mode = "viewed",
   listeners,
   value,
   placeholder,
   updateOnEnter = true,
   style,
-  focused = false,
   render,
   suggestion,
   preview,
   onKeyDown,
-  onFocus
+  onFocus,
 }: {
+  className?: string;
+  mode?: Mode;
   onUpdate?: (value: string) => void;
   onChange?: (value: string) => void;
   listeners?: Listeners
@@ -31,7 +34,6 @@ export default function TextField({
   placeholder?: string;
   updateOnEnter?: boolean;
   style?: CSSProperties;
-  focused?: boolean;
   render?: (text: string) => ReactNode,
   suggestion?: (text: string) => ReactElement,
   preview?: (value: string, selection: [number, number]) => ReactElement,
@@ -41,8 +43,8 @@ export default function TextField({
   onFocus?: () => void
 }) {
 
-  const [editing, setEditing] = useState(focused || false);
-  const [editingValue, setEditingValue] = useState(value || "");
+  const [_mode, setMode] = useState(mode);
+  const [_modeValue, setModeValue] = useState(value || "");
 
   const [lastChangedValue, setLastChangedValue] = useState("");
 
@@ -66,16 +68,16 @@ export default function TextField({
         if (textarea) {
           const caretPosition = textarea.selectionStart;
           const newValue =
-            editingValue.slice(0, caretPosition) +
+            _modeValue.slice(0, caretPosition) +
             "\n" +
-            editingValue.slice(caretPosition);
+            _modeValue.slice(caretPosition);
 
-          setEditingValue(newValue);
+          setModeValue(newValue);
           setCaretPosition(caretPosition + 1); // Save the new caret position
         }
       } else {
-        onUpdate && onUpdate(editingValue);
-        setEditing(false);
+        onUpdate && onUpdate(_modeValue);
+        setMode("viewed");
       }
     }
     if (e.ctrlKey) {
@@ -86,9 +88,9 @@ export default function TextField({
 
       if (e.key === "i" || e.key === "I") {
         // Handle Ctrl + I for italics
-        setEditingValue(editingValue.slice(0, start) +
-          `<em>${editingValue.slice(start, end)}</em>` +
-          editingValue.slice(end)
+        setModeValue(_modeValue.slice(0, start) +
+          `<em>${_modeValue.slice(start, end)}</em>` +
+          _modeValue.slice(end)
         )
 
       } else if (e.key === "b" || e.key === "B") {
@@ -99,15 +101,15 @@ export default function TextField({
   };
 
   function handleChange(e: ChangeEvent<HTMLTextAreaElement>) {
-    setLastChangedValue(editingValue);
-    setEditingValue(e.target.value);
-    onChange && onChange(editingValue);
+    setLastChangedValue(_modeValue);
+    setModeValue(e.target.value);
+    onChange && onChange(_modeValue);
   }
 
-  useEffect(() => {
-    setEditingValue(value || "");
-    setEditing(focused)
-  }, [value, focused]);
+  // useEffect(() => {
+  //   setModeValue(value || "");
+  //   setMode(focused)
+  // }, [value, focused]);
 
   useEffect(() => {
     const textarea = textareaRef.current;
@@ -118,22 +120,22 @@ export default function TextField({
   }, [latexOpen])
 
 
-  // Update height based on editingValue
+  // Update height based on _modeValue
   useEffect(() => {
     const textarea = textareaRef.current;
 
     if (textarea) {
       const height = typeof style?.height === 'number' ? style.height : Infinity;
-      textarea.style.height = `${Math.min(height, breakLines(editingValue, textarea.scrollWidth).length * 21)}px`;
+      textarea.style.height = `${Math.min(height, breakLines(_modeValue, textarea.scrollWidth).length * 21)}px`;
     }
 
   });
 
-  // Whenever editing changes, update the caret position
+  // Whenever _mode changes, update the caret position
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
-      textarea.setSelectionRange(editingValue.length, editingValue.length);
+      textarea.setSelectionRange(_modeValue.length, _modeValue.length);
 
       const caretCoordinates = getCaretCoordinates(textarea);
       textarea.scrollTop = caretCoordinates.top - textarea.clientHeight / 2;
@@ -143,7 +145,7 @@ export default function TextField({
       textarea.scrollIntoView({ block: "nearest", inline: "nearest" });
     }
 
-  }, [editing])
+  }, [_mode])
 
   useEffect(() => {
     const textarea = textareaRef.current;
@@ -158,32 +160,32 @@ export default function TextField({
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
-      const dollarIndices = getAllIndices(editingValue, '$')
+      const dollarIndices = getAllIndices(_modeValue, '$')
 
-      if (dollarIndices.length % 2 === 1 && editingValue.slice(editingValue.length - 1) === '$') {
+      if (dollarIndices.length % 2 === 1 && _modeValue.slice(_modeValue.length - 1) === '$') {
         if (latexOpen === 'none') {
           setLatexOpen('inline')
-          setEditingValue(prev => prev + "$")
+          setModeValue(prev => prev + "$")
         }
       }
 
-      if (editingValue.slice(editingValue.length - 1) !== '$') {
+      if (_modeValue.slice(_modeValue.length - 1) !== '$') {
         setLatexOpen('none')
         setLatexValue('')
       }
 
       if (latexOpen === 'inline') {
         if (latexValue === '') textarea.setSelectionRange(textarea.value.length - 1, textarea.value.length - 1);
-        setLatexValue(editingValue.substring(dollarIndices.at(dollarIndices.length - 2) as number,
+        setLatexValue(_modeValue.substring(dollarIndices.at(dollarIndices.length - 2) as number,
           dollarIndices.at(dollarIndices.length - 1) as number + 1))
       }
     }
-  }, [editingValue, latexOpen, latexValue]);
+  }, [_modeValue, latexOpen, latexValue]);
 
   return (
     <div className={`text-field rounded-sm`} {...listeners}
       onClick={(e) => {
-        setEditing(true)
+        setMode("editing")
         listeners?.onClick?.(e)
       }}
       style={{
@@ -192,7 +194,7 @@ export default function TextField({
         border: style?.border,
         padding: style?.padding
       }}>
-      {editing ?
+      {_mode === "editing" ?
         <textarea
           aria-label="text-field-input"
           ref={textareaRef}
@@ -205,19 +207,19 @@ export default function TextField({
           onKeyDown={handleKeyDown}
           // onBlur={() => {
           //   onUpdate && onUpdate(value || '')
-          //   setEditing(false)
+          //   setMode(false)
           // }}
           autoFocus
-          value={editingValue}
+          value={_modeValue}
           onFocus={onFocus}
         />
         :
         <div className="h-full overflow-ellipsis">
-          {render ? render(editingValue) : editingValue}
+          {render ? render(_modeValue) : _modeValue}
         </div>
       }
 
-      {latexOpen !== 'none' && editing && (
+      {latexOpen !== 'none' && _mode && (
         <div className="preview"
           style={{
             position: 'fixed',

@@ -189,7 +189,7 @@ export default function TextField({
       }}
       style={{
         width: style?.width || '100%',
-        height: style?.height || 21,
+        height: style?.height,
         border: style?.border,
         padding: style?.padding
       }}>

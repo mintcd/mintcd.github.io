@@ -182,7 +182,7 @@ export default function TextField({
   }, [_modeValue, latexOpen, latexValue]);
 
   return (
-    <div className={`text-field rounded-sm`} {...listeners}
+    <div className={`text-field rounded-sm min-h-[1rem]`} {...listeners}
       onClick={(e) => {
         setMode("editing")
         listeners?.onClick?.(e)

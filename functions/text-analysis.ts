@@ -25,6 +25,27 @@ export function getTextWidth(text: string, fontSize: number = 16, fontFamily: st
   return 0;
 }
 
+export function getCharacterOffsets(text: string, fontSize: number = 16, fontFamily: string = "Arial") {
+  const canvas = createCanvas(200, 200); // Adjust dimensions as needed
+  const context = canvas.getContext('2d');
+  if (!context) {
+    return [];
+  }
+
+  context.font = `${fontSize}px ${fontFamily}`;
+  const offsets: number[] = [];
+  let currentOffset = 0;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const charWidth = context.measureText(char).width;
+    offsets.push(currentOffset);
+    currentOffset += charWidth;
+  }
+
+  return offsets;
+}
+
 export function filterOnQuery(query: string, data: Term[], keys: string[] = ['name']) {
   return data.filter(term => {
     if (query.trim()) {

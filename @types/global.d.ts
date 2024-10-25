@@ -17,7 +17,7 @@ type Listeners = {
   onClick?: React.MouseEventHandler<Element>;
   onMouseEnter?: React.MouseEventHandler<Element>;
   onMouseLeave?: React.MouseEventHandler<Element>;
-  // onKeyDown?: React.MouseEventHandler<HTMLElement>;
+  onKeyDown?: React.KeyboardEventHandler<Element>;
 };
 
 type CSSProperties = React.CSSProperties

@@ -1,10 +1,16 @@
 export type AtomProps = {
-  id: number,
+  type?: 'text' | 'latex',
   text: string,
-  styles?: string[],
+  style?: string[],
 }
 
 export type Selection = {
-  atomId: number | undefined
-  range: [number, number] | undefined
+  from: {
+    id: number,
+    offset: number
+  },
+  to: {
+    id: number,
+    offset: number
+  }
 }

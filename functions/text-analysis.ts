@@ -25,7 +25,7 @@ export function getTextWidth(text: string, fontSize: number = 16, fontFamily: st
   return 0;
 }
 
-export function getCharacterOffsets(text: string, fontSize: number = 16, fontFamily: string = "Arial") {
+export function getCharacterOffsetWidths(text: string, fontSize: number = 14, fontFamily: string = "Arial") {
   const canvas = createCanvas(200, 200); // Adjust dimensions as needed
   const context = canvas.getContext('2d');
   if (!context) {
@@ -33,14 +33,14 @@ export function getCharacterOffsets(text: string, fontSize: number = 16, fontFam
   }
 
   context.font = `${fontSize}px ${fontFamily}`;
-  const offsets: number[] = [];
+  const offsets: number[] = [0];
   let currentOffset = 0;
 
   for (let i = 0; i < text.length; i++) {
     const char = text[i];
     const charWidth = context.measureText(char).width;
-    offsets.push(currentOffset);
     currentOffset += charWidth;
+    offsets.push(currentOffset);
   }
 
   return offsets;
@@ -87,3 +87,12 @@ export function breakLines(text: string, width: number, fontSize: number = 16, f
 
   return lines
 }
+
+export function removeAt(text: string, from: number, to: number = from + 1) {
+  return text.slice(0, from) + text.slice(to);
+}
+
+export function insertAt(text: string, what: string, from: number) {
+  return text.slice(0, from) + what + text.slice(from);
+}
+

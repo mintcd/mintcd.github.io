@@ -79,7 +79,8 @@ export default function TextField({
         setMode("viewed");
       }
     }
-    if (e.ctrlKey) {
+
+    else if (e.ctrlKey) {
       const textarea = textareaRef.current;
       if (!textarea) return
       const start = textarea.selectionStart

@@ -1,9 +1,7 @@
-import graphData from "@models/knowledge-graph";
+'use client'
 
-export default function Mathematics() {
-  return (
-    <div>
-      {/* <KnowledgeGraph graphData={graphData}></KnowledgeGraph> */}
-    </div>
-  )
+import DatabaseUI from '@components/organisms/database-ui';
+
+export default function Statements() {
+  return <DatabaseUI table="statement" />
 }

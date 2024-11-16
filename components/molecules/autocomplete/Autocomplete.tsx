@@ -76,7 +76,7 @@ export default function Autocomplete({
         onSubmit(selectedSuggestion)
       } else if (addable) {
         setMode("viewed");
-        onSubmit(inputValue);
+        onSubmit(suggestions[activeSuggestionIndex]);
       }
     }
   };

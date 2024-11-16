@@ -7,6 +7,11 @@ import {
   SearchOffOutlined,
   SearchOutlined
 } from '@mui/icons-material';
+
+import { HiMiniViewColumns } from "react-icons/hi2";
+
+import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
+import ViewColumnRoundedIcon from '@mui/icons-material/ViewColumnRounded';
 import { Dropdown } from "@components/molecules";
 import { Checkbox, TextField } from "@components/nuclears";
 import Autocomplete from "@components/molecules/autocomplete/Autocomplete";
@@ -40,7 +45,7 @@ export default function TableExtension({ upToDate, attrsByName, handleDownload, 
       {
         handleSearch &&
         <div className="search-box border border-gray-700 h-auto py-1 px-2 rounded-full flex items-center">
-          <SearchOutlined className="icon" />
+          <SearchOutlinedIcon className="icon" />
           <Autocomplete
             value={searchValue}
             suggestions={attrsByName.name.suggestions}
@@ -61,7 +66,8 @@ export default function TableExtension({ upToDate, attrsByName, handleDownload, 
         ref={menuRef}
       >
         <div className="table-menu-icons flex space-x-3">
-          {handleColumnAppearance && <ViewColumnRounded className="icon"
+          {handleColumnAppearance && <HiMiniViewColumns
+            className="icon"
             onClick={() => setMenu(menu === "column-visibility" ? undefined : "column-visibility")}
           />}
           {handleSort && <FormatListBulletedRounded className="icon" />}

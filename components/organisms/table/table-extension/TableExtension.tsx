@@ -1,55 +1,97 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useClickAway } from "@uidotdev/usehooks";
-import {
-  ViewColumnRounded,
-  FilterAltRounded, Download,
-  SettingsRounded, FormatListBulletedRounded,
-  SearchOffOutlined,
-  SearchOutlined
-} from '@mui/icons-material';
+import { updateFilter } from "../functions";
 
+import { FaAngleDown } from "react-icons/fa";
 import { HiMiniViewColumns } from "react-icons/hi2";
+import { MdFilterAlt } from "react-icons/md";
+import { IoMdSettings, IoMdDownload, IoIosSearch, IoIosClose } from "react-icons/io";
 
-import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-import ViewColumnRoundedIcon from '@mui/icons-material/ViewColumnRounded';
 import { Dropdown } from "@components/molecules";
 import { Checkbox, TextField } from "@components/nuclears";
 import Autocomplete from "@components/molecules/autocomplete/Autocomplete";
 import Latex from "@components/atoms/latex";
+import { exportToCSV, exportToJSON } from "@functions/document.ts";
 
-export default function TableExtension({ upToDate, attrsByName, handleDownload, tableProperties, handleColumnAppearance, handleFilter, handlePagination, handleSearch, handleSort }: {
-  upToDate?: boolean,
-  attrsByName: AttrsByName,
-  tableProperties: TableProperties,
-  handleSort?: (attrName: string, direction: 'asc' | 'desc') => void
-  handleDownload?: (fileType: 'json' | 'csv') => void,
-  handleColumnAppearance?: (columnName: string) => void,
-  handleFilter?: (action: FilterAction) => void,
-  handlePagination?: (itemsPerPage: number) => void,
-  handleSearch?: (searchString: string) => void
+export default function TableExtension({
+  factory,
+  data,
+  options = {
+    filter: true,
+    pagination: true,
+    columnVisibility: true,
+    download: true,
+    search: true,
+  }
+}: {
+  factory: Factory<TableProps>,
+  data?: DataItem[],
+  options?: {
+    filter?: boolean,
+    pagination?: boolean,
+    columnVisibility?: boolean,
+    download?: boolean,
+    search?: boolean,
+  }
 }) {
-  const [menu, setMenu] = useState<MenuState>(undefined)
+
   const [searchValue, setSearchValue] = useState("")
 
-  const menuRef = useClickAway(() => {
-    setMenu(undefined)
-  }) as any
+  const menuRef = useClickAway(() => factory.set('menu', undefined)) as any
+
+  function handleDeleteFilter(attrName: string) {
+    factory.set('attrsByName', {
+      ...factory.attrsByName,
+      attrName: {
+        ...factory.attrsByName[attrName],
+        filter: {
+          enabled: false,
+          contained: undefined,
+          is: undefined,
+        }
+      }
+    })
+  }
+
+  function handleFilter(action: FilterAction) {
+    factory.menu !== "filter" && factory.set("menu", "filter")
+    factory.set('attrsByName', updateFilter(factory.attrsByName, action))
+  }
+
+  function handleSearch(searchString: string) {
+    factory.set('searchString', searchString)
+  }
+
+  function handlePagination(itemsPerPage: number) {
+    factory.set('itemsPerPage', itemsPerPage)
+  }
+
+  function handleColumnVisibility(columnName: string) {
+    const newAttrsByName = { ...factory.attrsByName }
+    newAttrsByName[columnName] = { ...newAttrsByName[columnName], hidden: !factory.attrsByName[columnName].hidden }
+    factory.set('attrsByName', newAttrsByName)
+  }
+
+  function handleDownload(fileType: 'json' | 'csv') {
+    fileType === 'json' ? exportToJSON(data ?? [], factory.name)
+      : exportToCSV(Object.keys(factory.attrsByName), data ?? [], factory.name)
+  }
 
   return (
     <div className="table-extension flex justify-between">
       <span className="sync-state italic flex items-center w-[150px]">
-        {upToDate ? "All changes saved." : "Processing..."}
+        {factory.upToDate ? "All changes saved." : "Processing..."}
       </span>
 
-
       {
-        handleSearch &&
+        options.search &&
         <div className="search-box border border-gray-700 h-auto py-1 px-2 rounded-full flex items-center">
-          <SearchOutlinedIcon className="icon" />
+          <IoIosSearch className="icon" />
           <Autocomplete
             value={searchValue}
-            suggestions={attrsByName.name.suggestions}
+            suggestions={factory.attrsByName.name.suggestions}
             onSubmit={(value) => {
+              console.log(value)
               setSearchValue(value)
               handleSearch(value)
             }}
@@ -66,117 +108,136 @@ export default function TableExtension({ upToDate, attrsByName, handleDownload, 
         ref={menuRef}
       >
         <div className="table-menu-icons flex space-x-3">
-          {handleColumnAppearance && <HiMiniViewColumns
+          {options.columnVisibility && <HiMiniViewColumns
             className="icon"
-            onClick={() => setMenu(menu === "column-visibility" ? undefined : "column-visibility")}
+            onClick={() => factory.set("menu", factory.menu === "columnVisibility" ? undefined : "columnVisibility")}
           />}
-          {handleSort && <FormatListBulletedRounded className="icon" />}
-          {handleFilter && <FilterAltRounded className="icon"
-            onClick={() => setMenu(menu === "filter" ? undefined : "filter")} />}
-          {handlePagination && <SettingsRounded className="icon"
-            onClick={() => setMenu(menu === "settings" ? undefined : "settings")}
+          {options.filter && <MdFilterAlt className="icon"
+            onClick={() => factory.set("menu", factory.menu === "filter" ? undefined : "filter")} />}
+          {options.pagination && <IoMdSettings className="icon"
+            onClick={() => factory.set("menu", factory.menu === "settings" ? undefined : "settings")}
           />}
-          {handleDownload && <Download className="icon"
-            onClick={() => setMenu(menu === "download" ? undefined : "download")}
+          {options.download && <IoMdDownload className="icon"
+            onClick={() => factory.set("menu", factory.menu === "download" ? undefined : "download")}
           />}
         </div>
 
-        <div className="table-menu-dropdown absolute top-[20px] right-0 z-10 bg-white border border-gray-300"
+        <div className="menu absolute top-[20px] right-0 z-10 bg-white border border-gray-300 rounded-md"
         >
-          {menu === 'column-visibility' && handleColumnAppearance &&
+          {factory.menu === 'columnVisibility' &&
             <div className="column-visibility-menu p-4 w-48 shadow-lg space-y-2">
-              {Object.values(attrsByName).map(attr => (
+              {Object.values(factory.attrsByName).map(attr => (
                 !attr.newWindow &&
                 <div key={attr.name} className="flex justify-between items-center">
-                  <span className="text-gray-800">{attrsByName[attr.name].display}</span>
+                  <span className="text-gray-800">{factory.attrsByName[attr.name].display}</span>
                   <Checkbox
-                    checked={!attrsByName[attr.name].hidden}
-                    onChange={() => handleColumnAppearance(attr.name)}
+                    checked={!factory.attrsByName[attr.name].hidden}
+                    onChange={() => handleColumnVisibility(attr.name)}
                   />
                 </div>
               ))
               }
             </div>
           }
-          {menu === 'download' && handleDownload &&
+          {factory.menu === 'download' &&
             <div className="p-4 w-48 shadow-lg space-y-2">
               <button onClick={() => handleDownload('csv')} >Export to CSV</button>
               <button onClick={() => handleDownload('json')} >Export to JSON</button>
             </div>
           }
-          {menu === 'filter' && handleFilter &&
-            <div className="table-filter flex p-4 shadow-lg w-[500px] space-x-2">
-              {Object.keys(attrsByName)
-                .filter(attrName => attrsByName[attrName]['filterEnabled'])
-                .map((attrName) => (
-                  <Dropdown
-                    key={attrName}
-                    toggleButton={
-                      <span className=" bg-slate-300 rounded-full py-[2px] px-[8px]">
-                        {attrsByName[attrName].display}
-                        {function () {
-                          const candidates = Object.entries(attrsByName[attrName].filter)
-                            .flatMap(([_, candidates]) => {
-                              if (candidates.length === 0) return []
-                              return candidates
-                            })
-                          return candidates.length > 0 ? ": " + candidates.join(", ") : ""
-                        }()}
-                      </span>
-                    }
-                    content={
-                      <div className="filter-options">
-                        {
-                          attrsByName[attrName].type === 'multiselect' &&
-                          <div className="p-2">
-                            {attrsByName[attrName].display} <span className="italic"> is</span>
-                            {attrsByName[attrName].suggestions?.map(suggestion => (
-                              <div key={suggestion} className="w-[200px]">
-                                <Checkbox checked={Boolean(attrsByName[attrName]['filter']['is']?.includes(suggestion))}
-                                  onChange={() => handleFilter({
-                                    name: attrName,
-                                    predicate: "is",
-                                    candidate: suggestion
-                                  })} />
-                                <span className="mx-2">
-                                  {suggestion}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        }
-                        {
-                          attrsByName[attrName].type === 'text' &&
-                          <div className="p-2 w-[200px]">
-                            {attrsByName[attrName].display} <span className="italic"> contains</span>
-                            <TextField
-                              value={attrsByName[attrName].filter['contains'] || ""}
-                              onUpdate={(value) => {
-                                handleFilter({
-                                  name: attrName,
-                                  predicate: "contains",
-                                  candidate: value
+          {factory.menu === 'filter' &&
+            <div className="filter flex p-4 w-[500px] space-x-2">
+              {Object.values(factory.attrsByName).every(attr => attr.filter.enabled === false)
+                ? <span className="italic">
+                  No filter applied
+                </span>
+                : Object.values(factory.attrsByName)
+                  .filter(attr => factory.attrsByName[attr.name].filter.enabled)
+                  .map((attr) => (
+                    <Dropdown
+                      key={attr.name}
+                      toggler={
+                        <span className=" bg-slate-300 rounded-full py-[2px] px-[8px] flex items-center justify-between">
+                          <span>
+                            {factory.attrsByName[attr.name].display}
+                            {function () {
+                              const candidates = Object.entries(factory.attrsByName[attr.name].filter.predicates)
+                                .flatMap(([_, candidates]) => {
+                                  if (candidates.length === 0) return []
+                                  return candidates
                                 })
-                              }}
-                              style={{ border: '#4672b0' }}
-                            />
-                          </div>
-                        }
-                      </div>
-                    }
-                  />
-                ))}
+                              return candidates.length > 0 ? ": " + candidates.join(", ") : ""
+                            }()}
+                          </span>
+
+                          <FaAngleDown fontSize={14} />
+                        </span>
+                      }
+                      content={
+                        <div className="filter-options">
+                          {
+                            factory.attrsByName[attr.name].type === 'multiselect' &&
+                            <div className="p-2">
+                              <div className="flex items-center justify-between">
+                                <span>
+                                  {factory.attrsByName[attr.name].display} <span className="italic"> is</span>
+                                </span>
+                                <IoIosClose fontSize={20} cursor="pointer" onClick={() => handleDeleteFilter(attr.name)} />
+                              </div>
+
+                              {factory.attrsByName[attr.name].suggestions?.map(suggestion => (
+                                <div key={suggestion} className="w-[200px]">
+                                  <Checkbox checked={Boolean(factory.attrsByName[attr.name].filter.predicates.is?.includes(suggestion))}
+                                    onChange={() => handleFilter({
+                                      name: attr.name,
+                                      predicate: "is",
+                                      candidate: suggestion
+                                    })} />
+                                  <span className="mx-2">
+                                    {suggestion}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          }
+                          {
+                            factory.attrsByName[attr.name].type === 'text' &&
+                            <div className="p-2 w-[200px]">
+                              <div className="flex items-center justify-between">
+                                <span>
+                                  {factory.attrsByName[attr.name].display} <span className="italic"> contains</span>
+                                </span>
+                                <IoIosClose fontSize={14} />
+                              </div>
+
+                              <TextField
+                                value={factory.attrsByName[attr.name].filter.predicates.contains || ""}
+                                onUpdate={(value) => {
+                                  handleFilter({
+                                    name: attr.name,
+                                    predicate: "contains",
+                                    candidate: value
+                                  })
+                                }}
+                                style={{ border: '#4672b0' }}
+                              />
+                            </div>
+                          }
+                        </div>
+                      }
+                    />
+                  ))}
 
             </div>
           }
-          {menu === 'settings' && handlePagination &&
+          {factory.menu === 'settings' && handlePagination &&
             <div className="p-4 w-48 bg-white border border-gray-300 shadow-lg flex justify-between">
               <div className="whitespace-nowrap">
                 Items per page
               </div>
               <TextField
-                value={String(tableProperties.itemsPerPage)}
-                onUpdate={(value) => handlePagination(parseInt(value) || tableProperties.itemsPerPage)}
+                value={String(factory.itemsPerPage)}
+                onUpdate={(value) => handlePagination(parseInt(value) || factory.itemsPerPage)}
                 style={{ width: 20, border: '#4672b0' }}
               />
             </div>

@@ -1,6 +1,14 @@
 
 declare module 'is-hotkey'
 
+type Factory<T extends object> = {
+  [key in keyof T]: T[key];
+} & {
+  set: (key: keyof T, value: T[key]) => void;
+};
+
+
+
 type DefaultComponentProps = {
   className?: string
   style?: React.CSSProperties

@@ -3,10 +3,10 @@ import { ReactNode, useState, useRef } from "react";
 import { useOnClickOutside } from 'usehooks-ts';
 
 export default function Dropdown({
-  toggleButton,
+  toggler,
   content,
 }: {
-  toggleButton: ReactNode;
+  toggler: ReactNode;
   content: ReactNode;
 }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,7 +21,7 @@ export default function Dropdown({
   return (
     <div className={`drop-down relative w-fit`} ref={dropdownRef}>
       <span onClick={handleToggle} className="cursor-pointer">
-        {toggleButton}
+        {toggler}
       </span>
 
       <div

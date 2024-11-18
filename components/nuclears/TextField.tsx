@@ -14,7 +14,7 @@ export default function TextField({
   onChange,
   mode = "viewed",
   listeners,
-  value,
+  value = "",
   placeholder,
   updateOnEnter = true,
   style,
@@ -106,11 +106,6 @@ export default function TextField({
     onChange && onChange(_modeValue);
   }
 
-  // useEffect(() => {
-  //   setModeValue(value || "");
-  //   setMode(focused)
-  // }, [value, focused]);
-
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
@@ -181,6 +176,10 @@ export default function TextField({
       }
     }
   }, [_modeValue, latexOpen, latexValue]);
+
+  useEffect(() => {
+    setModeValue(value)
+  }, [value])
 
   return (
     <div className={`text-field rounded-sm min-h-[1rem]`} {...listeners}

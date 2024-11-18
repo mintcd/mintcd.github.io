@@ -1,22 +1,23 @@
 import { Dropdown } from "@components/molecules";
-import { ArrowDownwardRounded, ArrowUpwardRounded, AtmRounded, FilterAltRounded, HorizontalRuleRounded, MoreVertRounded } from "@mui/icons-material";
+import { FilterAltRounded } from "@mui/icons-material";
+import { FaArrowUp, FaArrowDown } from "react-icons/fa";
+import { MdOutlineHorizontalRule, MdMoreVert } from "react-icons/md";
 import { useCallback, useRef, useState } from "react"
 import { updateFilter } from "../functions";
 
-export default function TableHeaderGroup({ style, attrsByName, setAttrsByName, setMenu }: {
-  style?: {
-    cellMinWidth?: number,
-    optionsColumnWidth?: number
-  },
-  attrsByName: AttrsByName,
-  setAttrsByName: (newAttrsByName: AttrsByName) => void,
-  setMenu: () => void
+export default function TableHeaderGroup({ factory }: {
+  factory: Factory<TableProps>
 }) {
 
   const animationFrameRef = useRef<number | null>(null);
   const resizingRef = useRef({ startX: 0, startWidth: 0, attrName: '' });
   const [focusedIndex, setFocusedIndex] = useState(-1)
   const [resizeIndex, setResizeIndex] = useState(-1)
+  const iconStyle = {
+    fontSize: 14,
+    cursor: "pointer",
+    color: "#023e8a"
+  }
 
   const handleColumnDragStart = (e: React.DragEvent<HTMLDivElement>, draggedName: string) => {
     e.dataTransfer.setData('text/plain', draggedName);
@@ -31,7 +32,7 @@ export default function TableHeaderGroup({ style, attrsByName, setAttrsByName, s
     const draggedName = e.dataTransfer.getData('text/plain');
 
     if (draggedName !== targetName) {
-      const newAttrsByName = { ...attrsByName };
+      const newAttrsByName = { ...factory.attrsByName };
       const draggedOrder = newAttrsByName[draggedName].order;
       const targetOrder = newAttrsByName[targetName].order;
 
@@ -55,18 +56,39 @@ export default function TableHeaderGroup({ style, attrsByName, setAttrsByName, s
         });
       }
       newAttrsByName[draggedName].order = targetOrder;
-      setAttrsByName(newAttrsByName);
+      factory.set('attrsByName', newAttrsByName);
     }
   };
 
   const handleMouseDown = (e: React.MouseEvent, attrName: string) => {
     resizingRef.current.startX = e.clientX;
-    resizingRef.current.startWidth = attrsByName[attrName].width || 150;
+    resizingRef.current.startWidth = factory.attrsByName[attrName].width || 150;
     resizingRef.current.attrName = attrName;
 
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
   };
+
+  const handleSort = (attr: AttrProps, order: string | undefined = undefined) => {
+    let nextOrder: string
+    if (order) {
+      nextOrder = order
+    } else {
+      if (attr.sort === 'none') {
+        nextOrder = 'asc'
+      }
+      else if (attr.sort === 'asc') {
+        nextOrder = 'desc'
+      } else {
+        nextOrder = 'none'
+      }
+    }
+
+    factory.set('attrsByName', ({
+      ...factory.attrsByName,
+      [attr.name]: { ...attr, sort: nextOrder }
+    }))
+  }
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!animationFrameRef.current) {
@@ -74,15 +96,15 @@ export default function TableHeaderGroup({ style, attrsByName, setAttrsByName, s
         const { startX, startWidth, attrName } = resizingRef.current;
         if (attrName !== '') {
           const delta = e.clientX - startX;
-          const newWidth = Math.max(style?.cellMinWidth || 100, startWidth + delta);
-          const newAttrsByName = { ...attrsByName };
+          const newWidth = Math.max(factory.style?.cellMinWidth as number || 100, startWidth + delta);
+          const newAttrsByName = { ...factory.attrsByName };
           newAttrsByName[attrName].width = newWidth;
-          setAttrsByName(newAttrsByName);
+          factory.set('attrsByName', newAttrsByName);
         }
         animationFrameRef.current = null;
       });
     }
-  }, [attrsByName, setAttrsByName, style]);
+  }, [factory.attrsByName]);
 
   const handleMouseUp = useCallback(() => {
     document.removeEventListener('mousemove', handleMouseMove);
@@ -94,21 +116,21 @@ export default function TableHeaderGroup({ style, attrsByName, setAttrsByName, s
   return (
     <div className="header-group grid pb-[1px] border-b-[1px]"
       style={{
-        gridTemplateColumns: [`${style?.optionsColumnWidth || 100}px`,
-        ...Object.values(attrsByName)
+        gridTemplateColumns: [`${factory.style.optionsColumnWidth || 100}px`,
+        ...Object.values(factory.attrsByName)
           .sort((x, y) => x.order - y.order)
           .map((attr) => `${attr.width}px`)]
           .join(' ')
       }}>
       <div className="options-header"></div>
       {
-        Object.values(attrsByName)
+        Object.values(factory.attrsByName)
           .filter(attr => !attr.hidden && !attr.newWindow)
           .sort((x, y) => x.order - y.order)
           .map((attr, index) =>
             <div
               key={index}
-              className={`header-cell-${attr.name} py-2 flex justify-between items-center  pl-2`}
+              className={`header-cell-${attr.name} py-2 flex justify-between items-center pl-2`}
               onMouseEnter={() => setFocusedIndex(index)}
             >
               <div className="header-name flex-grow text-[16px] hover:cursor-grab"
@@ -125,78 +147,54 @@ export default function TableHeaderGroup({ style, attrsByName, setAttrsByName, s
                   <>
                     <div
                       className="relative size-[20px] hover:bg-gray-100 hover:rounded-full"
-                      onClick={() => {
-                        if (attr.sort === 'none') {
-                          setAttrsByName({ ...attrsByName, [attr.name]: { ...attrsByName[attr.name], sort: 'asc' } })
-                        }
-                        if (attr.sort === 'asc') {
-                          setAttrsByName({ ...attrsByName, [attr.name]: { ...attrsByName[attr.name], sort: 'desc' } })
-                        }
-                        if (attr.sort === 'desc') {
-                          setAttrsByName({ ...attrsByName, [attr.name]: { ...attrsByName[attr.name], sort: 'none' } })
-                        }
-
-                      }}
+                      onClick={() => handleSort(attr)}
                     >
-                      <HorizontalRuleRounded
+                      <MdOutlineHorizontalRule
                         className={`absolute inset-[4px]
-                              transition-transform duration-300 ease-in-out transform ${attr.sort === 'none' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'
+                              transition-transform duration-300 ease-in-out 
+                              transform ${attr.sort === 'none' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'
                           }`}
-                        style={{
-                          fontSize: '16px'
-                        }}
+                        fontSize={14}
+                        color="#023e8a"
                       />
-                      <ArrowDownwardRounded
+                      <FaArrowUp
                         className={`absolute inset-[4px]
                                   transition-transform duration-300 ease-in-out 
                                   transform ${attr.sort === 'asc' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'
                           }`}
-                        style={{
-                          fontSize: '16px'
-                        }}
+                        {...iconStyle}
                       />
-                      <ArrowUpwardRounded
+                      <FaArrowDown
                         className={`absolute inset-[4px]
-                                    transition-transform duration-300 ease-in-out transform ${attr.sort === 'desc' ? 'rotate-0 opacity-100' : '-rotate-90 opacity-0'
+                                    transition-transform duration-300 ease-in-out 
+                                    transform ${attr.sort === 'desc' ? 'rotate-0 opacity-100' : '-rotate-90 opacity-0'
                           }`}
-                        style={{
-                          fontSize: '16px'
-                        }}
+                        {...iconStyle}
                       />
                     </div>
+
                     <Dropdown
-                      toggleButton={<MoreVertRounded style={{ fontSize: '18px' }} />}
+                      toggler={<MdMoreVert {...iconStyle} fontSize={18} />}
                       content={
                         <div className="w-[175px]">
                           <div className="p-2 hover:bg-gray-200 flex items-center"
-                            onClick={() => setAttrsByName({
-                              ...attrsByName,
-                              [attr.name]:
-                              {
-                                ...attrsByName[attr.name],
-                                sort: attrsByName[attr.name].sort === 'asc' ? 'none' : 'asc'
-                              }
-                            })}
+                            onClick={() => handleSort(attr, factory.attrsByName[attr.name].sort === 'asc' ? 'none' : 'asc')}
                           >
-                            <ArrowDownwardRounded className="mr-3" style={{ fontSize: '16px' }} />
+                            <FaArrowUp className="mr-3" style={{ fontSize: '16px' }} />
                             Sort ascending
                           </div>
                           <div className="p-2 hover:bg-gray-200 flex items-center"
-                            onClick={() => setAttrsByName({
-                              ...attrsByName, [attr.name]: {
-                                ...attrsByName[attr.name],
-                                sort: attrsByName[attr.name].sort === 'desc' ? 'none' : 'desc'
-                              }
-                            })}
+                            onClick={() => handleSort(attr, factory.attrsByName[attr.name].sort === 'desc' ? 'none' : 'desc')}
+
                           >
-                            <ArrowUpwardRounded className="mr-3" style={{ fontSize: '16px' }} />
+                            <FaArrowDown className="mr-3" style={{ fontSize: '16px' }} />
                             Sort descending
                           </div>
 
                           <div className="p-2 hover:bg-gray-200 flex items-center"
                             onClick={() => {
-                              setMenu()
-                              setAttrsByName(updateFilter(attrsByName, { name: attr.name }))
+                              factory.set('menu', 'filter')
+                              factory.set('attrsByName', updateFilter(factory.attrsByName, { name: attr.name }))
                             }}
                           >
                             <FilterAltRounded className="mr-3" style={{ fontSize: '16px' }} />

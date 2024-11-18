@@ -1,25 +1,24 @@
 'use client'
 
-import { useState, useEffect, useMemo, useRef } from "react";
-import { filterData, initializeAttrsByName, sortData, updateFilter } from "./functions.ts";
+import { useEffect, useMemo } from "react";
+import { initializeAttrsByName, sortData, updateFilter } from "./functions.ts";
 import { useMediaQuery } from "@uidotdev/usehooks";
+import { createFactory } from "@functions/objects.ts";
 
 
 import {
   AddRounded, NavigateNextRounded,
   NavigateBeforeRounded,
-  Dvr
 } from '@mui/icons-material';
 import TableHeaderGroup from "./table-header-group/TableHeaderGroup.tsx";
 import TableBody from "./table-body/TableBody.tsx";
 import TableExtension from "./table-extension/TableExtension.tsx";
-import { exportToCSV, exportToJSON } from "@functions/document.ts";
-import TableCell from "./table-body/table-row/table-cell/TableCell.tsx";
+
 
 export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCreateItem, onReorder }:
   {
     name: string,
-    upToDate?: boolean,
+    upToDate: boolean,
     data: DataItem[],
     attrs: AttrProps[],
     onUpdateCell: (items: UpdatedItem | UpdatedItem[]) => Promise<void>,
@@ -27,114 +26,130 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     onReorder: (rangedItems: DataItem[], direction: 'up' | 'down') => void,
   }) {
 
-  // Constants
-  const style = { cellMinWidth: 100, optionsColumnWidth: 75 }
-  const isMobileDevice = useMediaQuery("only screen and (max-width : 768px)");
-
-  // States
-  const [attrsByName, setAttrsByName] = useState(() => {
-    const storedAttrsByName = localStorage.getItem('attrsByName')
-    if (storedAttrsByName) return JSON.parse(storedAttrsByName) as { [key: string]: AttrProps }
-    return initializeAttrsByName(attrs, data)
-  })
-  const [searchString, setSearchString] = useState<string>("")
-  const [tableProperties, setTableProperties] = useState<TableProperties>({
-    itemsPerPage: 10,
-    currentPage: 1
-  })
-  const [menu, setMenu] = useState<MenuState>(undefined)
-
-  // Dependent values
-
-  const processedDesktopData = useMemo(() => {
-    let processedData = filterData(data, attrsByName)
-    // Apply sorting
-    Object.values(attrsByName).forEach(prop => {
-      processedData = sortData(processedData, prop.name, prop.sort)
-    })
-    return processedData
-  }, [data, attrsByName])
-
-  const processedMobileData = useMemo(() => data.filter(item => item.name === searchString), [searchString, data])
-  const startIndex = (tableProperties.currentPage - 1) * tableProperties.itemsPerPage;
-  const endIndex = Math.min(startIndex + tableProperties.itemsPerPage, processedDesktopData.length);
-  const paginatedData = processedDesktopData.slice(startIndex, endIndex);
-  const totalPages = useMemo(() => {
-    return Math.ceil(processedDesktopData.length / tableProperties.itemsPerPage);
-  }, [processedDesktopData, tableProperties.itemsPerPage]);
-
-  // Handlers
-  function handleSearch(searchString: string) {
-    setSearchString(searchString)
-  }
-
-  function handlePagination(itemsPerPage: number) {
-    setTableProperties({
-      ...tableProperties,
-      itemsPerPage: itemsPerPage
-    })
-  }
-  function handleFilter(action: FilterAction) {
-    menu !== "filter" && setMenu("filter")
-    const updatedAttrsByName = updateFilter(attrsByName, action)
-    // Enable the filter
-    setAttrsByName(updatedAttrsByName)
-    setTableProperties(prev => ({ ...prev, currentPage: 1 }))
-  }
-
-  function handleColumnAppearance(columnName: string) {
-    const newAttrsByName = { ...attrsByName }
-    newAttrsByName[columnName] = { ...newAttrsByName[columnName], hidden: !attrsByName[columnName].hidden }
-    setAttrsByName(newAttrsByName)
-  }
-
-  function handleDownload(fileType: 'json' | 'csv') {
-    fileType === 'json' ? exportToJSON(data, name) : exportToCSV(Object.keys(attrsByName), data, name)
-  }
-
   const handlePageChange = (direction: 'back' | 'next') => {
-    if (direction === 'back' && tableProperties.currentPage > 1) {
-      setTableProperties(prev => ({ ...prev, currentPage: prev.currentPage - 1 }))
+    if (direction === 'back') {
+      tableProps.currentPage > 1
+        ? factory.set("currentPage", factory.currentPage - 1)
+        : factory.set("currentPage", totalPages)
     }
 
-    if (direction === 'next' && tableProperties.currentPage < totalPages) {
-      setTableProperties(prev => ({ ...prev, currentPage: prev.currentPage + 1 }))
+    if (direction === 'next') {
+      tableProps.currentPage < totalPages
+        ? factory.set("currentPage", factory.currentPage + 1)
+        : factory.set("currentPage", 1)
     }
   };
 
+  // Constants
+  const isMobileDevice = useMediaQuery("only screen and (max-width : 768px)");
+
+  // States
+  const tableProps: TableProps = function () {
+    const storeProps = localStorage.getItem('tableProps')
+    return storeProps
+      ? JSON.parse(storeProps)
+      : {
+        name: name,
+        itemsPerPage: 10,
+        currentPage: 1,
+        upToDate: upToDate,
+        searchString: "",
+        attrsByName: initializeAttrsByName(attrs, data),
+        style: { cellMinWidth: 100, optionsColumnWidth: 75 }
+      }
+  }()
+  const factory = createFactory(tableProps)
+
+  const processedDesktopData = useMemo(() => {
+    let processedData = data
+      // Filter
+      .filter(item => (
+        Object.entries(factory.attrsByName)
+          .every(([attrName, attrProps]) =>
+          (
+            attrProps.filter.enabled === false
+            || item[attrName].length === 0
+            || Object.entries(attrProps.filter.predicates).every(([predName, candidates]) => {
+              if (predName === 'is' && factory.attrsByName[attrName].type === 'multiselect') {
+                if (candidates === undefined || candidates.length === 0) return true;
+
+                // Ensure item[attrName] exists and is an array before checking
+                if (Array.isArray(item[attrName])) {
+                  // Return true if any value in item[attrName] is included in candidates
+                  return item[attrName].some((value: string) => candidates.includes(value));
+                }
+
+                // If item[attrName] is not an array, return false
+                return false;
+              }
+
+              if (predName === 'contains' && factory.attrsByName[attrName].type === 'text') {
+                const value = item[attrName] as string
+                const candidate = candidates as string
+
+                return value.toLowerCase().includes(candidate.toLowerCase())
+              }
+              return true; // Default return true if no predicates are matched
+            })
+          )
+          )
+      ))
+      // Search
+      .filter(item => Object.values(factory.attrsByName).some(attr => {
+        const value = item[attr.name]
+        if (typeof value === 'string') {
+          return value.includes(factory.searchString)
+        }
+
+        if (Array.isArray(value)) {
+          return value.flatMap(x => x).includes(factory.searchString)
+        }
+      }))
+    // Apply sorting
+    Object.values(factory.attrsByName).forEach(prop => {
+      processedData = sortData(processedData, prop.name, prop.sort)
+    })
+    return processedData
+  }, [data, factory.attrsByName, factory.searchString])
+
+  // const processedMobileData = useMemo(() => data.filter(item => item.name === searchString), [searchString, data])
+  const startIndex = (tableProps.currentPage - 1) * tableProps.itemsPerPage;
+  const endIndex = Math.min(startIndex + tableProps.itemsPerPage, processedDesktopData.length);
+  const paginatedData = processedDesktopData.slice(startIndex, endIndex);
+  const totalPages = useMemo(() => {
+    return Math.ceil(processedDesktopData.length / tableProps.itemsPerPage);
+  }, [processedDesktopData, tableProps.itemsPerPage]);
+
   // Effects
   useEffect(() => {
-    setTableProperties((prev) => ({ ...prev, currentPage: 1 }))
-  }, [tableProperties.itemsPerPage])
+    factory.set('currentPage', 1)
+  }, [tableProps.itemsPerPage])
 
   useEffect(() => {
     //Store attrsByName every time it changes
-    localStorage.setItem('attrsByName', JSON.stringify(attrsByName));
-  }, [attrsByName])
+    localStorage.setItem('tableProps', JSON.stringify(tableProps));
+  }, [tableProps])
 
   useEffect(() => {
     // Refetch suggestions every time data changes
-    setAttrsByName(attrsByName => {
-      let newAttrsByName = { ...attrsByName }
-      Object.values(attrsByName).forEach(attr => {
+    factory.set('attrsByName', function () {
+      let newAttrsByName = { ...factory.attrsByName }
+      Object.values(factory.attrsByName).forEach(attr => {
         newAttrsByName[attr.name].suggestions = Array.from(new Set(data.flatMap(item => attr.referencing
           ? item[attr.referencing]
           : item[attr.name])))
           .sort()
       })
       return newAttrsByName
-    })
+    }())
   }, [data])
 
   return (
     isMobileDevice
       ?
       <div>
-        <TableExtension
-          upToDate={upToDate}
-          attrsByName={attrsByName}
-          tableProperties={tableProperties}
-          handleSearch={handleSearch}
+        {/* <TableExtension
+          factory={factory}
         />
         <div>
           {processedMobileData.length > 0 ?
@@ -163,35 +178,28 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
           onClick={onCreateItem}>
           <AddRounded className={`icon`} />
           <span>New </span>
-        </div>
+        </div> */}
 
       </div>
       :
       <div className="table-container flex flex-col relative">
         <TableExtension
-          upToDate={upToDate}
-          attrsByName={attrsByName}
-          handleDownload={handleDownload}
-          handleColumnAppearance={handleColumnAppearance}
-          handleFilter={handleFilter}
-          tableProperties={tableProperties}
-          handlePagination={handlePagination}
+          factory={factory}
+          data={data}
         />
 
         <div className="table-content rounded-md shadow-md">
           <TableHeaderGroup
-            attrsByName={attrsByName}
-            setAttrsByName={setAttrsByName}
-            style={style}
-            setMenu={() => setMenu('filter')}
+            factory={factory}
           />
 
           <TableBody
-            paginatedData={paginatedData}
-            attrsByName={attrsByName}
-            onUpdateCell={onUpdateCell}
-            style={style}
-            onReorder={onReorder}
+            data={paginatedData}
+            factory={factory}
+            handlers={{
+              updateCell: onUpdateCell,
+              reorder: onReorder
+            }}
           />
         </div>
 
@@ -199,10 +207,10 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
           <div className="flex items-center rounded-md hover:bg-[#f0f0f0] py-1 px-2 cursor-pointer"
             onClick={() => {
               onCreateItem()
-              setSearchString("")
+              factory.set("searchString", "")
             }}>
             <AddRounded className={`icon`} />
-            <span>New </span>
+            <span> New </span>
           </div>
 
           <div className="pagination-controls flex items-center justify-end">
@@ -211,7 +219,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
               onClick={() => handlePageChange('back')}
             />
             <span className="pagination-info">
-              {(tableProperties.currentPage - 1) * tableProperties.itemsPerPage + 1} - {Math.min(tableProperties.currentPage * tableProperties.itemsPerPage, processedDesktopData.length)} of {processedDesktopData.length}
+              {(tableProps.currentPage - 1) * tableProps.itemsPerPage + 1} - {Math.min(tableProps.currentPage * tableProps.itemsPerPage, processedDesktopData.length)} of {processedDesktopData.length}
             </span>
             <NavigateNextRounded
               className="icon"

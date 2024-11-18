@@ -6,17 +6,16 @@ import { useRef } from "react";
 import TableRow from "./table-row/TableRow";
 
 export default function TableBody({
-  paginatedData,
-  attrsByName,
-  style,
-  onUpdateCell,
-  onReorder,
+  data,
+  factory,
+  handlers,
 }: {
-  paginatedData: DataItem[];
-  attrsByName: AttrsByName;
-  style: TableStyle;
-  onUpdateCell: (items: UpdatedItem | UpdatedItem[]) => Promise<void>;
-  onReorder: (rangedItems: DataItem[], direction: "up" | "down") => void;
+  data: DataItem[];
+  factory: Factory<TableProps>;
+  handlers: {
+    updateCell: (items: UpdatedItem | UpdatedItem[]) => Promise<void>;
+    reorder: (rangedItems: DataItem[], direction: "up" | "down") => void;
+  }
 }) {
   const bodyRef = useRef(null);
 
@@ -32,13 +31,13 @@ export default function TableBody({
 
     if (!over || active.id === over.id) return;
 
-    const sourceIndex = paginatedData.findIndex((item, index) => index === active.id);
-    const targetIndex = paginatedData.findIndex((item, index) => index === over.id);
+    const sourceIndex = data.findIndex((item, index) => index === active.id);
+    const targetIndex = data.findIndex((item, index) => index === over.id);
 
     const direction = sourceIndex < targetIndex ? "up" : "down";
 
 
-    onReorder(paginatedData.slice(Math.min(sourceIndex, targetIndex),
+    handlers.reorder(data.slice(Math.min(sourceIndex, targetIndex),
       Math.max(sourceIndex, targetIndex) + 1), direction);
   };
 
@@ -49,16 +48,16 @@ export default function TableBody({
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
     >
-      <SortableContext items={paginatedData.map((item, index) => index)}>
+      <SortableContext items={data.map((item, index) => index)}>
         <div className="table-body flex-grow text-gray-800" ref={bodyRef}>
-          {paginatedData.map((item, index) => (
+          {data.map((item, index) => (
             <DraggableRow
               key={item.id}
               item={item}
               index={index}
-              attrsByName={attrsByName}
-              style={style}
-              onUpdate={onUpdateCell}
+              attrsByName={factory.attrsByName}
+              style={factory.style}
+              onUpdate={handlers.updateCell}
             />
           ))}
         </div>

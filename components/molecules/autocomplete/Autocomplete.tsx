@@ -11,7 +11,6 @@ export default function Autocomplete({
   placeholder,
   value,
   addable = true, // Accept new values rather than suggestions
-  icon = false,
   renderSuggestion,
   renderDropper,
   maxDisplay,
@@ -24,7 +23,6 @@ export default function Autocomplete({
   value?: string
   autoFocus?: boolean
   addable?: boolean,
-  icon?: boolean,
   maxDisplay?: number,
   style?: CSSProperties,
   onSubmit: (selectedValue: string) => void
@@ -90,11 +88,6 @@ export default function Autocomplete({
     }
   }, [activeSuggestionIndex]);
 
-
-  useEffect(() => {
-    setInputValue(value || '');
-  }, [value])
-
   return (
     <div className="autocomplete relative min-w-[100px]" style={style} onKeyDown={handleKeyDown}>
       <TextField
@@ -107,7 +100,6 @@ export default function Autocomplete({
             [
               ...suggestions.filter(suggestion => suggestion === ""),
               ...fuse.search(value).map(({ item }) => item)
-
             ]
           );
         }}

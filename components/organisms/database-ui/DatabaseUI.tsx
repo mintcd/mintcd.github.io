@@ -20,8 +20,10 @@ export default function DatabaseUI({ table }: {
 
   async function handleCreate() {
     setUpToDate(false)
+    if (!authorized) return;
+
     // If there is item whose name is empty, do not create
-    if (data.some(item => item.name.length === 0)) {
+    if (data.every(item => item.name.length === 0)) {
       setUpToDate(true)
       return
     }

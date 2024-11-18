@@ -1,6 +1,12 @@
-type TableProperties = {
+type TableProps = {
+  name: string,
+  style: TableStyle,
+  menu: MenuState,
   itemsPerPage: number,
   currentPage: number,
+  upToDate: boolean,
+  searchString: string,
+  attrsByName: { [key: string]: AttrProps },
 }
 
 type TableStyle = {
@@ -8,7 +14,7 @@ type TableStyle = {
   cellMinWidth?: number;
 }
 
-type MenuState = "filter" | "sorts" | "column-visibility" | "download" | "settings" | "search" | undefined
+type MenuState = "filter" | "sorts" | "columnVisibility" | "download" | "settings" | "search" | undefined
 
 type AttrProps = {
   name: string,
@@ -23,10 +29,12 @@ type AttrProps = {
   sort: 'none' | 'asc' | 'desc',
   suggestions: string[],
   filter: {
-    'contains'?: string,
-    'is'?: string[],
+    enabled: boolean,
+    predicates: {
+      contains?: string,
+      is?: string[],
+    }
   }
-  filterEnabled: boolean
   color: {
     [tag: string]: string
   }

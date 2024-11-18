@@ -1,35 +1,33 @@
 import { capitalizeFirstLetter, getTextWidth } from "@functions/text-analysis";
-import assert from "assert";
 
 export function updateFilter(attrsByName: AttrsByName, action: FilterAction)
   : AttrsByName {
   const updatedAttrsByName = { ...attrsByName }
   // Enable the filter
-  updatedAttrsByName[action.name]["filterEnabled"] = true
+  updatedAttrsByName[action.name].filter.enabled = true
 
   if (action.predicate) {
-    let candidates = updatedAttrsByName[action.name].filter[action.predicate]
+    let candidates = updatedAttrsByName[action.name].filter.predicates[action.predicate]
     // If there is no such predicate, add it as a new one
     if (candidates === undefined) {
       if (action.predicate === 'is')
-        updatedAttrsByName[action.name].filter[action.predicate] = action.candidate ? [action.candidate] : []
+        updatedAttrsByName[action.name].filter.predicates[action.predicate] = action.candidate ? [action.candidate] : []
       if (action.predicate === 'contains')
-        updatedAttrsByName[action.name].filter[action.predicate] = action.candidate ? action.candidate : ""
+        updatedAttrsByName[action.name].filter.predicates[action.predicate] = action.candidate ? action.candidate : ""
     } else {
       if (action.candidate !== undefined) {
         // If there is no such candidate, add it as a new one
         if (action.predicate === 'is') {
           if (!candidates.includes(action.candidate)) {
-            updatedAttrsByName[action.name].filter[action.predicate]?.push(action.candidate)
+            updatedAttrsByName[action.name].filter.predicates[action.predicate]?.push(action.candidate)
           } else {
-            updatedAttrsByName[action.name].filter[action.predicate] =
+            updatedAttrsByName[action.name].filter.predicates[action.predicate] =
               (candidates as string[]).filter(candidate => candidate !== action.candidate)
           }
         }
 
         if (action.predicate === 'contains') {
-
-          updatedAttrsByName[action.name].filter[action.predicate] = action.candidate || ''
+          updatedAttrsByName[action.name].filter.predicates[action.predicate] = action.candidate || ''
         }
       }
     }
@@ -37,39 +35,9 @@ export function updateFilter(attrsByName: AttrsByName, action: FilterAction)
   return updatedAttrsByName
 }
 
-export function filterData(data: DataItem[], attrsByName: { [key: string]: AttrProps }): DataItem[] {
-  return data.filter(item => (
-    Object.keys(attrsByName).every((attrName) => {
-      if (attrsByName[attrName].filterEnabled === false
-        || item[attrName].length === 0) return true
-
-      return Object.entries(attrsByName[attrName].filter).every(([predName, candidates]) => {
-        if (predName === 'is') {
-          // If there are no candidates, return true
-          if (candidates.length === 0) return true;
-
-          // Ensure item[attrName] exists and is an array before checking
-          if (Array.isArray(item[attrName])) {
-            // Return true if any value in item[attrName] is included in candidates
-            return item[attrName].some((value: string) => candidates.includes(value));
-          }
-
-          // If item[attrName] is not an array, return false
-          return false;
-        }
-
-        if (predName === 'contains') {
-          const value = item[attrName] as string
-          const candidate = candidates as string
-          return value.toLowerCase().includes(candidate.toLowerCase())
-        }
-
-        // If other predicates are added later, handle them here
-        return true; // Default return true if no predicates are matched
-      });
-    })
-  ));
-}
+// export function filterData(data: DataItem[], attrsByName: { [key: string]: AttrProps }): DataItem[] {
+//   return 
+// }
 
 export function sortData(data: DataItem[], attrName: string, direction: 'asc' | 'desc' | 'none') {
   if (direction === 'none') {
@@ -107,22 +75,13 @@ export function initializeAttrsByName(attrs: AttrProps[], data: DataItem[]): { [
         ? item[attr.referencing]
         : item[attr.name])))
         .sort(),
-      filter: function () {
-        if (attr.type === 'multiselect') {
-          return {
-            "is": []
-          }
+      filter: {
+        enabled: false,
+        predicates: {
+          "is": [],
+          "contains": ""
         }
-        else if (attr.type === 'text') {
-          return {
-            "contains": ""
-          }
-        }
-        else {
-          throw new Error("Unknown type")
-        }
-      }(),
-      filterEnabled: false
+      }
     }
   })
   return attrsByName;

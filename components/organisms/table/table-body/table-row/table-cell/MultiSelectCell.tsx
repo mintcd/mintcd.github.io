@@ -66,7 +66,6 @@ export default function MultiSelectCell({ itemId, attr, values, onUpdate, sugges
         mode === 'editing' &&
         <Autocomplete
           className="tag-editor"
-          icon={false}
           autoFocus
           style={{ border: 'none' }}
           addable

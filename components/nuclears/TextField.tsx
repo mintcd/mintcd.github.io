@@ -121,7 +121,7 @@ export default function TextField({
 
     if (textarea) {
       const height = typeof style?.height === 'number' ? style.height : Infinity;
-      textarea.style.height = `${Math.min(height, breakLines(_modeValue, textarea.scrollWidth).length * 21)}px`;
+      textarea.style.height = `${Math.min(height, breakLines(_modeValue, textarea.clientWidth).length * 21)}px`;
     }
 
   });

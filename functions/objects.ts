@@ -5,6 +5,7 @@ export function createFactory<T extends object>(obj: T): Factory<T> {
   return {
     // Initially copy over all keys and values from the input object
     ..._obj,
+    get: () => _obj,
     set: (key: keyof T, value: T[keyof T]) => {
       dispatch((prev) => ({
         ...prev,

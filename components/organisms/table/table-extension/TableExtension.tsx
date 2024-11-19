@@ -39,15 +39,18 @@ export default function TableExtension({
 
   const menuRef = useClickAway(() => factory.set('menu', undefined)) as any
 
-  function handleDeleteFilter(attrName: string) {
+  function handleDeleteFilter(attr: AttrProps) {
+    console.log(attr)
     factory.set('attrsByName', {
       ...factory.attrsByName,
-      attrName: {
-        ...factory.attrsByName[attrName],
+      [attr.name]: {
+        ...attr,
         filter: {
           enabled: false,
-          contained: undefined,
-          is: undefined,
+          predicates: {
+            contained: "",
+            is: [],
+          }
         }
       }
     })
@@ -182,7 +185,7 @@ export default function TableExtension({
                                 <span>
                                   {factory.attrsByName[attr.name].display} <span className="italic"> is</span>
                                 </span>
-                                <IoIosClose fontSize={20} cursor="pointer" onClick={() => handleDeleteFilter(attr.name)} />
+                                <IoIosClose fontSize={20} cursor="pointer" onClick={() => handleDeleteFilter(attr)} />
                               </div>
 
                               {factory.attrsByName[attr.name].suggestions?.map(suggestion => (

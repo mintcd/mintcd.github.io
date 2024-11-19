@@ -68,9 +68,10 @@ export function breakLines(text: string, width: number, fontSize: number = 16, f
 
   endlineSplits.forEach(line => {
     const words = line.split(" ")
+
     let currentLine = "";
     words.forEach(word => {
-      const testLine = currentLine + word + ` `;
+      const testLine = currentLine.length > 0 ? currentLine + ` ` + word : word;
       const testWidth = getTextWidth(testLine, fontSize, fontFamily);
 
       if (testWidth <= width) {
@@ -82,8 +83,6 @@ export function breakLines(text: string, width: number, fontSize: number = 16, f
     })
     lines.push(currentLine)
   })
-
-  // console.log(lines)
 
   return lines
 }

@@ -35,10 +35,6 @@ export function updateFilter(attrsByName: AttrsByName, action: FilterAction)
   return updatedAttrsByName
 }
 
-// export function filterData(data: DataItem[], attrsByName: { [key: string]: AttrProps }): DataItem[] {
-//   return 
-// }
-
 export function sortData(data: DataItem[], attrName: string, direction: 'asc' | 'desc' | 'none') {
   if (direction === 'none') {
     return data;

@@ -5,11 +5,9 @@ import { initializeAttrsByName, sortData, updateFilter } from "./functions.ts";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { createFactory } from "@functions/objects.ts";
 
+import { IoMdAdd } from "react-icons/io";
+import { MdNavigateNext, MdNavigateBefore } from "react-icons/md";
 
-import {
-  AddRounded, NavigateNextRounded,
-  NavigateBeforeRounded,
-} from '@mui/icons-material';
 import TableHeaderGroup from "./table-header-group/TableHeaderGroup.tsx";
 import TableBody from "./table-body/TableBody.tsx";
 import TableExtension from "./table-extension/TableExtension.tsx";
@@ -28,15 +26,9 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
 
   const handlePageChange = (direction: 'back' | 'next') => {
     if (direction === 'back') {
-      tableProps.currentPage > 1
-        ? factory.set("currentPage", factory.currentPage - 1)
-        : factory.set("currentPage", totalPages)
-    }
-
-    if (direction === 'next') {
-      tableProps.currentPage < totalPages
-        ? factory.set("currentPage", factory.currentPage + 1)
-        : factory.set("currentPage", 1)
+      factory.set("currentPage", tableProps.currentPage > 1 ? factory.currentPage - 1 : totalPages)
+    } else {
+      factory.set("currentPage", tableProps.currentPage < totalPages ? factory.currentPage + 1 : 1)
     }
   };
 
@@ -64,27 +56,27 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     let processedData = data
       // Filter
       .filter(item => (
-        Object.entries(factory.attrsByName)
-          .every(([attrName, attrProps]) =>
+        Object.values(factory.attrsByName)
+          .every((attr) =>
           (
-            attrProps.filter.enabled === false
-            || item[attrName].length === 0
-            || Object.entries(attrProps.filter.predicates).every(([predName, candidates]) => {
-              if (predName === 'is' && factory.attrsByName[attrName].type === 'multiselect') {
+            attr.filter.enabled === false
+            || item[attr.name].length === 0
+            || Object.entries(attr.filter.predicates).every(([predName, candidates]) => {
+              if (predName === 'is' && attr.type === 'multiselect') {
                 if (candidates === undefined || candidates.length === 0) return true;
 
                 // Ensure item[attrName] exists and is an array before checking
-                if (Array.isArray(item[attrName])) {
+                if (Array.isArray(item[attr.name])) {
                   // Return true if any value in item[attrName] is included in candidates
-                  return item[attrName].some((value: string) => candidates.includes(value));
+                  return item[attr.name].some((value: string) => candidates.includes(value));
                 }
 
                 // If item[attrName] is not an array, return false
                 return false;
               }
 
-              if (predName === 'contains' && factory.attrsByName[attrName].type === 'text') {
-                const value = item[attrName] as string
+              if (predName === 'contains' && attr.type === 'text') {
+                const value = item[attr.name] as string
                 const candidate = candidates as string
 
                 return value.toLowerCase().includes(candidate.toLowerCase())
@@ -123,12 +115,12 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
   // Effects
   useEffect(() => {
     factory.set('currentPage', 1)
-  }, [tableProps.itemsPerPage])
+  }, [factory.itemsPerPage])
 
   useEffect(() => {
     //Store attrsByName every time it changes
-    localStorage.setItem('tableProps', JSON.stringify(tableProps));
-  }, [tableProps])
+    localStorage.setItem('tableProps', JSON.stringify(factory.get()));
+  }, [factory])
 
   useEffect(() => {
     // Refetch suggestions every time data changes
@@ -209,19 +201,19 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
               onCreateItem()
               factory.set("searchString", "")
             }}>
-            <AddRounded className={`icon`} />
+            <IoMdAdd className={`icon`} />
             <span> New </span>
           </div>
 
           <div className="pagination-controls flex items-center justify-end">
-            <NavigateBeforeRounded
+            <MdNavigateBefore
               className="icon"
               onClick={() => handlePageChange('back')}
             />
             <span className="pagination-info">
               {(tableProps.currentPage - 1) * tableProps.itemsPerPage + 1} - {Math.min(tableProps.currentPage * tableProps.itemsPerPage, processedDesktopData.length)} of {processedDesktopData.length}
             </span>
-            <NavigateNextRounded
+            <MdNavigateNext
               className="icon"
               onClick={() => handlePageChange('next')}
             />

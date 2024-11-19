@@ -1,9 +1,12 @@
-import { Dropdown } from "@components/molecules";
-import { FilterAltRounded } from "@mui/icons-material";
-import { FaArrowUp, FaArrowDown } from "react-icons/fa";
-import { MdOutlineHorizontalRule, MdMoreVert } from "react-icons/md";
 import { useCallback, useRef, useState } from "react"
 import { updateFilter } from "../functions";
+import { Dropdown } from "@components/molecules";
+
+import { MdFilterAlt } from "react-icons/md";
+import { FaArrowUp, FaArrowDown } from "react-icons/fa";
+import { MdOutlineHorizontalRule, MdMoreVert } from "react-icons/md";
+import { IoMdColorWand } from "react-icons/io";
+
 
 export default function TableHeaderGroup({ factory }: {
   factory: Factory<TableProps>
@@ -13,10 +16,51 @@ export default function TableHeaderGroup({ factory }: {
   const resizingRef = useRef({ startX: 0, startWidth: 0, attrName: '' });
   const [focusedIndex, setFocusedIndex] = useState(-1)
   const [resizeIndex, setResizeIndex] = useState(-1)
+
   const iconStyle = {
+    marginRight: 12,
     fontSize: 14,
     cursor: "pointer",
     color: "#023e8a"
+  }
+
+  const options = [{
+    name: "Sort ascending",
+    icon: <FaArrowUp style={iconStyle} />,
+    handler: (attr: AttrProps) => handleSort(attr, factory.attrsByName[attr.name].sort === 'asc' ? 'none' : 'asc'),
+  },
+  {
+    name: "Sort descending",
+    icon: <FaArrowUp style={iconStyle} />,
+    handler: (attr: AttrProps) => handleSort(attr, factory.attrsByName[attr.name].sort === 'asc' ? 'none' : 'asc'),
+  },
+  {
+    name: "Filter",
+    icon: <MdFilterAlt style={iconStyle} />,
+    handler: (attr: AttrProps) => {
+      factory.set('menu', 'filter')
+      factory.set('attrsByName', updateFilter(factory.attrsByName, { name: attr.name }))
+    }
+  },
+  {
+    name: "Customize",
+    icon: <IoMdColorWand style={iconStyle} />,
+    handler: (attr: AttrProps) => {
+    }
+  },
+  ]
+
+  const resizeListeners = {
+    onMouseDown: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, attr: AttrProps) => {
+      resizingRef.current.startX = e.clientX;
+      resizingRef.current.startWidth = factory.attrsByName[attr.name].width || 150;
+      resizingRef.current.attrName = attr.name;
+
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    },
+    onMouseEnter: (index: number) => setResizeIndex(index),
+    onMouseLeave: () => setResizeIndex(-1)
   }
 
   const handleColumnDragStart = (e: React.DragEvent<HTMLDivElement>, draggedName: string) => {
@@ -177,29 +221,15 @@ export default function TableHeaderGroup({ factory }: {
                       toggler={<MdMoreVert {...iconStyle} fontSize={18} />}
                       content={
                         <div className="w-[175px]">
-                          <div className="p-2 hover:bg-gray-200 flex items-center"
-                            onClick={() => handleSort(attr, factory.attrsByName[attr.name].sort === 'asc' ? 'none' : 'asc')}
-                          >
-                            <FaArrowUp className="mr-3" style={{ fontSize: '16px' }} />
-                            Sort ascending
-                          </div>
-                          <div className="p-2 hover:bg-gray-200 flex items-center"
-                            onClick={() => handleSort(attr, factory.attrsByName[attr.name].sort === 'desc' ? 'none' : 'desc')}
-
-                          >
-                            <FaArrowDown className="mr-3" style={{ fontSize: '16px' }} />
-                            Sort descending
-                          </div>
-
-                          <div className="p-2 hover:bg-gray-200 flex items-center"
-                            onClick={() => {
-                              factory.set('menu', 'filter')
-                              factory.set('attrsByName', updateFilter(factory.attrsByName, { name: attr.name }))
-                            }}
-                          >
-                            <FilterAltRounded className="mr-3" style={{ fontSize: '16px' }} />
-                            Filter
-                          </div>
+                          {options.map(option => (
+                            <div className="p-2 hover:bg-gray-200 flex items-center cursor-pointer"
+                              key={option.name}
+                              onClick={() => option.handler(attr)}
+                            >
+                              {option.icon}
+                              {option.name}
+                            </div>
+                          ))}
                         </div>
                       }
                     />

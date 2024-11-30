@@ -11,6 +11,7 @@ import { MdNavigateNext, MdNavigateBefore, MdLastPage, MdFirstPage } from "react
 import TableHeaderGroup from "./table-header-group/TableHeaderGroup.tsx";
 import TableBody from "./table-body/TableBody.tsx";
 import TableExtension from "./table-extension/TableExtension.tsx";
+import TableCell from "./table-body/table-row/table-cell/TableCell.tsx";
 
 export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCreateItem, onReorder }:
   {
@@ -40,7 +41,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
       }) as TableProps
   })
 
-  const processedDesktopData = useMemo(() => {
+  const processedData = useMemo(() => {
     let processedData = data
       // Filter
       .filter(item => (
@@ -93,15 +94,15 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
   }, [data, factory.attrsByName, factory.searchString])
 
   const totalPages = useMemo(() => {
-    return Math.ceil(processedDesktopData.length / factory.itemsPerPage)
-  }, [processedDesktopData, factory.itemsPerPage])
+    return Math.ceil(processedData.length / factory.itemsPerPage)
+  }, [processedData, factory.itemsPerPage])
 
 
   const paginatedData = useMemo(() => {
     const startIndex = (factory.currentPage - 1) * factory.itemsPerPage
-    const endIndex = Math.min(startIndex + factory.itemsPerPage, processedDesktopData.length);
-    return processedDesktopData.slice(startIndex, endIndex)
-  }, [processedDesktopData, factory.itemsPerPage, factory.currentPage])
+    const endIndex = Math.min(startIndex + factory.itemsPerPage, processedData.length);
+    return processedData.slice(startIndex, endIndex)
+  }, [processedData, factory.itemsPerPage, factory.currentPage])
 
   // Effects
   useEffect(() => {
@@ -125,100 +126,101 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
   }, [data])
 
   return (
-    isMobileDevice
-      ?
-      <div>
-        {/* <TableExtension
-          factory={factory}
-        />
-        <div>
-          {processedMobileData.length > 0 ?
-            Object.entries(processedMobileData[0]).map(([key, value]) => (
-              <div className="grid grid-cols-[70px,1fr] border-b border-b-gray-300 rounded-md"
-                key={key}>
-                <div className="p-2 border-r border-r-gray-300">
-                  {attrsByName[key].display}
-                </div>
-                <TableCell
-                  itemId={processedMobileData[0].id}
-                  attr={attrsByName[key]}
-                  onUpdate={(item) => {
-                    onUpdateCell(item)
-                    if (key === 'name') setSearchString(item.attrValue.name)
-                  }}
-                  value={value}
-                  suggestions={attrsByName[key].suggestions}
-                />
-              </div>
-            )) :
-            <div className="text-center italic"> No item found </div>
-          }
-        </div>
+    <div className="table">
+      <TableExtension
+        factory={factory}
+        data={data}
+      />
+      {paginatedData.length > 0 ?
+        (isMobileDevice
+          ?
+          <div className="mt-3">
+            {paginatedData.map(item => {
+              return (
+                <>
+                  <div className="rounded-md border-2 border-gray-300">
+                    {Object.entries(item).map(([key, value], index) => (
+                      <div className={`grid grid-cols-[70px,1fr] 
+                          ${index < Object.keys(item).length - 1 && "border-b-2"} border-b-gray-300`}
+                        key={key}>
+                        <div className="p-2 border-r-2 border-r-gray-300">
+                          {factory.attrsByName[key].display}
+                        </div>
+                        <TableCell
+                          itemId={item.id}
+                          attr={factory.attrsByName[key]}
+                          onUpdate={(item) => {
+                            onUpdateCell(item)
+                          }}
+                          value={value}
+                          suggestions={factory.attrsByName[key].suggestions}
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  <br />
+                </>
+              )
+            })}
+          </div>
+          :
+          <div className="table-container flex flex-col relative">
+            <div className="table-content rounded-md shadow-md">
+              <TableHeaderGroup
+                factory={factory}
+              />
+
+              <TableBody
+                data={paginatedData}
+                factory={factory}
+                handlers={{
+                  updateCell: onUpdateCell,
+                  reorder: onReorder
+                }}
+              />
+            </div>
+          </div>)
+        :
+        <div className="text-center italic"> No item found </div>
+      }
+
+      <div className="table-footer flex items-center justify-between text-[#023e8a]">
         <div className="flex items-center rounded-md hover:bg-[#f0f0f0] py-1 px-2 cursor-pointer"
-          onClick={onCreateItem}>
-          <AddRounded className={`icon`} />
-          <span>New </span>
-        </div> */}
-
-      </div>
-      :
-      <div className="table-container flex flex-col relative">
-        <TableExtension
-          factory={factory}
-          data={data}
-        />
-
-        <div className="table-content rounded-md shadow-md">
-          <TableHeaderGroup
-            factory={factory}
-          />
-
-          <TableBody
-            data={paginatedData}
-            factory={factory}
-            handlers={{
-              updateCell: onUpdateCell,
-              reorder: onReorder
-            }}
-          />
+          onClick={() => {
+            onCreateItem()
+            factory.set("searchString", "")
+          }}>
+          <IoMdAdd className={`icon`} />
+          <span> New </span>
         </div>
 
-        <div className="table-footer flex items-center justify-between text-[#023e8a]">
-          <div className="flex items-center rounded-md hover:bg-[#f0f0f0] py-1 px-2 cursor-pointer"
-            onClick={() => {
-              onCreateItem()
-              factory.set("searchString", "")
-            }}>
-            <IoMdAdd className={`icon`} />
-            <span> New </span>
-          </div>
-
-          <div className="pagination-controls flex items-center justify-end">
-            <MdFirstPage
-              className="icon"
-              opacity={factory.currentPage > 1 ? 1 : 0.6}
-              onClick={() => factory.currentPage > 1 && factory.set("currentPage", 1)}
-            />
-            <MdNavigateBefore
-              className="icon"
-              opacity={factory.currentPage > 1 ? 1 : 0.6}
-              onClick={() => factory.currentPage > 1 && factory.set("currentPage", factory.currentPage - 1)}
-            />
-            <span className="pagination-info">
-              {(factory.currentPage - 1) * factory.itemsPerPage + 1} - {Math.min(factory.currentPage * factory.itemsPerPage, processedDesktopData.length)} of {processedDesktopData.length}
-            </span>
-            <MdNavigateNext
-              className="icon"
-              opacity={factory.currentPage < totalPages ? 1 : 0.6}
-              onClick={() => factory.currentPage < totalPages && factory.set("currentPage", factory.currentPage + 1)}
-            />
-            <MdLastPage
-              className="icon"
-              opacity={factory.currentPage < totalPages ? 1 : 0.6}
-              onClick={() => factory.currentPage < totalPages && factory.set("currentPage", totalPages)}
-            />
-          </div>
+        <div className="pagination-controls flex items-center justify-end">
+          <MdFirstPage
+            className="icon"
+            opacity={factory.currentPage > 1 ? 1 : 0.6}
+            onClick={() => factory.currentPage > 1 && factory.set("currentPage", 1)}
+          />
+          <MdNavigateBefore
+            className="icon"
+            opacity={factory.currentPage > 1 ? 1 : 0.6}
+            onClick={() => factory.currentPage > 1 && factory.set("currentPage", factory.currentPage - 1)}
+          />
+          <span className="pagination-info">
+            {(factory.currentPage - 1) * factory.itemsPerPage + 1} - {Math.min(factory.currentPage * factory.itemsPerPage, processedData.length)} of {processedData.length}
+          </span>
+          <MdNavigateNext
+            className="icon"
+            opacity={factory.currentPage < totalPages ? 1 : 0.6}
+            onClick={() => factory.currentPage < totalPages && factory.set("currentPage", factory.currentPage + 1)}
+          />
+          <MdLastPage
+            className="icon"
+            opacity={factory.currentPage < totalPages ? 1 : 0.6}
+            onClick={() => factory.currentPage < totalPages && factory.set("currentPage", totalPages)}
+          />
         </div>
       </div>
-  );
+    </div>
+  )
 }

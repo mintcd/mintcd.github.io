@@ -127,8 +127,7 @@ export default function TableExtension({
           />}
         </div>
 
-        <div className="menu absolute top-[20px] right-0 z-10 bg-white border border-gray-300 rounded-md"
-        >
+        <div className="menu absolute top-[120px] right-[40px] z-10 bg-white border border-gray-300 rounded-md">
           {factory.menu === 'columnVisibility' &&
             <div className="column-visibility-menu p-4 w-48 shadow-lg space-y-2">
               {Object.values(factory.attrsByName).map(attr => (

@@ -89,7 +89,6 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     Object.values(factory.attrsByName).forEach(prop => {
       processedData = sortData(processedData, prop.name, prop.sort)
     })
-    factory.set("currentPage", 1)
     return processedData
   }, [data, factory.attrsByName, factory.searchString])
 

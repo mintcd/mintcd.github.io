@@ -63,6 +63,7 @@ export default function TableExtension({
 
   function handleSearch(searchString: string) {
     factory.set('searchString', searchString)
+    factory.set("currentPage", 1)
   }
 
   function handlePagination(itemsPerPage: number) {

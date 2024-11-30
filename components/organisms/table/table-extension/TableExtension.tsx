@@ -25,7 +25,7 @@ export default function TableExtension({
   }
 }: {
   factory: Factory<TableProps>,
-  data?: DataItem[],
+  data: DataItem[],
   options?: {
     filter?: boolean,
     pagination?: boolean,
@@ -67,6 +67,7 @@ export default function TableExtension({
 
   function handlePagination(itemsPerPage: number) {
     factory.set('itemsPerPage', itemsPerPage)
+    factory.set('currentPage', 1)
   }
 
   function handleColumnVisibility(columnName: string) {
@@ -92,7 +93,7 @@ export default function TableExtension({
           <IoIosSearch className="icon" />
           <Autocomplete
             value={searchValue}
-            suggestions={factory.attrsByName.name.suggestions}
+            suggestions={data.map(item => item.name)}
             onSubmit={(value) => {
               console.log(value)
               setSearchValue(value)

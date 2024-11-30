@@ -137,6 +137,9 @@ export default function DatabaseUI({ table }: {
 
   useEffect(() => {
     if (window.localStorage.getItem("timeKeyGot")) setAuthorized(true);
+
+    console.log("Refetch data")
+
     Promise.all([
       fetchData({ table: table }),
       fetchData({ table: `${table}_attr` })

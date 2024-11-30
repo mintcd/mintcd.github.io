@@ -6,12 +6,11 @@ import { useMediaQuery } from "@uidotdev/usehooks";
 import { createFactory } from "@functions/objects.ts";
 
 import { IoMdAdd } from "react-icons/io";
-import { MdNavigateNext, MdNavigateBefore } from "react-icons/md";
+import { MdNavigateNext, MdNavigateBefore, MdLastPage, MdFirstPage } from "react-icons/md";
 
 import TableHeaderGroup from "./table-header-group/TableHeaderGroup.tsx";
 import TableBody from "./table-body/TableBody.tsx";
 import TableExtension from "./table-extension/TableExtension.tsx";
-
 
 export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCreateItem, onReorder }:
   {
@@ -24,21 +23,11 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     onReorder: (rangedItems: DataItem[], direction: 'up' | 'down') => void,
   }) {
 
-  const handlePageChange = (direction: 'back' | 'next') => {
-    if (direction === 'back') {
-      factory.set("currentPage", tableProps.currentPage > 1 ? factory.currentPage - 1 : totalPages)
-    } else {
-      factory.set("currentPage", tableProps.currentPage < totalPages ? factory.currentPage + 1 : 1)
-    }
-  };
-
-  // Constants
   const isMobileDevice = useMediaQuery("only screen and (max-width : 768px)");
 
-  // States
-  const tableProps: TableProps = function () {
+  const factory: Factory<TableProps> = createFactory(() => {
     const storeProps = localStorage.getItem('tableProps')
-    return storeProps
+    return (storeProps
       ? JSON.parse(storeProps)
       : {
         name: name,
@@ -48,9 +37,8 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
         searchString: "",
         attrsByName: initializeAttrsByName(attrs, data),
         style: { cellMinWidth: 100, optionsColumnWidth: 75 }
-      }
-  }()
-  const factory = createFactory(tableProps)
+      }) as TableProps
+  })
 
   const processedDesktopData = useMemo(() => {
     let processedData = data
@@ -104,19 +92,18 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     return processedData
   }, [data, factory.attrsByName, factory.searchString])
 
-  // const processedMobileData = useMemo(() => data.filter(item => item.name === searchString), [searchString, data])
-  const startIndex = (tableProps.currentPage - 1) * tableProps.itemsPerPage;
-  const endIndex = Math.min(startIndex + tableProps.itemsPerPage, processedDesktopData.length);
-  const paginatedData = processedDesktopData.slice(startIndex, endIndex);
   const totalPages = useMemo(() => {
-    return Math.ceil(processedDesktopData.length / tableProps.itemsPerPage);
-  }, [processedDesktopData, tableProps.itemsPerPage]);
+    return Math.ceil(processedDesktopData.length / factory.itemsPerPage)
+  }, [processedDesktopData, factory.itemsPerPage])
+
+
+  const paginatedData = useMemo(() => {
+    const startIndex = (factory.currentPage - 1) * factory.itemsPerPage
+    const endIndex = Math.min(startIndex + factory.itemsPerPage, processedDesktopData.length);
+    return processedDesktopData.slice(startIndex, endIndex)
+  }, [processedDesktopData, factory.itemsPerPage, factory.currentPage])
 
   // Effects
-  useEffect(() => {
-    factory.set('currentPage', 1)
-  }, [factory.itemsPerPage])
-
   useEffect(() => {
     //Store attrsByName every time it changes
     localStorage.setItem('tableProps', JSON.stringify(factory.get()));
@@ -126,11 +113,12 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
     // Refetch suggestions every time data changes
     factory.set('attrsByName', function () {
       let newAttrsByName = { ...factory.attrsByName }
-      Object.values(factory.attrsByName).forEach(attr => {
-        newAttrsByName[attr.name].suggestions = Array.from(new Set(data.flatMap(item => attr.referencing
-          ? item[attr.referencing]
-          : item[attr.name])))
-          .sort()
+      Object.values(factory.attrsByName).filter(attr => attr.type !== 'text').forEach(attr => {
+        newAttrsByName[attr.name].suggestions =
+          Array.from(new Set(data.flatMap(item => attr.referencing
+            ? item[attr.referencing]
+            : item[attr.name])))
+            .sort()
       })
       return newAttrsByName
     }())
@@ -206,16 +194,28 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
           </div>
 
           <div className="pagination-controls flex items-center justify-end">
+            <MdFirstPage
+              className="icon"
+              opacity={factory.currentPage > 1 ? 1 : 0.6}
+              onClick={() => factory.currentPage > 1 && factory.set("currentPage", 1)}
+            />
             <MdNavigateBefore
               className="icon"
-              onClick={() => handlePageChange('back')}
+              opacity={factory.currentPage > 1 ? 1 : 0.6}
+              onClick={() => factory.currentPage > 1 && factory.set("currentPage", factory.currentPage - 1)}
             />
             <span className="pagination-info">
-              {(tableProps.currentPage - 1) * tableProps.itemsPerPage + 1} - {Math.min(tableProps.currentPage * tableProps.itemsPerPage, processedDesktopData.length)} of {processedDesktopData.length}
+              {(factory.currentPage - 1) * factory.itemsPerPage + 1} - {Math.min(factory.currentPage * factory.itemsPerPage, processedDesktopData.length)} of {processedDesktopData.length}
             </span>
             <MdNavigateNext
               className="icon"
-              onClick={() => handlePageChange('next')}
+              opacity={factory.currentPage < totalPages ? 1 : 0.6}
+              onClick={() => factory.currentPage < totalPages && factory.set("currentPage", factory.currentPage + 1)}
+            />
+            <MdLastPage
+              className="icon"
+              opacity={factory.currentPage < totalPages ? 1 : 0.6}
+              onClick={() => factory.currentPage < totalPages && factory.set("currentPage", totalPages)}
             />
           </div>
         </div>

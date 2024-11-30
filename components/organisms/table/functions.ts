@@ -67,10 +67,11 @@ export function initializeAttrsByName(attrs: AttrProps[], data: DataItem[]): { [
       hidden: false,
       display: capitalizeFirstLetter(attr.name),
       sort: 'none',
-      suggestions: Array.from(new Set(data.flatMap(item => attr.referencing
-        ? item[attr.referencing]
-        : item[attr.name])))
-        .sort(),
+      suggestions: attr.type !== 'text'
+        ? Array.from(new Set(data.flatMap(item => attr.referencing
+          ? item[attr.referencing]
+          : item[attr.name])))
+          .sort() : [],
       filter: {
         enabled: false,
         predicates: {

@@ -2,9 +2,11 @@ import { CSSProperties, ReactElement, useState, useEffect, useRef, ReactNode, us
 import zIndices from '@styles/z-indices';
 import TextField from '@components/nuclears/TextField';
 import Fuse from 'fuse.js';
+import { useClickAway } from "@uidotdev/usehooks";
 
 export default function Autocomplete({
   className,
+  focused = true,
   suggestions,
   mode = "viewed",
   style,
@@ -18,6 +20,7 @@ export default function Autocomplete({
 }: {
   className?: string
   suggestions: string[],
+  focused?: boolean,
   mode?: Mode,
   placeholder?: string,
   value?: string
@@ -36,11 +39,12 @@ export default function Autocomplete({
   const [_mode, setMode] = useState<"viewed" | "editing">(mode);
 
   const suggestionRefs = useRef<(HTMLLIElement | null)[]>([]); // Reference to each suggestion item
+  const ref = useClickAway(() => setMode("viewed")) as any
 
 
   const fuse = useMemo(() => new Fuse(suggestions, {
     shouldSort: true,
-    threshold: 0.5,
+    threshold: 0.2,
   }), [suggestions]);
 
   const handleSuggestionClick = (suggestion: string) => {
@@ -89,7 +93,10 @@ export default function Autocomplete({
   }, [activeSuggestionIndex]);
 
   return (
-    <div className="autocomplete relative min-w-[100px]" style={style} onKeyDown={handleKeyDown}>
+    <div className="autocomplete relative min-w-[100px]"
+      style={style}
+      onKeyDown={handleKeyDown}
+      ref={ref}>
       <TextField
         style={{ width: style?.width, height: style?.height }}
         value={inputValue}
@@ -110,7 +117,7 @@ export default function Autocomplete({
         render={renderDropper}
       />
 
-      {_mode && (
+      {_mode == "editing" && (
         <ul
           className="absolute bg-white rounded mt-1 min-w-[150px] overflow-y-auto shadow-sm"
           style={{

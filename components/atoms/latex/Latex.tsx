@@ -30,7 +30,7 @@ export default function Latex({ children, style }: {
       .replace(/<\/li>\s*<\/ul>/g, '</li></ul>');
   };
 
-  const preprocessedChildren = preprocessItemize(children);
+  const preprocessedChildren = preprocessItemize(children).replace(/\n/g, "<br/>")
   const renderedLatex = renderLatex(preprocessedChildren, delimiters, false, macros);
 
   const shouldTruncate = style?.width && style?.height;

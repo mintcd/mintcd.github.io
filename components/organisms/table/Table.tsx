@@ -137,7 +137,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
           <div className="mt-3">
             {paginatedData.map(item => {
               return (
-                <>
+                <div key={item.id}>
                   <div className="rounded-md border-2 border-gray-300">
                     {Object.entries(item).map(([key, value], index) => (
                       <div className={`grid grid-cols-[70px,1fr] 
@@ -160,7 +160,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
                   </div>
 
                   <br />
-                </>
+                </div>
               )
             })}
           </div>

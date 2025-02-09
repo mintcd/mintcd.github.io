@@ -108,7 +108,7 @@ export default function Autocomplete({
         onChange={(value) => {
           setFilteredSuggestions(
             [
-              ...suggestions.filter(suggestion => suggestion === ""),
+              "",
               ...fuse.search(value).map(({ item }) => item)
             ]
           );
@@ -128,11 +128,10 @@ export default function Autocomplete({
             zIndex: zIndices.autoComplete
           }}
         >
-
           {filteredSuggestions.map((suggestion, index) => (
             <li
               key={index}
-              ref={el => { suggestionRefs.current[index] = el }} // Set ref to each suggestion
+              ref={el => { suggestionRefs.current[index] = el }}
               onClick={() => handleSuggestionClick(suggestion)}
               className={`p-2 cursor-pointer ${index === activeSuggestionIndex ? 'bg-gray-200' : 'hover:bg-gray-200'}`}
             >

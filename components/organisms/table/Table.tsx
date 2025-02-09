@@ -190,6 +190,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
           onClick={() => {
             onCreateItem()
             factory.set("searchString", "")
+            factory.set("currentPage", totalPages)
           }}>
           <IoMdAdd className={`icon`} />
           <span> New </span>

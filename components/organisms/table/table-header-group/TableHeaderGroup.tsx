@@ -2,10 +2,11 @@ import { useCallback, useRef, useState } from "react"
 import { updateFilter } from "../functions";
 import { Dropdown } from "@components/molecules";
 
-import { MdFilterAlt } from "react-icons/md";
-import { FaArrowUp, FaArrowDown } from "react-icons/fa";
+import { IoIosArrowRoundDown, IoIosArrowRoundUp, IoMdColorWand } from "react-icons/io";
+import { IoFilter } from "react-icons/io5";
 import { MdOutlineHorizontalRule, MdMoreVert } from "react-icons/md";
-import { IoMdColorWand } from "react-icons/io";
+
+import { GoHorizontalRule } from "react-icons/go";
 
 
 export default function TableHeaderGroup({ factory }: {
@@ -19,17 +20,17 @@ export default function TableHeaderGroup({ factory }: {
 
   const options = [{
     name: "Sort ascending",
-    icon: <FaArrowUp className="icon" />,
+    icon: <IoIosArrowRoundUp className="icon" />,
     handler: (attr: AttrProps) => handleSort(attr, factory.attrsByName[attr.name].sort === 'asc' ? 'none' : 'asc'),
   },
   {
     name: "Sort descending",
-    icon: <FaArrowUp className="icon" />,
-    handler: (attr: AttrProps) => handleSort(attr, factory.attrsByName[attr.name].sort === 'asc' ? 'none' : 'asc'),
+    icon: <IoIosArrowRoundDown className="icon" />,
+    handler: (attr: AttrProps) => handleSort(attr, factory.attrsByName[attr.name].sort === 'desc' ? 'none' : 'desc'),
   },
   {
     name: "Filter",
-    icon: <MdFilterAlt className="icon" />,
+    icon: <IoFilter className="icon" />,
     handler: (attr: AttrProps) => {
       factory.set('menu', 'filter')
       factory.set('attrsByName', updateFilter(factory.attrsByName, { name: attr.name }))
@@ -186,23 +187,22 @@ export default function TableHeaderGroup({ factory }: {
                       className="relative size-[20px] hover:bg-gray-100 hover:rounded-full"
                       onClick={() => handleSort(attr)}
                     >
-                      <MdOutlineHorizontalRule
-                        className={`absolute inset-[4px]
+                      <GoHorizontalRule
+                        className={`icon absolute inset-[2px]
                               transition-transform duration-300 ease-in-out 
                               transform ${attr.sort === 'none' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'
                           }`}
-                        fontSize={14}
                         color="#023e8a"
                       />
-                      <FaArrowUp
-                        className={`icon absolute inset-[4px]
+                      <IoIosArrowRoundUp
+                        className={`icon absolute inset-[2px]
                                   transition-transform duration-300 ease-in-out 
                                   transform ${attr.sort === 'asc' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'
                           }`}
 
                       />
-                      <FaArrowDown
-                        className={`icon absolute inset-[4px]
+                      <IoIosArrowRoundDown
+                        className={`icon absolute inset-[2px]
                                     transition-transform duration-300 ease-in-out 
                                     transform ${attr.sort === 'desc' ? 'rotate-0 opacity-100' : '-rotate-90 opacity-0'
                           }`}
@@ -214,12 +214,15 @@ export default function TableHeaderGroup({ factory }: {
                       content={
                         <div className="w-[175px]">
                           {options.map(option => (
-                            <div className="p-2 hover:bg-gray-200 flex items-center cursor-pointer"
+                            <div className="p-3 hover:bg-gray-200 flex items-center cursor-pointer"
                               key={option.name}
                               onClick={() => option.handler(attr)}
                             >
                               {option.icon}
-                              {option.name}
+                              <span className="pl-2">
+                                {option.name}
+                              </span>
+
                             </div>
                           ))}
                         </div>

@@ -1,7 +1,7 @@
 import TableCell from "./table-cell";
 import { useEffect, useState } from "react";
 import { useClickAway } from "@uidotdev/usehooks";
-import { DragIndicatorOutlined, UnfoldMoreRounded, UnfoldLessRounded } from "@mui/icons-material";
+import { DragIndicatorOutlined } from "@mui/icons-material";
 import TextCell from "./table-cell/TextCell";
 import { Divider } from "@mui/material";
 
@@ -31,6 +31,23 @@ export default function TableRow(props: Props) {
   const ref = useClickAway(() => {
     setFocusedCell(-1);
   }) as any;
+
+  const openedRef = useClickAway(() => {
+    setOpened(false);
+  }) as any
+
+  const [visible, setVisible] = useState(false);
+
+  const openModal = () => {
+    setVisible(true);  // Ensure the modal is in the DOM first
+    setTimeout(() => setOpened(true), 10);  // Delay transition
+  };
+
+  const closeModal = () => {
+    setOpened(false);
+    setTimeout(() => setVisible(false), 500); // Remove from DOM after animation
+  };
+
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -101,26 +118,30 @@ export default function TableRow(props: Props) {
         ))}
       </div>
 
-      {opened && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-3xl w-full max-h-[80vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">Expanded View</h2>
-              <IoClose
-                className="icon cursor-pointer"
-                onClick={() => setOpened(false)}
-              />
-            </div>
-            {expandedAttrs.map((attr, index) => (
-              <div className="my-4" key={attr.name}>
-                <span className="text-[16px] font-bold">{attr.display}</span>
-                <TextCell itemId={item.id} attr={attr} value={item[attr.name]} onUpdate={onUpdate} />
-                {index < expandedAttrs.length - 1 && <Divider className="my-4" />}
-              </div>
-            ))}
+      <div
+        className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 
+                    transition-opacity duration-500 ease-out 
+                    ${opened ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+      >
+        <div
+          ref={openedRef}
+          className={`bg-white rounded-lg p-6 max-w-3xl w-full max-h-[80vh] overflow-y-auto 
+      transition-transform duration-500 ease-out 
+      ${opened ? "scale-100 opacity-100" : "scale-95 opacity-0"}`}
+        >
+          <div className="flex justify-end items-center">
+            <IoClose className="icon cursor-pointer" onClick={() => setOpened(false)} />
           </div>
+          {expandedAttrs.map((attr, index) => (
+            <div className="" key={attr.name}>
+              <span className="text-lg font-bold">{attr.display}</span>
+              <TextCell itemId={item.id} attr={attr} value={item[attr.name]} onUpdate={onUpdate} />
+              {index < expandedAttrs.length - 1 && <Divider className="my-4" />}
+            </div>
+          ))}
         </div>
-      )}
+      </div>
+
     </div>
   );
 }

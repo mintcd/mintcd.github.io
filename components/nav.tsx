@@ -48,7 +48,7 @@ export default function Nav() {
               {navItems.map((item) => (
                 item
               ))}
-              {authorize() && <IoAddCircleOutline size={35} cursor='pointer' />}
+              {authorize() && <IoAddCircleOutline className='icon' size={30} />}
             </div>
           </div>
 

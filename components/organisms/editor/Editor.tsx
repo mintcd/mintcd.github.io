@@ -94,9 +94,12 @@ export default function Editor() {
 
   const moleculeListeners: Listeners = {
     onKeyDown: (e) => {
+      let newAtoms: AtomProps[]
+      let newSelection: Selection
+
       if (e.ctrlKey) {
         if (e.key == "b") {
-          // console.log(selection)
+
           if (selection.from.id === selection.to.id) {
             const atom = atoms[selection.from.id]
 
@@ -115,7 +118,7 @@ export default function Editor() {
 
               ...atoms.slice(selection.from.id + 1)
 
-            ]))
+            ], selection))
 
             setSelection(adjustedSelection({
               from: {
@@ -157,7 +160,7 @@ export default function Editor() {
                 text: atoms[selection.to.id].text.slice(selection.to.offset),
               },
               ...atoms.slice(selection.to.id + 1)
-            ]))
+            ], selection))
 
             setSelection(adjustedSelection(
               {
@@ -171,8 +174,6 @@ export default function Editor() {
                 },
               }, atoms
             ))
-
-
           }
         }
         return
@@ -233,26 +234,46 @@ export default function Editor() {
       }
 
       if (e.key === "Backspace") {
-        console.log(selection)
-        setSelection({
-          from: {
-            id: selection.from.id,
-            offset: selection.from.offset - 1
-          },
-          to: {
-            id: selection.from.id,
-            offset: selection.from.offset - 1
-          },
-        })
+        if (selection.from.id === selection.to.id) {
+          const modifiedAtom = atoms[selection.from.id]
+          modifiedAtom.text = modifiedAtom.text.slice(0, selection.from.offset - 1) + modifiedAtom.text.slice(selection.to.offset)
+          console.log(modifiedAtom.text)
 
-        setAtoms(cleanedContent(
-          [...atoms.slice(0, selection.from.id),
-          {
-            ...atoms[selection.from.id],
-            text: removeAt(atoms[selection.from.id].text, selection.from.offset - 1)
-          },
-          ...atoms.slice(selection.from.id + 1)]
-        ))
+          if (modifiedAtom.text.length > 0) {
+            setAtoms([...atoms.slice(0, selection.from.id),
+              modifiedAtom,
+            ...atoms.slice(selection.to.id + 1)])
+
+            setSelection({
+              from: {
+                id: selection.from.id,
+                offset: selection.from.offset - 1
+              },
+              to: {
+                id: selection.from.id,
+                offset: selection.from.offset - 1
+              },
+            })
+          } else {
+            setAtoms(cleanedContent(
+              [...atoms.slice(0, selection.from.id),
+              ...atoms.slice(selection.to.id + 1)], selection
+            ))
+            setSelection({
+              from: {
+                id: selection.from.id - 1,
+                offset: atoms[selection.from.id - 1].text.length - 1
+              },
+              to: {
+                id: selection.from.id - 1,
+                offset: atoms[selection.from.id - 1].text.length - 1
+              },
+            })
+          }
+
+        } else {
+
+        }
       }
 
       // Characters
@@ -284,8 +305,6 @@ export default function Editor() {
       }
     },
   }
-
-
 
   useEffect(() => {
 
@@ -338,7 +357,7 @@ export default function Editor() {
     }
   }, [contentChanged]);
 
-  // console.log(selection)
+  console.log(atoms, selection)
 
   return (
     <div className="editor flex items-center"

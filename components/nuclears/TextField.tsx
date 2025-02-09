@@ -204,10 +204,6 @@ export default function TextField({
           className="focus:outline-none border-none resize-none bg-inherit textarea-no-scrollbar"
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          // onBlur={() => {
-          //   onUpdate && onUpdate(value || '')
-          //   setMode(false)
-          // }}
           autoFocus
           value={_modeValue}
           onFocus={onFocus}
@@ -217,22 +213,6 @@ export default function TextField({
           {render ? render(_modeValue) : _modeValue}
         </div>
       }
-
-      {latexOpen !== 'none' && _mode && (
-        <div className="preview"
-          style={{
-            position: 'fixed',
-            top: previewPosition?.top,
-            left: previewPosition?.left,
-            padding: 1,
-            backgroundColor: 'whitesmoke'
-          }}>
-          <Latex>
-            {String(latexValue === '$$' || latexValue === '$' ? '' : latexValue)}
-          </Latex>
-        </div>
-
-      )}
     </div>
   );
 }

@@ -1,6 +1,3 @@
-
-declare module 'is-hotkey'
-
 type Factory<T extends object> = {
   [key in keyof T]: T[key];
 } & {

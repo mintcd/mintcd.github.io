@@ -34,29 +34,26 @@ export function adjustedSelection(selection: Selection, atoms: AtomProps[]) {
     selection
 }
 
-export function cleanedContent(content: AtomProps[]) {
-  return content
-
+export function cleanedContent(content: AtomProps[], selection: Selection) {
   // If an atom have the same style as its neighbor, merge them
   let index = 0
   let cleanedContent = []
 
   while (index < content.length - 1) {
-
     const currentAtom = content[index];
-    index += 1
-    for (const i of range(index, content.length - 1)) {
+    if (currentAtom.text.length === 0) continue
+
+    for (const i of range(index + 1, content.length - 1)) {
       const nextAtom = content[i + 1]
 
       if (containsSameElements(currentAtom.style || [], nextAtom.style || []) && currentAtom.type === nextAtom.type) {
         content[index].text += nextAtom.text
-        index += 1
+        index = i
       }
       else break
-
-
     }
     cleanedContent.push(currentAtom)
+    index += 1
   }
   return content
 }

@@ -5,11 +5,12 @@ import Link from 'next/link';
 import { BsList } from 'react-icons/bs';
 import Image from 'next/image';
 import Favicon from '@app/favicon.ico';
-
+import { authorize } from '@functions/authorization';
 
 import GitHubIcon from '@public/github.png';
 import Email from '@public/email.png';
 import Cv from '@public/cv.png';
+import { IoAddCircleOutline } from "react-icons/io5";
 
 export default function Nav() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -44,9 +45,10 @@ export default function Nav() {
 
           <div className="hidden md:block">
             <div className="ml-10 flex items-center space-x-10">
-              {navItems.map((item, index) => (
+              {navItems.map((item) => (
                 item
               ))}
+              {authorize() && <IoAddCircleOutline size={35} cursor='pointer' />}
             </div>
           </div>
 

@@ -1,7 +1,7 @@
 'use client'
 
 import Table from '@components/organisms/table'
-import { createItem, exchangeItems, fetchData, update, supabase } from '@functions/database';
+import { createItem, fetchData, update, supabase } from '@functions/database';
 import { useCallback, useEffect, useState } from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
 import { toObject } from '@functions/array';
@@ -21,12 +21,6 @@ export default function DatabaseUI({ table }: {
   async function handleCreate() {
     setUpToDate(false)
     if (!authorized) return;
-
-    // If there is item whose name is empty, do not create
-    if (data.every(item => item.name.length === 0)) {
-      setUpToDate(true)
-      return
-    }
 
     const currentIds = data.map(item => item.id).sort((x: number, y: number) => x - y);
     let newId = 1;
@@ -136,7 +130,7 @@ export default function DatabaseUI({ table }: {
 
 
   useEffect(() => {
-    if (window.localStorage.getItem("timeKeyGot")) setAuthorized(true);
+    setAuthorized(window.localStorage.getItem("timeKeyGot") !== null);
 
     console.log("Refetch data")
 
@@ -159,18 +153,16 @@ export default function DatabaseUI({ table }: {
     })
   }, [table]);
 
-  if (loading) {
-    return <CircularProgress />;
-  }
-
   return (
-    <Table
-      name={table}
-      data={data}
-      upToDate={upToDate}
-      attrs={attrs}
-      onUpdateCell={handleUpdate}
-      onCreateItem={handleCreate}
-      onReorder={handleReorder} />
+    loading
+      ? <CircularProgress /> :
+      <Table
+        name={table}
+        data={data}
+        upToDate={upToDate}
+        attrs={attrs}
+        onUpdateCell={handleUpdate}
+        onCreateItem={handleCreate}
+        onReorder={handleReorder} />
   );
 }

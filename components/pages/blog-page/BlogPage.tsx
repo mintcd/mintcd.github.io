@@ -6,7 +6,7 @@ import AuthorAvatar from './AuthorAvatar';
 import AuthorAttribution from './AuthorAttribution';
 import Image from 'next/image';
 
-export default function SinglePost() {
+export default function BlogPage() {
   const post: Post = {
     id: '1',
     slug: 'slug',
@@ -44,7 +44,7 @@ export default function SinglePost() {
           <div className="mr-20 flex w-full max-w-3xl flex-col justify-start md:w-3/4">
             <h2>
               {!post && <div className="text-center">Post Not found</div>}
-              {post && <Link href={`/posts/${post.slug}`}>{post.title}</Link>}
+              {post && <div>{post.title}</div>}
             </h2>
             {post && (
               <>

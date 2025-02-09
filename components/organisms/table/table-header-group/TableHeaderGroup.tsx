@@ -17,26 +17,19 @@ export default function TableHeaderGroup({ factory }: {
   const [focusedIndex, setFocusedIndex] = useState(-1)
   const [resizeIndex, setResizeIndex] = useState(-1)
 
-  const iconStyle = {
-    marginRight: 12,
-    fontSize: 14,
-    cursor: "pointer",
-    color: "#023e8a"
-  }
-
   const options = [{
     name: "Sort ascending",
-    icon: <FaArrowUp style={iconStyle} />,
+    icon: <FaArrowUp className="icon" />,
     handler: (attr: AttrProps) => handleSort(attr, factory.attrsByName[attr.name].sort === 'asc' ? 'none' : 'asc'),
   },
   {
     name: "Sort descending",
-    icon: <FaArrowUp style={iconStyle} />,
+    icon: <FaArrowUp className="icon" />,
     handler: (attr: AttrProps) => handleSort(attr, factory.attrsByName[attr.name].sort === 'asc' ? 'none' : 'asc'),
   },
   {
     name: "Filter",
-    icon: <MdFilterAlt style={iconStyle} />,
+    icon: <MdFilterAlt className="icon" />,
     handler: (attr: AttrProps) => {
       factory.set('menu', 'filter')
       factory.set('attrsByName', updateFilter(factory.attrsByName, { name: attr.name }))
@@ -44,7 +37,7 @@ export default function TableHeaderGroup({ factory }: {
   },
   {
     name: "Customize",
-    icon: <IoMdColorWand style={iconStyle} />,
+    icon: <IoMdColorWand className="icon" />,
     handler: (attr: AttrProps) => {
     }
   },
@@ -202,23 +195,22 @@ export default function TableHeaderGroup({ factory }: {
                         color="#023e8a"
                       />
                       <FaArrowUp
-                        className={`absolute inset-[4px]
+                        className={`icon absolute inset-[4px]
                                   transition-transform duration-300 ease-in-out 
                                   transform ${attr.sort === 'asc' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'
                           }`}
-                        {...iconStyle}
+
                       />
                       <FaArrowDown
-                        className={`absolute inset-[4px]
+                        className={`icon absolute inset-[4px]
                                     transition-transform duration-300 ease-in-out 
                                     transform ${attr.sort === 'desc' ? 'rotate-0 opacity-100' : '-rotate-90 opacity-0'
                           }`}
-                        {...iconStyle}
                       />
                     </div>
 
                     <Dropdown
-                      toggler={<MdMoreVert {...iconStyle} fontSize={18} />}
+                      toggler={<MdMoreVert className="icon" />}
                       content={
                         <div className="w-[175px]">
                           {options.map(option => (

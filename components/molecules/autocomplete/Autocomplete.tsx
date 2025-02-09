@@ -12,7 +12,7 @@ export default function Autocomplete({
   style,
   placeholder,
   value,
-  addable = true, // Accept new values rather than suggestions
+  addable = true,
   renderSuggestion,
   renderDropper,
   maxDisplay,
@@ -68,14 +68,15 @@ export default function Autocomplete({
         prevIndex > -1 ? prevIndex - 1 : filteredSuggestions.length - 1
       );
     } else if (e.key === 'Enter') {
-      e.preventDefault()
-      if (activeSuggestionIndex !== -1) {
+      e.preventDefault();
+      if (activeSuggestionIndex !== -1 && filteredSuggestions.length > 0) {
         const selectedSuggestion = filteredSuggestions[activeSuggestionIndex];
         setInputValue(selectedSuggestion);
         setFilteredSuggestions([]);
-        setActiveSuggestionIndex(0);
+        setActiveSuggestionIndex(addable ? -1 : 0);
         setMode("viewed");
-        onSubmit(selectedSuggestion)
+        console.log(selectedSuggestion);
+        onSubmit(selectedSuggestion);
       } else {
         if (addable) {
           setMode("viewed");

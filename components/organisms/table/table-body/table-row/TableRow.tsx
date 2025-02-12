@@ -32,18 +32,25 @@ export default function TableRow(props: Props) {
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
+      console.log(e.key);
       if (e.key === 'Tab' && focusedCell !== -1 && focusedCell !== attrs.length - 1) {
         e.preventDefault();
         setFocusedCell((prev) => prev + 1);
+      }
+
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setOpened(false);
       }
     };
 
     window.addEventListener('keydown', handleKeyPress);
 
     return () => {
-      window.removeEventListener('keydown', handleKeyPress); // Cleanup
+      window.removeEventListener('keydown', handleKeyPress);
     };
-  }, [focusedCell, attrs.length]); // Add dependencies
+  }, [focusedCell, attrs.length, opened]);
+
 
 
   return (

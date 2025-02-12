@@ -2,11 +2,9 @@ import { useCallback, useRef, useState } from "react"
 import { updateFilter } from "../functions";
 import { Dropdown } from "@components/molecules";
 
-import { IoIosArrowRoundDown, IoIosArrowRoundUp, IoMdColorWand } from "react-icons/io";
+import { IoIosArrowRoundDown, IoIosArrowRoundUp } from "react-icons/io";
 import { IoFilter } from "react-icons/io5";
-import { MdOutlineHorizontalRule, MdMoreVert } from "react-icons/md";
-
-import { GoHorizontalRule } from "react-icons/go";
+import { HiAdjustmentsHorizontal } from "react-icons/hi2";
 
 
 export default function TableHeaderGroup({ factory }: {
@@ -15,8 +13,14 @@ export default function TableHeaderGroup({ factory }: {
 
   const animationFrameRef = useRef<number | null>(null);
   const resizingRef = useRef({ startX: 0, startWidth: 0, attrName: '' });
-  const [focusedIndex, setFocusedIndex] = useState(-1)
-  const [resizeIndex, setResizeIndex] = useState(-1)
+  const [dragColumns, setDragColumns] = useState<{ source: string | null, target: string | null }>({
+    source: null,
+    target: null
+  })
+
+  const normalAttrs = Object.values(factory.attrsByName)
+    .filter(attr => !attr.hidden && !attr.newWindow)
+    .sort((x, y) => x.order - y.order)
 
   const options = [{
     name: "Sort ascending",
@@ -37,75 +41,90 @@ export default function TableHeaderGroup({ factory }: {
     }
   },
   {
-    name: "Customize",
-    icon: <IoMdColorWand className="icon" />,
+    name: "Edit property",
+    icon: <HiAdjustmentsHorizontal className="icon" />,
     handler: (attr: AttrProps) => {
     }
   },
   ]
 
-  const resizeListeners = {
-    onMouseDown: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, attr: AttrProps) => {
-      resizingRef.current.startX = e.clientX;
-      resizingRef.current.startWidth = factory.attrsByName[attr.name].width || 150;
-      resizingRef.current.attrName = attr.name;
-
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-    },
-    onMouseEnter: (index: number) => setResizeIndex(index),
-    onMouseLeave: () => setResizeIndex(-1)
-  }
-
-  const handleColumnDragStart = (e: React.DragEvent<HTMLDivElement>, draggedName: string) => {
-    e.dataTransfer.setData('text/plain', draggedName);
-  };
-
-  const handleColumnDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-  };
-
-  const handleColumnDrop = (e: React.DragEvent<HTMLDivElement>, targetName: string) => {
-    e.preventDefault();
-    const draggedName = e.dataTransfer.getData('text/plain');
-
-    if (draggedName !== targetName) {
-      const newAttrsByName = { ...factory.attrsByName };
-      const draggedOrder = newAttrsByName[draggedName].order;
-      const targetOrder = newAttrsByName[targetName].order;
-
-      if (draggedOrder < targetOrder) {
-        Object.keys(newAttrsByName).forEach((key) => {
-          const attr = newAttrsByName[key]
-          if (attr && attr.order
-            && attr.order > draggedOrder
-            && attr.order <= targetOrder) {
-            attr.order -= 1;
+  const resizeListeners = useCallback((attr: AttrProps) => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!animationFrameRef.current) {
+        animationFrameRef.current = requestAnimationFrame(() => {
+          const { startX, startWidth, attrName } = resizingRef.current;
+          if (attrName) {
+            const delta = e.clientX - startX;
+            const newWidth = Math.max(factory.style?.cellMinWidth || 100, startWidth + delta);
+            factory.set("attrsByName", {
+              ...factory.attrsByName,
+              [attrName]: { ...factory.attrsByName[attrName], width: newWidth },
+            });
           }
-        });
-      } else {
-        Object.keys(newAttrsByName).forEach((key) => {
-          const attr = newAttrsByName[key]
-          if (attr && attr.order
-            && attr.order < draggedOrder
-            && attr.order >= targetOrder) {
-            attr.order += 1;
-          }
+          animationFrameRef.current = null;
         });
       }
-      newAttrsByName[draggedName].order = targetOrder;
-      factory.set('attrsByName', newAttrsByName);
+    };
+
+    const handleMouseUp = () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      resizingRef.current.attrName = "";
+    };
+    return {
+      onMouseDown: (e: React.MouseEvent) => {
+        resizingRef.current = {
+          startX: e.clientX,
+          startWidth: factory.attrsByName[attr.name]?.width || 150,
+          attrName: attr.name,
+        };
+        document.addEventListener("mousemove", handleMouseMove);
+        document.addEventListener("mouseup", handleMouseUp);
+      }
     }
-  };
+  }, [factory]);
 
-  const handleMouseDown = (e: React.MouseEvent, attrName: string) => {
-    resizingRef.current.startX = e.clientX;
-    resizingRef.current.startWidth = factory.attrsByName[attrName].width || 150;
-    resizingRef.current.attrName = attrName;
+  const dragListeners = (attr: AttrProps) => ({
+    onDragStart: (e: React.DragEvent<HTMLDivElement>) => {
+      console.log(dragColumns)
+      setDragColumns({ source: attr.name, target: null })
+    },
+    onDragOver: (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      setDragColumns((prev) => ({ ...prev, target: attr.name }));
+    },
+    onDragEnd: (e: React.DragEvent<HTMLDivElement>) => {
+      console.log(dragColumns)
+      if (dragColumns.source === null || dragColumns.target === null) return
+      if (dragColumns.source !== dragColumns.target) {
+        const newAttrsByName = { ...factory.attrsByName };
+        const sourceOrder = newAttrsByName[dragColumns.source].order;
+        const targetOrder = newAttrsByName[dragColumns.target].order;
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-  };
+        if (sourceOrder < targetOrder) {
+          Object.keys(newAttrsByName).forEach((key) => {
+            const attr = newAttrsByName[key]
+            if (attr && attr.order
+              && attr.order > sourceOrder
+              && attr.order <= targetOrder) {
+              attr.order -= 1;
+            }
+          });
+        } else {
+          Object.keys(newAttrsByName).forEach((key) => {
+            const attr = newAttrsByName[key]
+            if (attr && attr.order
+              && attr.order < sourceOrder
+              && attr.order >= targetOrder) {
+              attr.order += 1;
+            }
+          });
+        }
+        newAttrsByName[dragColumns.source].order = targetOrder;
+        factory.set('attrsByName', newAttrsByName);
+      }
+      setDragColumns({ source: null, target: null })
+    }
+  })
 
   const handleSort = (attr: AttrProps, order: string | undefined = undefined) => {
     let nextOrder: string
@@ -128,121 +147,49 @@ export default function TableHeaderGroup({ factory }: {
     }))
   }
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!animationFrameRef.current) {
-      animationFrameRef.current = requestAnimationFrame(() => {
-        const { startX, startWidth, attrName } = resizingRef.current;
-        if (attrName !== '') {
-          const delta = e.clientX - startX;
-          const newWidth = Math.max(factory.style?.cellMinWidth as number || 100, startWidth + delta);
-          const newAttrsByName = { ...factory.attrsByName };
-          newAttrsByName[attrName].width = newWidth;
-          factory.set('attrsByName', newAttrsByName);
-        }
-        animationFrameRef.current = null;
-      });
-    }
-  }, [factory.attrsByName]);
-
-  const handleMouseUp = useCallback(() => {
-    document.removeEventListener('mousemove', handleMouseMove);
-    document.removeEventListener('mouseup', handleMouseUp);
-    resizingRef.current.attrName = '';
-
-  }, [handleMouseMove]);
-
   return (
-    <div className="header-group grid pb-[1px] border-b-[1px]"
-      style={{
-        gridTemplateColumns: [`${factory.style.optionsColumnWidth || 100}px`,
-        ...Object.values(factory.attrsByName)
-          .sort((x, y) => x.order - y.order)
-          .map((attr) => `${attr.width}px`)]
-          .join(' ')
-      }}>
-      <div className="options-header"></div>
+    <div className="header-group flex mt-2">
+      <div className={`option-column`} style={{ width: factory.style.optionsColumnWidth || 100 }}></div>
       {
-        Object.values(factory.attrsByName)
-          .filter(attr => !attr.hidden && !attr.newWindow)
-          .sort((x, y) => x.order - y.order)
-          .map((attr, index) =>
-            <div
-              key={index}
-              className={`header-cell-${attr.name} py-2 flex justify-between items-center pl-2`}
-              onMouseEnter={() => setFocusedIndex(index)}
-            >
-              <div className="header-name flex-grow text-[16px] hover:cursor-grab"
-                draggable
-                onDragStart={(e) => handleColumnDragStart(e, attr.name)}
-                onDragOver={handleColumnDragOver}
-                onDrop={(e) => handleColumnDrop(e, attr.name)}
-              >
-                {attr.display}
-              </div>
-
-              <div className="column-option flex items-center flex-nowrap">
-                {focusedIndex === index &&
-                  <>
-                    <div
-                      className="relative size-[20px] hover:bg-gray-100 hover:rounded-full"
-                      onClick={() => handleSort(attr)}
+        normalAttrs.map((attr, index) =>
+          <div className={`header-cell-${attr.name} flex`} key={index}>
+            <Dropdown
+              toggler={
+                <div
+                  className={`py-1 flex justify-between items-center pl-2 text-[16px]
+                                hover:cursor-pointer hover:bg-blue-100`}
+                  style={{ width: attr.width }}
+                  draggable
+                  {...dragListeners(attr)}
+                >
+                  {attr.display}
+                </div>
+              }
+              content={
+                <div className="w-[175px]">
+                  {options.map(option => (
+                    <div className="p-3 hover:bg-gray-200 flex items-center cursor-pointer"
+                      key={option.name}
+                      onClick={() => option.handler(attr)}
                     >
-                      <GoHorizontalRule
-                        className={`icon absolute inset-[2px]
-                              transition-transform duration-300 ease-in-out 
-                              transform ${attr.sort === 'none' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'
-                          }`}
-                        color="#023e8a"
-                      />
-                      <IoIosArrowRoundUp
-                        className={`icon absolute inset-[2px]
-                                  transition-transform duration-300 ease-in-out 
-                                  transform ${attr.sort === 'asc' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'
-                          }`}
+                      {option.icon}
+                      <span className="pl-2">
+                        {option.name}
+                      </span>
 
-                      />
-                      <IoIosArrowRoundDown
-                        className={`icon absolute inset-[2px]
-                                    transition-transform duration-300 ease-in-out 
-                                    transform ${attr.sort === 'desc' ? 'rotate-0 opacity-100' : '-rotate-90 opacity-0'
-                          }`}
-                      />
                     </div>
-
-                    <Dropdown
-                      toggler={<MdMoreVert className="icon" />}
-                      content={
-                        <div className="w-[175px]">
-                          {options.map(option => (
-                            <div className="p-3 hover:bg-gray-200 flex items-center cursor-pointer"
-                              key={option.name}
-                              onClick={() => option.handler(attr)}
-                            >
-                              {option.icon}
-                              <span className="pl-2">
-                                {option.name}
-                              </span>
-
-                            </div>
-                          ))}
-                        </div>
-                      }
-                    />
-                  </>}
-              </div>
-
-              <div className={`column-separator h-full w-[5px] hover:cursor-col-resize hover:bg-[#4672b0] rounded-full flex items-center justify-center`}
-                onMouseDown={(e) => handleMouseDown(e, attr.name)}
-                onMouseEnter={() => setResizeIndex(index)}
-                onMouseLeave={() => setResizeIndex(-1)}
-              >
-                <div className={`h-full w-[1px] ${resizeIndex === index ? 'bg-transparent' : 'bg-gray-300'}`} />
-
-              </div>
-
+                  ))}
+                </div>
+              }>
+            </Dropdown>
+            <div className={`column-separator w-[3px] hover:cursor-col-resize hover:bg-[#4672b0]
+            ${attr.name === dragColumns.target && 'bg-[#4672b0]'}`}
+              {...resizeListeners(attr)}
+            />
+            <div className="bottom-separator h-[1px] bg-gray-300">
             </div>
-          )
-      }
+          </div>
+        )}
     </div>
   )
 }

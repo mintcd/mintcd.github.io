@@ -1,5 +1,5 @@
 import Latex from '@components/atoms/latex';
-import { breakLinesForCircle } from '@functions/graph-analysis';
+import { breakLinesForCircle } from '../functions';
 import { statementProps } from '@styles/statement-props';
 
 import "@styles/global.css"
@@ -40,7 +40,7 @@ export default function Vertex({ vertex, radius, fontSize = radius / 3 }
             fontSize: fontSize
           }}
         >
-          {breakLinesForCircle(vertex, radius, fontSize).map((line, i) => (
+          {breakLinesForCircle(String(vertex.content), radius, fontSize).map((line, i) => (
             <Latex key={i}>{line}</Latex>
           ))}
         </div>

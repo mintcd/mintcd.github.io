@@ -8,7 +8,7 @@ export default function Autocomplete({
   className,
   focused = true,
   suggestions,
-  mode = "viewed",
+  mode = "view",
   style,
   placeholder,
   value,
@@ -21,7 +21,7 @@ export default function Autocomplete({
   className?: string
   suggestions: string[],
   focused?: boolean,
-  mode?: Mode,
+  mode?: "view" | "edit",
   placeholder?: string,
   value?: string
   autoFocus?: boolean
@@ -36,10 +36,10 @@ export default function Autocomplete({
   const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(addable ? -1 : 0);
 
-  const [_mode, setMode] = useState<"viewed" | "editing">(mode);
+  const [_mode, setMode] = useState<"view" | "edit">(mode);
 
   const suggestionRefs = useRef<(HTMLLIElement | null)[]>([]); // Reference to each suggestion item
-  const ref = useClickAway(() => setMode("viewed")) as any
+  const ref = useClickAway(() => setMode("view")) as any
 
 
   const fuse = useMemo(() => new Fuse(suggestions, {
@@ -51,7 +51,7 @@ export default function Autocomplete({
     setInputValue(suggestion);
     setFilteredSuggestions([]);
     setActiveSuggestionIndex(addable ? -1 : 0)
-    setMode("viewed")
+    setMode("view")
     if (onSubmit) onSubmit(suggestion);
   };
 
@@ -74,12 +74,12 @@ export default function Autocomplete({
         setInputValue(selectedSuggestion);
         setFilteredSuggestions([]);
         setActiveSuggestionIndex(addable ? -1 : 0);
-        setMode("viewed");
+        setMode("view");
         console.log(selectedSuggestion);
         onSubmit(selectedSuggestion);
       } else {
         if (addable) {
-          setMode("viewed");
+          setMode("view");
           onSubmit(inputValue);
         }
       }
@@ -102,25 +102,21 @@ export default function Autocomplete({
       ref={ref}>
       <TextField
         style={{ width: style?.width, height: style?.height }}
-        value={inputValue}
         mode={mode}
-        onFocus={() => setMode("editing")}
+        value={inputValue}
+
+        onSubmit={(value) => {
+          onSubmit(value as string)
+          setMode("view")
+        }}
         onChange={(value) => {
-          setFilteredSuggestions(
-            [
-              "",
-              ...fuse.search(value).map(({ item }) => item)
-            ]
-          );
+          setFilteredSuggestions([
+            "",
+            ...fuse.search(value as string).map(({ item }) => item)]);
         }}
-        onUpdate={(value) => {
-          onSubmit(value)
-          setMode("viewed")
-        }}
-        render={renderDropper}
       />
 
-      {_mode == "editing" && (
+      {_mode == "edit" && (
         <ul
           className="absolute bg-white rounded mt-1 min-w-[150px] overflow-y-auto shadow-sm"
           style={{

@@ -1,6 +1,5 @@
 import { getTextWidth } from "@functions/text-analysis";
 import dagre from 'dagre';
-import styles from '@styles/styles';
 
 export function initiateLayout(vertices: Vertex[], width: number, height: number) {
   const dagreGraph = new dagre.graphlib.Graph();
@@ -272,41 +271,6 @@ export function breakLines(
 
   return lines;
 }
-
-export function getBoundingRect(vertex: TreeNode, maxWidth: number, fontSize: number = styles.fontSize) {
-  const textWidth = getTextWidth(String(vertex.content))
-
-  if (textWidth < maxWidth) {
-    vertex.width = textWidth + 20;
-    vertex.height = fontSize * 2;
-  } else {
-    const lines = breakLines(String(vertex.content), 'rect', maxWidth, fontSize)
-    vertex.width = maxWidth
-    vertex.height = lines.length * fontSize * 2
-    console.log(lines, vertex.width, vertex.height)
-  }
-
-
-
-  return vertex
-}
-
-export function getPosition(vertex: TreeNode, vertices: TreeNode[], viewWidth: number, layerGap = 100) {
-  const sameLevelCount = depthCount(vertices, vertex.depth as number)
-  vertex.x = viewWidth / (sameLevelCount + 1) * (vertex.order + 1) - (vertex.width as number) / 2
-  vertex.y = (vertex.depth ?? 0) * layerGap;
-
-  vertex.x1 = vertex.shape === 'circ' ? vertex.x : vertex.x + (vertex.width as number) / 2
-  vertex.y1 = vertex.shape === 'circ' ? vertex.y : vertex.y + (vertex.height as number)
-  vertex.x2 = vertex.shape === 'circ' ? vertex.x : vertex.x + (vertex.width as number) / 2
-  vertex.y2 = vertex.shape === 'circ' ? vertex.y - (vertex.height as number) : vertex.y
-  return vertex
-}
-
-export function depthCount(vertices: Vertex[], depth: number): number {
-  return vertices.filter(v => v.depth === depth).length
-}
-
 
 // export function toAdjacencyMatrix(graph: Graph) {
 //   if (graph.edges === undefined) {

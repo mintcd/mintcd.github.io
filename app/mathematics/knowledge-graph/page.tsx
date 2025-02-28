@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 
 import Graph from '@components/organisms/visualization/graph'
 import { fetchData } from '@functions/database'
-import { getEdges } from '@functions/graph-analysis'
 
 export default function Mathematics() {
   const [data, setData] = useState<Graph>({ vertices: [] })
@@ -17,7 +16,6 @@ export default function Mathematics() {
       const vertices = data as unknown as Vertex[]
       setData({
         vertices: vertices,
-        edges: getEdges(vertices)
       })
     })
   }, [])

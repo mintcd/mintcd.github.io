@@ -1,3 +1,5 @@
+import { State } from "@node_modules/@dnd-kit/core/dist/store";
+
 type Factory<T extends object> = {
   [key in keyof T]: T[key];
 } & {
@@ -5,27 +7,23 @@ type Factory<T extends object> = {
   set: (key: keyof T, value: T[key]) => void;
 };
 
+type ComponentAction = 'change' | 'submit'
 
-
-type DefaultComponentProps = {
-  className?: string
-  style?: React.CSSProperties
+type DefaultComponentProps<T> = {
+  className?: string;
+  style?: React.CSSProperties;
+  state: T;
+  render?: (partialState: Partial<T>) => React.ReactElement;
+  useComponentDispatch?: (partialState: Partial<T>, action: 'change' | 'submit') => void;
   listeners?: Listeners
-  renderers?: {
-    [key: string]: (value) => React.ReactElement
-  }
-}
-
-type Percentage = `${number}%`;
-
-
-type Listeners = {
-  onClick?: React.MouseEventHandler<Element>;
-  onMouseEnter?: React.MouseEventHandler<Element>;
-  onMouseLeave?: React.MouseEventHandler<Element>;
-  onKeyDown?: React.KeyboardEventHandler<Element>;
 };
 
-type CSSProperties = React.CSSProperties
+type Listeners<T extends HTMLElement = HTMLElement> = {
+  onClick?: React.MouseEventHandler<T>;
+  onMouseEnter?: React.MouseEventHandler<T>;
+  onMouseLeave?: React.MouseEventHandler<T>;
+  onKeyDown?: React.KeyboardEventHandler<T>;
+};
 
-type Mode = "viewed" | "editing"
+
+type Percentage = `${number}%`;

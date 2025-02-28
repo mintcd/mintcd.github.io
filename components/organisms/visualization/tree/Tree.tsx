@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { getEdges, getPosition, depthCount, getBoundingRect } from './functions';
 
 import Node from '../Node';
-import Edge from '../edge';
+import Edge from '../Edge';
 
 import { AddIcon, EditIcon, DeleteIcon } from '@components/atoms/icons';
 
@@ -12,7 +12,7 @@ import styles from '@styles/styles'
 import "./styles.css"
 
 import GraphStyles from './styles';
-import Loading from '@components/atoms/loading/loading';
+import Loading from '@components/atoms/loading';
 import { useOnClickOutside } from '@node_modules/usehooks-ts/dist';
 
 type ArgumentType = 'contention' | 'support' | 'objection' | 'premise'

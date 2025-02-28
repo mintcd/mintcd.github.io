@@ -1,4 +1,4 @@
-// webpack.config.js
+const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 
 module.exports = {
   module: {
@@ -16,5 +16,8 @@ module.exports = {
         ]
       }
     ]
-  }
+  },
+  plugins: [
+    new CaseSensitivePathsPlugin()
+  ]
 };

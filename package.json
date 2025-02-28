@@ -51,6 +51,7 @@
     "@types/react-color": "^3.0.12",
     "@types/react-dom": "^18",
     "autoprefixer": "^10.0.1",
+    "case-sensitive-paths-webpack-plugin": "^2.4.0",
     "eslint": "^8.57.1",
     "eslint-config-next": "^14.2.13",
     "file-loader": "^6.2.0",

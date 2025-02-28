@@ -24,8 +24,7 @@ export default function TextCell({
   return (
     <TextField
       value={String(value)}
-      onUpdate={handleUpdate}
-      preview={(value: string, selection: [number, number]) => <Latex>{String(value)}</Latex>}
+      onSubmit={handleUpdate}
       render={(value) => <Latex>{value}</Latex>}
     />
   );

@@ -7,10 +7,10 @@ import { select } from 'd3-selection';
 import { drag } from 'd3-drag';
 import { forceSimulation, forceLink, forceCenter, forceCollide } from 'd3-force';
 
-import { getEdges, initiateLayout } from '../functions';
+import { getEdges, initiateLayout } from './functions';
 import { useZoomBehavior } from './behaviors';
-import Vertex from './graph-node';
-import GraphLink from './graph-link';
+import GraphNode from './GraphNode';
+import GraphLink from './GraphLink';
 import GraphStyles from './styles';
 import { selectAll } from 'd3';
 
@@ -99,7 +99,7 @@ export default function Graph({ graphData }: { graphData: Graph }) {
       .attr("class", "node-container")
       .each(function (d: Vertex) {
         createRoot(this as any).render(
-          <Vertex
+          <GraphNode
             vertex={d}
             radius={params.radius}
           />

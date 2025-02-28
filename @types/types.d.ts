@@ -84,7 +84,7 @@ type Vertex = {
   keywords?: Field[],
 
   // Graph
-  parents?: string[],
+  parents?: number[],
   children?: number[]
   depth?: number,
   order?: number

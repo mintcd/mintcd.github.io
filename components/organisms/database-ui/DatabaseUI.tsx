@@ -4,7 +4,7 @@ import Table from '@components/organisms/table'
 import { createItem, fetchData, update, supabase } from '@functions/database';
 import { useCallback, useEffect, useState } from 'react';
 import { toObject } from '@functions/array';
-import Loading from '@components/atoms/loading/loading';
+import Loading from '@components/atoms/loading';
 
 
 export default function DatabaseUI({ table }: {

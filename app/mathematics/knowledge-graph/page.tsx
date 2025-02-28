@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 
-import KnowledgeGraph from '@components/organisms/graph'
+import Graph from '@components/organisms/visualization/graph'
 import { fetchData } from '@functions/database'
 import { getEdges } from '@functions/graph-analysis'
 
@@ -24,7 +24,7 @@ export default function Mathematics() {
 
   return (
     <div className=''>
-      {data.vertices.length > 0 && <KnowledgeGraph graphData={data} />}
+      {data.vertices.length > 0 && <Graph graphData={data} />}
     </div>
   );
 

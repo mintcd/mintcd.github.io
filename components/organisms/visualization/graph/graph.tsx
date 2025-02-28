@@ -7,16 +7,15 @@ import { select } from 'd3-selection';
 import { drag } from 'd3-drag';
 import { forceSimulation, forceLink, forceCenter, forceCollide } from 'd3-force';
 
-import { getEdges, initiateLayout, getVerticesOfTopic } from '@functions/graph-analysis';
+import { getEdges, initiateLayout } from '../functions';
 import { useZoomBehavior } from './behaviors';
-import GraphNode from './graph-node';
+import Vertex from './graph-node';
 import GraphLink from './graph-link';
 import GraphStyles from './styles';
 import { selectAll } from 'd3';
 
-export default function KnowledgeGraph({ graphData }: { graphData: Graph }) {
+export default function Graph({ graphData }: { graphData: Graph }) {
 
-  const contentRef = useRef(null);
   const containerRef = useRef<SVGSVGElement>(null);
   const dropdownRef = useRef(null);
   const environmentRef: RefObject<HTMLDivElement> = useRef(null);
@@ -35,9 +34,7 @@ export default function KnowledgeGraph({ graphData }: { graphData: Graph }) {
   function getFieldsWithAllOption(vertices: Vertex[]): { value: string; label: string }[] {
     const fieldsSet = new Set<string>();
     vertices.forEach(vertex => {
-      if (vertex.field) {
-        vertex.field.forEach(field => fieldsSet.add(field));
-      }
+      vertex.keywords?.forEach(field => fieldsSet.add(field));
     });
 
     const uniqueFields = Array.from(fieldsSet).sort();
@@ -51,9 +48,9 @@ export default function KnowledgeGraph({ graphData }: { graphData: Graph }) {
   const fields = getFieldsWithAllOption(graphData.vertices);
 
   let vertices = graphData.vertices;
-  if (selectedField !== "all-fields") {
-    vertices = getVerticesOfTopic(graphData.vertices, [selectedField]);
-  }
+  // if (selectedField !== "all-fields") {
+  //   vertices = getVerticesOfTopic(graphData.vertices, [selectedField]);
+  // }
   vertices = initiateLayout(vertices, 2 * params.radius, 2 * params.radius);
 
   let edges = getEdges(vertices);
@@ -102,7 +99,7 @@ export default function KnowledgeGraph({ graphData }: { graphData: Graph }) {
       .attr("class", "node-container")
       .each(function (d: Vertex) {
         createRoot(this as any).render(
-          <GraphNode
+          <Vertex
             vertex={d}
             radius={params.radius}
           />

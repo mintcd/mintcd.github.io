@@ -1,5 +1,6 @@
 import { createCanvas } from 'canvas';
 import Fuse from 'fuse.js';
+import styles from '@styles/styles'
 
 export function getAllIndices(str: string, char: string): number[] {
   const indices: number[] = [];
@@ -15,7 +16,7 @@ export function capitalizeFirstLetter(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1)
 }
 
-export function getTextWidth(text: string, fontSize: number = 16, fontFamily: string = "Arial") {
+export function getTextWidth(text: string, fontSize: number = styles.fontSize, fontFamily: string = "Arial") {
   const canvas = createCanvas(200, 200); // Adjust dimensions as needed
   const context = canvas.getContext('2d');
   if (context) {
@@ -61,7 +62,7 @@ export function filterOnQuery(query: string, data: Term[], keys: string[] = ['na
   });
 }
 
-export function breakLines(text: string, width: number, fontSize: number = 16, fontFamily: string = "Arial"): string[] {
+export function breakLines(text: string, width: number, fontSize: number = 9, fontFamily: string = "Arial"): string[] {
 
   const lines: string[] = [];
   const endlineSplits = text.split('\n')

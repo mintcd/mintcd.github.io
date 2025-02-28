@@ -4,7 +4,7 @@ import { useClickAway } from "@uidotdev/usehooks";
 import { DragIndicatorOutlined } from "@mui/icons-material";
 import TextCell from "./table-cell/TextCell";
 
-import { IoOpenOutline, IoClose } from "react-icons/io5";
+import { OpenIcon, CloseIcon } from "@components/atoms/icons";
 
 type Props = DefaultComponentProps & {
   item: DataItem,
@@ -77,7 +77,7 @@ export default function TableRow(props: Props) {
                 <DragIndicatorOutlined className="icon hover:cursor-grab" {...listeners} />
               </span>
 
-              {attrs.some(attr => attr.newWindow) && <IoOpenOutline
+              {attrs.some(attr => attr.newWindow) && <OpenIcon
                 className="icon"
                 onClick={(e) => {
                   e.preventDefault();
@@ -118,7 +118,7 @@ export default function TableRow(props: Props) {
                   ${opened ? "scale-100 opacity-100" : "scale-95 opacity-0"}`}
           >
             <div className="flex justify-end items-center">
-              <IoClose className="icon cursor-pointer" onClick={() => setOpened(false)} />
+              <CloseIcon className="icon cursor-pointer" onClick={() => setOpened(false)} />
             </div>
 
             <div className="content">

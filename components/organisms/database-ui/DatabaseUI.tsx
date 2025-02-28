@@ -3,8 +3,8 @@
 import Table from '@components/organisms/table'
 import { createItem, fetchData, update, supabase } from '@functions/database';
 import { useCallback, useEffect, useState } from 'react';
-import CircularProgress from '@mui/material/CircularProgress';
 import { toObject } from '@functions/array';
+import Loading from '@components/atoms/loading/loading';
 
 
 export default function DatabaseUI({ table }: {
@@ -155,7 +155,7 @@ export default function DatabaseUI({ table }: {
 
   return (
     loading
-      ? <CircularProgress /> :
+      ? <Loading /> :
       <Table
         name={table}
         data={data}

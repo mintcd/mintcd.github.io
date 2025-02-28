@@ -2,10 +2,7 @@ import { useCallback, useRef, useState } from "react"
 import { updateFilter } from "../functions";
 import { Dropdown } from "@components/molecules";
 
-import { IoIosArrowRoundDown, IoIosArrowRoundUp } from "react-icons/io";
-import { IoFilter } from "react-icons/io5";
-import { HiAdjustmentsHorizontal } from "react-icons/hi2";
-
+import { ArrowDownIcon, ArrowUpIcon, FilterIcon, AdjustmentsIcon } from "@components/atoms/icons"
 
 export default function TableHeaderGroup({ factory }: {
   factory: Factory<TableProps>
@@ -24,17 +21,17 @@ export default function TableHeaderGroup({ factory }: {
 
   const options = [{
     name: "Sort ascending",
-    icon: <IoIosArrowRoundUp className="icon" />,
+    icon: <ArrowUpIcon className="icon" />,
     handler: (attr: AttrProps) => handleSort(attr, factory.attrsByName[attr.name].sort === 'asc' ? 'none' : 'asc'),
   },
   {
     name: "Sort descending",
-    icon: <IoIosArrowRoundDown className="icon" />,
+    icon: <ArrowDownIcon className="icon" />,
     handler: (attr: AttrProps) => handleSort(attr, factory.attrsByName[attr.name].sort === 'desc' ? 'none' : 'desc'),
   },
   {
     name: "Filter",
-    icon: <IoFilter className="icon" />,
+    icon: <FilterIcon className="icon" />,
     handler: (attr: AttrProps) => {
       factory.set('menu', 'filter')
       factory.set('attrsByName', updateFilter(factory.attrsByName, { name: attr.name }))
@@ -42,7 +39,7 @@ export default function TableHeaderGroup({ factory }: {
   },
   {
     name: "Edit property",
-    icon: <HiAdjustmentsHorizontal className="icon" />,
+    icon: <AdjustmentsIcon className="icon" />,
     handler: (attr: AttrProps) => {
     }
   },

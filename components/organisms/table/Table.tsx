@@ -5,8 +5,7 @@ import { initializeAttrsByName, sortData, updateFilter } from "./functions.ts";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { createFactory } from "@functions/objects.ts";
 
-import { IoMdAdd } from "react-icons/io";
-import { MdNavigateNext, MdNavigateBefore, MdLastPage, MdFirstPage } from "react-icons/md";
+import { AddIcon, NavigateNextIcon, NavigateBeforeIcon, LastPageIcon, FirstPageIcon } from "@components/atoms/icons";
 
 import TableHeaderGroup from "./table-header-group/TableHeaderGroup.tsx";
 import TableBody from "./table-body/TableBody.tsx";
@@ -192,17 +191,17 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
             factory.set("searchString", "")
             factory.set("currentPage", totalPages)
           }}>
-          <IoMdAdd className={`icon`} />
+          <AddIcon className={`icon`} />
           <span> New </span>
         </div>
 
         <div className="pagination-controls flex items-center justify-end">
-          <MdFirstPage
+          <FirstPageIcon
             className="icon"
             opacity={factory.currentPage > 1 ? 1 : 0.6}
             onClick={() => factory.currentPage > 1 && factory.set("currentPage", 1)}
           />
-          <MdNavigateBefore
+          <NavigateBeforeIcon
             className="icon"
             opacity={factory.currentPage > 1 ? 1 : 0.6}
             onClick={() => factory.currentPage > 1 && factory.set("currentPage", factory.currentPage - 1)}
@@ -210,12 +209,12 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
           <span className="pagination-info">
             {(factory.currentPage - 1) * factory.itemsPerPage + 1} - {Math.min(factory.currentPage * factory.itemsPerPage, processedData.length)} of {processedData.length}
           </span>
-          <MdNavigateNext
+          <NavigateNextIcon
             className="icon"
             opacity={factory.currentPage < totalPages ? 1 : 0.6}
             onClick={() => factory.currentPage < totalPages && factory.set("currentPage", factory.currentPage + 1)}
           />
-          <MdLastPage
+          <LastPageIcon
             className="icon"
             opacity={factory.currentPage < totalPages ? 1 : 0.6}
             onClick={() => factory.currentPage < totalPages && factory.set("currentPage", totalPages)}

@@ -2,10 +2,7 @@ import { useState } from "react";
 import { useClickAway } from "@uidotdev/usehooks";
 import { updateFilter } from "../functions";
 
-import { FaAngleDown } from "react-icons/fa";
-import { HiMiniViewColumns } from "react-icons/hi2";
-import { MdFilterAlt } from "react-icons/md";
-import { IoMdSettings, IoMdDownload, IoIosSearch, IoIosClose } from "react-icons/io";
+import { SettingsIcon, DownloadIcon, SearchIcon, CloseIcon, AngleDownIcon, ViewColumnsIcon, FilterIcon } from "@components/atoms/icons";
 
 import { Dropdown } from "@components/molecules";
 import { Checkbox, TextField } from "@components/nuclears";
@@ -91,7 +88,7 @@ export default function TableExtension({
       {
         options.search &&
         <div className="search-box border border-gray-700 h-auto py-1 px-2 rounded-full flex items-center">
-          <IoIosSearch className="icon" />
+          <SearchIcon className="icon" />
           <Autocomplete
             value={searchValue}
             suggestions={data.map(item => item.name)}
@@ -113,16 +110,16 @@ export default function TableExtension({
         ref={menuRef}
       >
         <div className="table-menu-icons flex space-x-3">
-          {options.columnVisibility && <HiMiniViewColumns
+          {options.columnVisibility && <ViewColumnsIcon
             className="icon"
             onClick={() => factory.set("menu", factory.menu === "columnVisibility" ? undefined : "columnVisibility")}
           />}
-          {options.filter && <MdFilterAlt className="icon"
+          {options.filter && <FilterIcon className="icon"
             onClick={() => factory.set("menu", factory.menu === "filter" ? undefined : "filter")} />}
-          {options.pagination && <IoMdSettings className="icon"
+          {options.pagination && <SettingsIcon className="icon"
             onClick={() => factory.set("menu", factory.menu === "settings" ? undefined : "settings")}
           />}
-          {options.download && <IoMdDownload className="icon"
+          {options.download && <DownloadIcon className="icon"
             onClick={() => factory.set("menu", factory.menu === "download" ? undefined : "download")}
           />}
         </div>
@@ -174,7 +171,7 @@ export default function TableExtension({
                             }()}
                           </span>
 
-                          <FaAngleDown fontSize={14} />
+                          <AngleDownIcon fontSize={14} />
                         </span>
                       }
                       content={
@@ -186,7 +183,7 @@ export default function TableExtension({
                                 <span>
                                   {factory.attrsByName[attr.name].display} <span className="italic"> is</span>
                                 </span>
-                                <IoIosClose fontSize={20} cursor="pointer" onClick={() => handleDeleteFilter(attr)} />
+                                <CloseIcon fontSize={20} cursor="pointer" onClick={() => handleDeleteFilter(attr)} />
                               </div>
 
                               {factory.attrsByName[attr.name].suggestions?.map(suggestion => (
@@ -211,7 +208,7 @@ export default function TableExtension({
                                 <span>
                                   {factory.attrsByName[attr.name].display} <span className="italic"> contains</span>
                                 </span>
-                                <IoIosClose fontSize={14} />
+                                <CloseIcon fontSize={14} />
                               </div>
 
                               <TextField

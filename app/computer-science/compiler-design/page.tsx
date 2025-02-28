@@ -51,7 +51,7 @@ export default function SubjectNotes() {
                   data[shownChapter].sections?.[shownSection].content)) || ''}
             </Latex>
             {/* {data[shownChapter].name === 'Semantic Analysis' && (
-              <KnowledgeGraph key={shownChapter} graph={ast} />
+              <Graph key={shownChapter} graph={ast} />
             )} */}
           </>
         )}

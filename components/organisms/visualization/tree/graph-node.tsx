@@ -4,7 +4,7 @@ import { statementProps } from '@styles/statement-props';
 
 import "@styles/global.css"
 
-export default function GraphNode({ vertex, radius, fontSize = radius / 3 }
+export default function Vertex({ vertex, radius, fontSize = radius / 3 }
   : {
     vertex: Vertex,
     radius: number,

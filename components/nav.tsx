@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { BsList } from 'react-icons/bs';
 import Image from 'next/image';
 import Favicon from '@app/favicon.ico';
 import { authorize } from '@functions/authorization';
@@ -10,7 +9,8 @@ import { authorize } from '@functions/authorization';
 import GitHubIcon from '@public/github.png';
 import Email from '@public/email.png';
 import Cv from '@public/cv.png';
-import { IoAddCircleOutline } from "react-icons/io5";
+
+import { ListIcon, AddCircleIcon } from './atoms/icons';
 
 export default function Nav() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -48,13 +48,13 @@ export default function Nav() {
               {navItems.map((item) => (
                 item
               ))}
-              {authorize() && <IoAddCircleOutline className='icon' size={30} />}
+              {authorize() && <AddCircleIcon className='icon' size={30} />}
             </div>
           </div>
 
           <div className="md:hidden">
             <div onClick={toggleMobileMenu} className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-700">
-              <BsList size={24} />
+              <ListIcon size={24} />
             </div>
           </div>
         </div>

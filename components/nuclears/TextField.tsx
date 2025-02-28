@@ -7,18 +7,16 @@
 
 import { ChangeEvent, CSSProperties, ReactElement, ReactNode, useEffect, useRef, useState } from "react";
 import { getAllIndices, breakLines } from "@functions/text-analysis";
-import Latex from "@components/atoms/latex";
 import { getCaretCoordinates } from "@functions/elements";
+import { useOnClickOutside } from "@node_modules/usehooks-ts";
 export default function TextField({
   onUpdate,
-  onChange,
   mode = "viewed",
   listeners,
   value = "",
   placeholder,
   updateOnEnter = true,
   style,
-  render,
   suggestion,
   preview,
   onKeyDown,
@@ -27,25 +25,27 @@ export default function TextField({
   className?: string;
   mode?: Mode;
   onUpdate?: (value: string) => void;
-  onChange?: (value: string) => void;
   listeners?: Listeners
   value?: string;
   placeholder?: string;
   updateOnEnter?: boolean;
   style?: CSSProperties;
-  render?: (text: string) => ReactNode,
   suggestion?: (text: string) => ReactElement,
   preview?: (value: string, selection: [number, number]) => ReactElement,
-  onKeyDown?: (keys: string[],
-    setValue: (value: string) => void,
-    selectedText: [number, number]) => void,
+  onKeyDown?: (e: React.KeyboardEvent, value: string) => void
   onFocus?: () => void
 }) {
 
   const [_mode, setMode] = useState(mode);
-  const [_modeValue, setModeValue] = useState(value || "");
+  const [_value, setValue] = useState(value || "");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const [lastChangedValue, setLastChangedValue] = useState("");
+
+  useOnClickOutside(textareaRef, () => {
+    onUpdate && onUpdate(_value)
+    setMode("viewed");
+  })
 
   const [latexOpen, setLatexOpen] = useState<"inline" | "newline" | "none">(
     "none"
@@ -55,11 +55,13 @@ export default function TextField({
     left: number;
   } | null>(null);
 
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
   const [latexValue, setLatexValue] = useState("");
   const [caretPosition, setCaretPosition] = useState<number | null>(null);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    listeners?.onKeyDown?.(e);
+
     if (updateOnEnter && e.key === "Enter") {
       if (e.shiftKey) {
         e.preventDefault();
@@ -67,43 +69,25 @@ export default function TextField({
         if (textarea) {
           const caretPosition = textarea.selectionStart;
           const newValue =
-            _modeValue.slice(0, caretPosition) +
+            _value.slice(0, caretPosition) +
             "\n" +
-            _modeValue.slice(caretPosition);
+            _value.slice(caretPosition);
 
-          setModeValue(newValue);
+          setValue(newValue);
           setCaretPosition(caretPosition + 1); // Save the new caret position
         }
       } else {
-        onUpdate && onUpdate(_modeValue);
+        console.log("Enter pressed")
+        onUpdate?.(_value);
         setMode("viewed");
-      }
-    }
-
-    else if (e.ctrlKey) {
-      const textarea = textareaRef.current;
-      if (!textarea) return
-      const start = textarea.selectionStart
-      const end = textarea.selectionEnd;
-
-      if (e.key === "i" || e.key === "I") {
-        // Handle Ctrl + I for italics
-        setModeValue(_modeValue.slice(0, start) +
-          `<em>${_modeValue.slice(start, end)}</em>` +
-          _modeValue.slice(end)
-        )
-
-      } else if (e.key === "b" || e.key === "B") {
-        // Handle Ctrl + B for bold
-
       }
     }
   };
 
   function handleChange(e: ChangeEvent<HTMLTextAreaElement>) {
-    setLastChangedValue(_modeValue);
-    setModeValue(e.target.value);
-    onChange && onChange(_modeValue);
+    const newValue = e.target.value;
+    setLastChangedValue(_value);
+    setValue(newValue);
   }
 
   useEffect(() => {
@@ -115,13 +99,13 @@ export default function TextField({
   }, [latexOpen])
 
 
-  // Update height based on _modeValue
+  // Update height based on _value
   useEffect(() => {
     const textarea = textareaRef.current;
 
     if (textarea) {
       const height = typeof style?.height === 'number' ? style.height : Infinity;
-      textarea.style.height = `${Math.min(height, breakLines(_modeValue, textarea.clientWidth).length * 21)}px`;
+      textarea.style.height = `${Math.min(height, breakLines(_value, textarea.clientWidth).length * 21)}px`;
     }
 
   });
@@ -130,7 +114,7 @@ export default function TextField({
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
-      textarea.setSelectionRange(_modeValue.length, _modeValue.length);
+      textarea.setSelectionRange(_value.length, _value.length);
 
       const caretCoordinates = getCaretCoordinates(textarea);
       textarea.scrollTop = caretCoordinates.top - textarea.clientHeight / 2;
@@ -155,41 +139,41 @@ export default function TextField({
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
-      const dollarIndices = getAllIndices(_modeValue, '$')
+      const dollarIndices = getAllIndices(_value, '$')
 
-      if (dollarIndices.length % 2 === 1 && _modeValue.slice(_modeValue.length - 1) === '$') {
+      if (dollarIndices.length % 2 === 1 && _value.slice(_value.length - 1) === '$') {
         if (latexOpen === 'none') {
           setLatexOpen('inline')
-          setModeValue(prev => prev + "$")
+          setValue(prev => prev + "$")
         }
       }
 
-      if (_modeValue.slice(_modeValue.length - 1) !== '$') {
+      if (_value.slice(_value.length - 1) !== '$') {
         setLatexOpen('none')
         setLatexValue('')
       }
 
       if (latexOpen === 'inline') {
         if (latexValue === '') textarea.setSelectionRange(textarea.value.length - 1, textarea.value.length - 1);
-        setLatexValue(_modeValue.substring(dollarIndices.at(dollarIndices.length - 2) as number,
+        setLatexValue(_value.substring(dollarIndices.at(dollarIndices.length - 2) as number,
           dollarIndices.at(dollarIndices.length - 1) as number + 1))
       }
     }
-  }, [_modeValue, latexOpen, latexValue]);
+  }, [_value, latexOpen, latexValue]);
 
   useEffect(() => {
-    setModeValue(value)
+    setValue(value)
   }, [value])
 
   return (
-    <div className={`text-field rounded-sm min-h-[1rem]`} {...listeners}
+    <div className={`text-field flex items-center`} {...listeners}
       onClick={(e) => {
         setMode("editing")
         listeners?.onClick?.(e)
       }}
       style={{
         width: style?.width || '100%',
-        height: style?.height,
+        height: style?.height || '100%',
         border: style?.border,
         padding: style?.padding
       }}>
@@ -205,12 +189,12 @@ export default function TextField({
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           autoFocus
-          value={_modeValue}
+          value={_value}
           onFocus={onFocus}
         />
         :
         <div className="h-full overflow-ellipsis">
-          {render ? render(_modeValue) : _modeValue}
+          {_value}
         </div>
       }
     </div>

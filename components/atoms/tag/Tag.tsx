@@ -6,7 +6,7 @@ export default function Tag({ value, onClick, onClose, style }:
     value: ReactElement,
     onClick: (event: React.MouseEvent) => void,
     onClose: (event: React.MouseEvent) => void,
-    style?: CSSProperties
+    style?: React.CSSProperties
   }
 ) {
   return (

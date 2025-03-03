@@ -1,8 +1,8 @@
-import { CSSProperties, ReactElement, useState, useEffect, useRef, ReactNode, useMemo } from 'react';
 import zIndices from '@styles/z-indices';
 import TextField from '@components/atoms/text-field';
 import Fuse from 'fuse.js';
 import { useClickAway } from "@uidotdev/usehooks";
+import { useState, useRef, useMemo, useEffect } from 'react'
 
 export default function Autocomplete({
   className,
@@ -27,11 +27,11 @@ export default function Autocomplete({
   autoFocus?: boolean
   addable?: boolean,
   maxDisplay?: number,
-  style?: CSSProperties,
+  style?: React.CSSProperties,
   onSubmit: (selectedValue: string) => void
-  renderSuggestion?: (value: string) => ReactNode
-  renderDropper?: (value: string) => ReactNode
-}): ReactElement {
+  renderSuggestion?: (value: string) => React.ReactNode
+  renderDropper?: (value: string) => React.ReactNode
+}) {
   const [inputValue, setInputValue] = useState(value || '');
   const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(addable ? -1 : 0);

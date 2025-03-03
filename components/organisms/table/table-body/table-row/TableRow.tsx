@@ -6,15 +6,13 @@ import TextCell from "./table-cell/TextCell";
 
 import { OpenIcon, CloseIcon } from "@components/atoms/icons";
 
-type Props = DefaultComponentProps & {
+type Props = {
   item: DataItem,
   attrsByName: AttrsByName,
   onUpdate: (items: UpdatedItem | UpdatedItem[]) => Promise<void>
 }
 
-export default function TableRow(props: Props) {
-  const { item, attrsByName, onUpdate, listeners } = props;
-
+export default function TableRow({ item, attrsByName, onUpdate }: Props) {
   const attrs = Object.values(attrsByName)
 
   const regularAttrs = attrs.filter(attr => attr.newWindow === false && attr.hidden === false)
@@ -74,7 +72,7 @@ export default function TableRow(props: Props) {
               <span
                 className={``}
               >
-                <DragIndicatorOutlined className="icon hover:cursor-grab" {...listeners} />
+                <DragIndicatorOutlined className="icon hover:cursor-grab" />
               </span>
 
               {attrs.some(attr => attr.newWindow) && <OpenIcon
@@ -91,18 +89,18 @@ export default function TableRow(props: Props) {
         </div>}
 
         {regularAttrs.sort((x, y) => x.order - y.order).map((attr, index) => (
-          <TableCell
-            key={`table-cell-${item.id}-${index + 1}`}
-            itemId={item.id}
-            attr={attr}
-            value={item[attr.name]}
-            suggestions={attr.suggestions}
-            onUpdate={onUpdate}
-            focused={focusedCell === index}
-            listeners={{
-              onClick: () => setFocusedCell(index)
-            }}
-          />
+          <span onClick={() => setFocusedCell(index)}>
+            <TableCell
+              key={`table-cell-${item.id}-${index + 1}`}
+              itemId={item.id}
+              attr={attr}
+              value={item[attr.name]}
+              suggestions={attr.suggestions}
+              onUpdate={onUpdate}
+              focused={focusedCell === index}
+            />
+          </span>
+
 
         ))}
       </div>

@@ -107,7 +107,6 @@ function DraggableRow({
         item={item}
         attrsByName={attrsByName}
         onUpdate={onUpdate}
-        listeners={listeners}
       />
     </div>
   );

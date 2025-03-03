@@ -15,7 +15,6 @@ import GraphStyles from './styles';
 import Loading from '@components/atoms/loading';
 import { useOnClickOutside } from '@node_modules/usehooks-ts/dist';
 import { useSize } from '@hooks';
-import useTransform from '@hooks/useTransform';
 
 type ArgumentType = 'contention' | 'support' | 'objection' | 'premise'
 
@@ -72,7 +71,6 @@ export default function Tree({ data, fontSize = styles.fontSize, layerGap = 100,
   const [layout, setLayout] = useState<TreeLayout>({})
 
   const [optionsPosition, setOptionsPosition] = useState<{ x: number, y: number }>({ x: 0, y: 0 })
-  const selectedNodeLayout = layout[selectedNode?.id ?? 0] ?? { x: 0, y: 0 };
 
   const edges = getEdges(nodes)
 

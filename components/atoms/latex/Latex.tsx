@@ -4,7 +4,7 @@ import renderLatex from './renderLatex';
 
 export default function Latex({ children, style }: {
   children: string,
-  style?: CSSProperties
+  style?: React.CSSProperties
 }) {
   const delimiters = [
     { left: '$$', right: '$$', display: true },

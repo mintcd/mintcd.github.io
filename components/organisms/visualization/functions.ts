@@ -273,7 +273,7 @@ export function breakLines(
   return lines;
 }
 
-export function getBoundingRect(vertex: TreeNode, maxWidth: number, fontSize: number = styles.fontSize) {
+export function setBoundingRect(vertex: TreeNode, maxWidth: number, fontSize: number = styles.fontSize) {
   const textWidth = getTextWidth(String(vertex.content))
 
   if (textWidth < maxWidth) {

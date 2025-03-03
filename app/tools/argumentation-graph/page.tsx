@@ -1,16 +1,17 @@
-'use client'
+"use client"
 
 import { useEffect, useRef, useState } from "react";
 import Tree from "@components/organisms/visualization/tree";
 import Button from "@components/atoms/button";
 
 import axios from 'axios'
+import { getEdges } from "@components/organisms/visualization/tree/functions";
 
 
 export default function ArgumentationGraph() {
 
   const [isClient, setIsClient] = useState(false);
-  const [tree, setTree] = useState<Tree>({ nodes: [], edges: [] });
+  const [tree, setTree] = useState<TreeNode[]>([]);
   const [mermaidCode, setMermaidCode] = useState<string>("")
 
   const notionIcon = <svg width={30} height={30}>
@@ -23,7 +24,7 @@ export default function ArgumentationGraph() {
 
   async function handleExport() {
     console.log("exporting...")
-    await axios.post('http://localhost:5000/api/notion/page/test', {
+    await axios.post(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/notion/page/test`, {
       type: 'code',
       content: mermaidCode,
     },
@@ -42,14 +43,21 @@ export default function ArgumentationGraph() {
   }, []);
 
   useEffect(() => {
-    const treeToMermaid = (tree: Tree) => {
+    const treeToMermaid = (nodes: TreeNode[]) => {
       let mermaidCode = `graph TD\n`;
-      tree.nodes.forEach(node => {
-        mermaidCode += `${node.id}["${node.content}"]\n`;
-      })
+      nodes.forEach(node => {
+        if (node.content.length > 1) {
+          mermaidCode += `subgraph ${node.id}\n${node.content.map((content, index) => `${node.id}_${index}["${content}"]`).join('\n')}\nend\n`;
+        } else {
+          mermaidCode += `${node.id}["${node.content}"]\n`;
+        }
+      });
+
+
+      const edges = getEdges(nodes)
 
       // Add dependencies (support, objections)
-      tree.edges.forEach(edge => {
+      edges.forEach(edge => {
         // Create edges between nodes based on dependencies
         mermaidCode += `${edge.source} --> ${edge.target}\n`;
       });
@@ -59,6 +67,8 @@ export default function ArgumentationGraph() {
 
     setMermaidCode(treeToMermaid(tree));
   }, [tree])
+
+  console.log(mermaidCode)
 
   return (
     <div className="flex flex-col items-center space-y-4">

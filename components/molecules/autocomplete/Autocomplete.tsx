@@ -1,6 +1,6 @@
 import { CSSProperties, ReactElement, useState, useEffect, useRef, ReactNode, useMemo } from 'react';
 import zIndices from '@styles/z-indices';
-import TextField from '@components/nuclears/TextField';
+import TextField from '@components/atoms/text-field';
 import Fuse from 'fuse.js';
 import { useClickAway } from "@uidotdev/usehooks";
 

@@ -1,7 +1,7 @@
-type Tree = {
-  nodes: TreeNode[] = [],
-  edges: TreeEdge[] = [],
-}
+// type Tree = {
+//   nodes: TreeNode[] = [],
+//   layout: TreeNodeLayout
+// }
 
 type NodeType = 'contention' | 'support' | 'objection' | 'premise'
 
@@ -21,7 +21,7 @@ type TreeNode = {
   keywords?: Field[],
 
   // Graph
-  children?: number[] = [],
+  children: number[] = [],
   depth: number = 0,
   order: number
 
@@ -29,18 +29,37 @@ type TreeNode = {
   color?: string,
   shape?: Shape
   lines?: string[],
-  fx?: number,
-  fy?: number,
-  x?: number,
-  y?: number,
-  x1?: number,
-  y1?: number,
-  x2?: number,
-  y2?: number,
+
   screenX?: number,
   screenY?: number,
+
   width?: number,
   height?: number,
+}
+
+type TreeLayout = {
+  [key: number]: Layout
+}
+
+type Layout = {
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  subLayouts: {
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  }[]
+}
+
+type SubNode = {
+  content: string,
+  width?: number,
+  height?: number,
+  x?: number,
+  y?: number
 }
 
 type Option = 'add' | 'edit' | 'delete'

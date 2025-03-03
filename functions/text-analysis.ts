@@ -26,6 +26,17 @@ export function getTextWidth(text: string, fontSize: number = styles.fontSize, f
   return 0;
 }
 
+export function getBoundingRect(text: string, maxWidth: number, fontSize: number = styles.fontSize) {
+  const textWidth = getTextWidth(text, fontSize)
+  const lines = breakLines(text, maxWidth, fontSize)
+
+  return {
+    width: lines.length === 1 ? textWidth + 20 : maxWidth,
+    height: fontSize * 2
+  }
+
+}
+
 export function getCharacterOffsetWidths(text: string, fontSize: number = 14, fontFamily: string = "Arial") {
   const canvas = createCanvas(200, 200); // Adjust dimensions as needed
   const context = canvas.getContext('2d');

@@ -1,5 +1,5 @@
 import Latex from "@components/atoms/latex";
-import { TextField } from "@components/nuclears"
+import TextField from "@components/atoms/text-field"
 
 export default function TextCell({
   itemId,

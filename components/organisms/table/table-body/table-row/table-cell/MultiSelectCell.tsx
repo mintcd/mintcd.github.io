@@ -1,4 +1,4 @@
-import Tag from '@components/nuclears/Tag';
+import Tag from '@components/atoms/tag';
 import Latex from '@components/atoms/latex';
 import Autocomplete from '@components/molecules/autocomplete/Autocomplete';
 import { useEffect, useState } from 'react';
@@ -14,10 +14,10 @@ export default function MultiSelectCell({ itemId, attr, values, onUpdate, sugges
     focused?: boolean
   }
 ) {
-  const [mode, setMode] = useState<"viewed" | "editing">("viewed");
+  const [mode, setMode] = useState<"view" | "edit">("view");
 
   const ref = useClickAway(() => {
-    setMode("viewed");
+    setMode("view");
   }) as any;
 
   const handleTagClick = (event: React.MouseEvent) => {
@@ -25,16 +25,16 @@ export default function MultiSelectCell({ itemId, attr, values, onUpdate, sugges
   };
 
   useEffect(() => {
-    if (focused) setMode('editing')
-    else setMode("viewed")
+    if (focused) setMode('edit')
+    else setMode("view")
   }, [focused])
 
   return (
     <div className="table-multiselect-cell w-full h-full"
       ref={ref}
       onClick={() => {
-        if (mode === "viewed")
-          setMode("editing")
+        if (mode === "view")
+          setMode("edit")
       }}
     >
       <div className='tag-group flex flex-wrap'>
@@ -63,7 +63,7 @@ export default function MultiSelectCell({ itemId, attr, values, onUpdate, sugges
       </div>
 
       {
-        mode === 'editing' &&
+        mode === 'edit' &&
         <Autocomplete
           className="tag-editor"
           autoFocus
@@ -71,14 +71,14 @@ export default function MultiSelectCell({ itemId, attr, values, onUpdate, sugges
           addable
           suggestions={suggestions}
           onSubmit={(newValue) => {
-            if (newValue && mode === 'editing') {
+            if (newValue && mode === 'edit') {
               if (!values.includes(newValue)) {
                 onUpdate({
                   id: itemId,
                   attrValue: { [attr.name]: [...values, newValue] }
                 });
               }
-              setMode("viewed");
+              setMode("view");
             }
           }}
           maxDisplay={5}

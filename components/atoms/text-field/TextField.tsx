@@ -100,7 +100,7 @@ export default function TextField(
       textarea.scrollIntoView({ block: "nearest", inline: "nearest" });
     }
 
-  }, [mode])
+  }, [mode, _value.length])
 
   useEffect(() => {
     const textarea = textareaRef.current;
@@ -117,7 +117,7 @@ export default function TextField(
 
   useEffect(() => {
     onChange?.(_value)
-  }, [_value])
+  }, [_value, onChange])
 
   return (
     <div className={`text-field flex items-center ${className}`}

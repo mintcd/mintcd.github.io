@@ -3,10 +3,10 @@ import styles from '@styles/styles';
 
 import "@styles/global.css"
 import { breakLines } from './functions';
-import { TextField } from '@components/nuclears';
+import TextField from '@components/atoms/text-field';
 
 type VertexRendering = {
-  id: number,
+  id: number | string,
   x: number,
   y: number
   shape?: 'rect' | 'circ'
@@ -19,11 +19,11 @@ type VertexRendering = {
   color?: string;
   editing?: boolean;
 
-  onUpdate?: (newNode: Partial<TreeNode>) => void;
+  onUpdate?: (value: string) => void;
 }
 
-export default function Vertex({
-  id, shape = 'circ', x, y, width = 200, height = 0, radius = 0, label = "", fontSize = styles.fontSize,
+export default function Node({
+  id, shape = 'circ', x, y, width = 200, height = 20, radius = 0, label = "", fontSize = styles.fontSize,
   color = "#E3E7EE",
   editing = false,
   onUpdate = () => { }
@@ -34,6 +34,7 @@ export default function Vertex({
   //     onUpdate({ content: [value] });
   //   }
   // }
+
 
   return (
     <g
@@ -69,10 +70,10 @@ export default function Vertex({
       >
         {editing ?
           <TextField
-            mode='editing'
+            mode='edit'
             value={label}
             // onKeyDown={(e, value) => handleKeyDown(e, value)}
-            onUpdate={(value) => onUpdate({ content: [value] })}
+            onSubmit={(value) => onUpdate(value)}
           />
 
           : <div className={``}

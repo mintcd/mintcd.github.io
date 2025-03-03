@@ -107,11 +107,11 @@ type Vertex = {
   height?: number,
 }
 
-type Edge = {
-  source: number,
-  target: number,
-  relation?: RelationType
-}
+// type Edge = {
+//   source: number,
+//   target: number,
+//   relation?: RelationType
+// }
 
 type EdgeCoordinate = {
   source: VertexCoordinate,

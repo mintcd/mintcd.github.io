@@ -4,9 +4,10 @@ export default function Button({ text, icon, style, listeners }:
   {
     text?: string,
     icon?: React.ReactElement<SVGElement>,
-    style?: CSSProperties,
+    style?: React.CSSProperties,
     listeners?: Listeners
   }) {
+
   return (
     <button className={`flex items-center hover:cursor-pointer w-fit p-1 rounded-md`}
       style={{

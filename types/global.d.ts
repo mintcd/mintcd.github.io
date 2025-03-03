@@ -1,5 +1,3 @@
-import { State } from "@node_modules/@dnd-kit/core/dist/store";
-
 type Factory<T extends object> = {
   [key in keyof T]: T[key];
 } & {
@@ -27,3 +25,8 @@ type Listeners<T extends HTMLElement = HTMLElement> = {
 
 
 type Percentage = `${number}%`;
+
+type Coordinate = {
+  x: number;
+  y: number;
+}

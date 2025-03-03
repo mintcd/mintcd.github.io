@@ -5,7 +5,7 @@ import { updateFilter } from "../functions";
 import { SettingsIcon, DownloadIcon, SearchIcon, CloseIcon, AngleDownIcon, ViewColumnsIcon, FilterIcon } from "@components/atoms/icons";
 
 import { Dropdown } from "@components/molecules";
-import { Checkbox, TextField } from "@components/nuclears";
+import { Checkbox, TextField } from "@components/atoms";
 import Autocomplete from "@components/molecules/autocomplete/Autocomplete";
 import Latex from "@components/atoms/latex";
 import { exportToCSV, exportToJSON } from "@functions/document.ts";
@@ -213,7 +213,7 @@ export default function TableExtension({
 
                               <TextField
                                 value={factory.attrsByName[attr.name].filter.predicates.contains || ""}
-                                onUpdate={(value) => {
+                                onSubmit={(value) => {
                                   handleFilter({
                                     name: attr.name,
                                     predicate: "contains",
@@ -238,7 +238,7 @@ export default function TableExtension({
               </div>
               <TextField
                 value={String(factory.itemsPerPage)}
-                onUpdate={(value) => handlePagination(parseInt(value) || factory.itemsPerPage)}
+                onSubmit={(value) => handlePagination(parseInt(value) || factory.itemsPerPage)}
                 style={{ width: 20, border: '#4672b0' }}
               />
             </div>

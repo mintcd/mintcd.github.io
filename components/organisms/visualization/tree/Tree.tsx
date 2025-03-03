@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { getEdges, getPosition, depthCount, getBoundingRect } from './functions';
+import { getEdges, createNode, getLayout } from './functions';
 
 import Node from '../Node';
 import Edge from '../Edge';
@@ -14,13 +14,20 @@ import "./styles.css"
 import GraphStyles from './styles';
 import Loading from '@components/atoms/loading';
 import { useOnClickOutside } from '@node_modules/usehooks-ts/dist';
+import { useSize } from '@hooks';
+import useTransform from '@hooks/useTransform';
 
 type ArgumentType = 'contention' | 'support' | 'objection' | 'premise'
 
 export default function Tree({ data, fontSize = styles.fontSize, layerGap = 100, onUpdate }:
-  { data?: Tree, fontSize?: number, layerGap?: number, onUpdate?: (value: Tree) => void }) {
+  {
+    data?: TreeNode[],
+    fontSize?: number,
+    layerGap?: number,
+    onUpdate?: (value: TreeNode[]) => void
+  }) {
 
-  const root = {
+  const root: TreeNode = {
     id: 0,
     type: "contention",
     content: ["contention"],
@@ -51,218 +58,209 @@ export default function Tree({ data, fontSize = styles.fontSize, layerGap = 100,
 
   useOnClickOutside(nodeOptionsRef, () => {
     setOption(null)
-    setClickedNode(null);
+    setSelectedNode(null);
   })
 
 
-  const [maxNodeWidth, setMaxNodeWidth] = useState(0)
-
-  const [clickedNode, setClickedNode] = useState<TreeNode | null>(null)
+  const [selectedNode, setSelectedNode] = useState<TreeNode & { order?: number } | null>(null)
   const [option, setOption] = useState<Option | null>(null)
 
-  const [view, setView] = useState({
-    width: 0,
-    height: 0
-  });
+  const view = useSize(environmentRef)
+  const maxNodeWidth = view.width / 5;
 
-  const [tree, setTree] = useState<Tree>({ nodes: [root], edges: [] })
+  const [nodes, setNodes] = useState<TreeNode[]>([root])
+  const [layout, setLayout] = useState<TreeLayout>({})
 
-  function handleNodeClick(e: React.MouseEvent, v: TreeNode) {
+  const [optionsPosition, setOptionsPosition] = useState<{ x: number, y: number }>({ x: 0, y: 0 })
+  const selectedNodeLayout = layout[selectedNode?.id ?? 0] ?? { x: 0, y: 0 };
+
+  const edges = getEdges(nodes)
+
+  function handleNodeClick(e: React.MouseEvent, node: TreeNode) {
     e.preventDefault();
-
-    if (!containerRef.current) return;
-
-    const svg = containerRef.current;
-    const point = svg.createSVGPoint();
-    point.x = v.x ?? 0;
-    point.y = v.y ?? 0;
-
-    const screenCTM = svg.getScreenCTM();
-    if (!screenCTM) return;
-
-    const transformedPoint = point.matrixTransform(screenCTM);
-
-    setClickedNode({
-      ...v,
-      screenX: transformedPoint.x,
-      screenY: transformedPoint.y
-    });
+    setOption(null)
+    setSelectedNode(node)
   }
 
   function handleOptionClick(option: 'add' | 'edit' | 'delete') {
-    setOption(prev => prev === option ? null : option);
+    setOption(option);
   }
 
   function handleAdd(type: ArgumentType) {
-
-    if (!clickedNode) return;
-    const [depth, order] = [clickedNode.depth as number + 1, clickedNode.children?.length || 0]
+    if (!selectedNode) return;
 
     let newNode: TreeNode = {
-      id: tree.nodes.length,
+      id: nodes.length,
       type: type,
       content: [`New ${type}`],
-      depth: depth,
-      order: tree.nodes.find(node => node.id === clickedNode.id)?.children?.length || 0,
+      depth: selectedNode.depth + 1,
+      order: selectedNode.children.length,
       shape: 'rect',
       color: nodeStyles[type].color,
       children: []
-    }
-
-    // Update nodes
-    const newNodes = [...tree.nodes.map(node => (
-      node.id === clickedNode.id
-        ? {
-          ...node,
-          children: [...(node.children || []), newNode.id]
-        }
-        : node
-    )), newNode]
-
-    // Make sure to pass maxNodeWidth and fontSize to getBoundingRect
-    newNode = getBoundingRect(newNode, maxNodeWidth, fontSize)
-    // Then pass the updated nodes and view width to getPosition
-    newNode = getPosition(newNode, newNodes, view.width)
-
-    // Re-position other children and ensure they have proper bounding rects too
-    const repositionedNodes = newNodes.map(node => {
-      if (clickedNode.children?.includes(node.id) && node.id != newNode.id) {
-        // Make sure existing nodes have proper bounding rects
-        const nodeWithRect = getBoundingRect(node, maxNodeWidth, fontSize);
-        return getPosition(nodeWithRect, newNodes, view.width);
-      }
-      return node;
-    });
-
-    setTree(prev => ({
-      nodes: repositionedNodes,
-      edges: [...prev.edges || [], { source: clickedNode.id, target: newNode.id }]
-    }));
-
-    setClickedNode(null);
-  }
-
-  function handleUpdateNode(nodeId: number, newValues: Partial<TreeNode>) {
-    setTree(prev => {
-      // First update the node with new values
-      const updatedNodes = prev.nodes.map(node =>
-        node.id === nodeId ? { ...node, ...newValues } : node
-      );
-
-      // Then recalculate its bounding rect and position
-      return {
-        ...prev,
-        nodes: updatedNodes.map(node => {
-          if (node.id === nodeId) {
-            // Apply bounding rect with maxNodeWidth and fontSize
-            const nodeWithRect = getBoundingRect(node, maxNodeWidth, fontSize);
-            // Then reposition based on the updated rect
-            return getPosition(nodeWithRect, updatedNodes, view.width);
-          }
-          return node;
-        })
-      };
-    });
-  }
-
-  useEffect(() => {
-    onUpdate && onUpdate(tree)
-  }, [tree])
-
-  useEffect(() => {
-    const updateView = () => {
-      if (environmentRef.current) {
-        const rect = environmentRef.current.getBoundingClientRect();
-        setView({
-          width: rect.width,
-          height: rect.height
-        });
-
-        setMaxNodeWidth(rect.width / 5);
-      }
     };
 
-    updateView();
+    const newNodes = nodes.map(node =>
+      node.id === selectedNode.id
+        ? { ...node, children: [...node.children, newNode.id] }
+        : node
+    ).concat(newNode)
 
-    window.addEventListener("resize", updateView);
-    return () => window.removeEventListener("resize", updateView);
-  }, []);
+    const newLayout = getLayout(newNodes, maxNodeWidth, view.width)
 
-  // New effect to reposition all nodes when view dimensions change
+    setNodes(newNodes);
+    setLayout(newLayout)
+    setSelectedNode(null)
+  }
+
+
+  function handleExtend() {
+    if (!selectedNode) return
+    const newNodes = nodes.map(node => node.id === selectedNode.id ? {
+      ...node,
+      content: [...node.content, "New peer"]
+    } : node
+    )
+    const newLayout = getLayout(newNodes, maxNodeWidth, view.width)
+
+    setNodes(newNodes)
+    setLayout(newLayout)
+    setSelectedNode(null)
+  }
+
+  function handleUpdateNode(value: string) {
+    setNodes(prev => {
+      // First update the node with new values
+      const updatedNodes = prev.map(node =>
+        node.id === selectedNode?.id
+          ? (
+            selectedNode.order
+              ? {
+                ...node,
+                content: node.content.map((subnode, index) =>
+                  index === selectedNode.order
+                    ? createNode(value, maxNodeWidth)
+                    : subnode)
+              }
+              : {
+                ...node,
+                content: [createNode(value, maxNodeWidth)]
+              }
+          )
+          : node
+      );
+
+      return {
+        ...prev,
+        nodes: updatedNodes
+      }
+    });
+  }
+
   useEffect(() => {
-    setTree(prevTree => ({
-      ...prevTree,
-      nodes: prevTree.nodes.map(node => {
-        const nodeWithRect = getBoundingRect(node, maxNodeWidth, fontSize);
-        return getPosition(nodeWithRect, prevTree.nodes, view.width);
-      })
-    }));
+    onUpdate && onUpdate(nodes)
+  }, [nodes])
 
-  }, [maxNodeWidth]);
+  // Reposition nodes when view dimensions change
+  useEffect(() => {
+    const newLayout = getLayout(nodes, maxNodeWidth, view.width)
+    setLayout(newLayout);
+  }, [view.width]);
+
+  console.log(layout)
+
+  // Get position of options
+  useEffect(() => {
+    if (!selectedNode) return;
+    if (!containerRef.current) return;
+
+    const rect = containerRef.current.getBoundingClientRect();
+
+    setOptionsPosition({
+      x: layout[selectedNode.id]?.x + rect.left,
+      y: layout[selectedNode.id]?.y + rect.top + (layout[selectedNode.id]?.height || 0)
+    });
+  }, [selectedNode, layout]);
+
+  console.log(nodes, layout)
 
   return (
-    <div ref={environmentRef} className={`tree flex flex-col items-center justify-center w-full`}>
+    <div ref={environmentRef} className={`nodes flex flex-col items-center justify-center w-full`}>
       {view.width > 0 ?
         <svg ref={containerRef}
           className='graph-container'
           width={view.width}
-          height={(Math.max(...tree.nodes.map(node => node.depth)) + 1) * layerGap +
-            (Math.max(...tree.nodes.map(node => node.depth))) * 20}>
+          height={(Math.max(...nodes.map(node => node.depth)) + 1) * layerGap +
+            (Math.max(...nodes.map(node => node.depth))) * 20}>
           <g className='graph'>
             <GraphStyles />
-            {tree.nodes.map((node) => (
+            {nodes.map((node, nodeIndex) => (
               <g className='node-container' key={node.id}
                 onClick={(e) => handleNodeClick(e, node)}>
-                <Node
-                  key={node.id}
-                  x={node.x ?? 0}
-                  y={node.y ?? 0}
-                  id={node.id}
-                  shape='rect'
-                  width={node.width}
-                  height={node.height}
-                  label={String(node.content)}
-                  editing={option === 'edit' && clickedNode?.id === node.id}
-                  onUpdate={(newValues: Partial<TreeNode>) => handleUpdateNode(node.id, newValues)}
-                  color={node.color}
-                />
+                {node.content.length > 1
+                  && <rect
+                    width={layout[node.id].width}
+                    height={layout[node.id].height}
+                    fill={'#aaa'}
+                    opacity={0.5}
+                    rx={2}
+                    ry={2}
+                    transform={`translate(${layout[node.id].x}, ${layout[node.id].y})`}
+                  />}
+
+                {node.content.map((subnode, subnodeIndex) => (
+                  <Node
+                    id={`${node.id}-${subnodeIndex}`}
+                    key={`${node.id}-${subnodeIndex}`}
+                    x={layout[node.id].subLayouts[subnodeIndex].x as number}
+                    y={layout[node.id].subLayouts[subnodeIndex].y as number}
+                    shape="rect"
+                    width={layout[node.id].subLayouts[subnodeIndex].width}
+                    height={layout[node.id].subLayouts[subnodeIndex].height}
+                    label={subnode}
+                    editing={option === "edit" && selectedNode?.id === node.id}
+                    onUpdate={(value) => handleUpdateNode(value)}
+                    color={node.color}
+                  />
+                ))}
               </g>
 
             ))}
-            {tree.edges.map((edge, index) => (
+            {edges.map((edge, index) => (
               <g key={index}>
                 <Edge
                   key={index}
-                  edge={{
-                    source: tree.nodes.find(v => v.id === edge.source) as TreeNode,
-                    target: tree.nodes.find(v => v.id === edge.target) as TreeNode
-                  }}
+                  source={layout[edge.source]}
+                  target={layout[edge.target]}
                 />
               </g>
 
             ))}
           </g>
-        </svg> : <Loading />}
-      {clickedNode &&
+        </svg>
+        : <Loading />
+      }
+      {selectedNode &&
         <div className='node-options' ref={nodeOptionsRef}>
-          <div className={`fixed flex justify-between`}
-            style={{
-              fontSize: 9,
-              width: clickedNode.width,
-              left: `${clickedNode.screenX}px`,
-              top: `${(clickedNode.screenY as number) + (clickedNode.height as number)}px`,
-            }}>
-            <AddIcon size={15} cursor='pointer' onClick={() => handleOptionClick('add')} />
-            <EditIcon size={15} cursor='pointer' onClick={() => handleOptionClick('edit')} />
-            <DeleteIcon size={15} cursor='pointer' onClick={() => handleOptionClick('delete')} />
-          </div>
+          {option === null
+            && < div className={`fixed flex justify-between`}
+              style={{
+                fontSize: 9,
+                width: layout[selectedNode.id].width,
+                left: `${optionsPosition.x}px`,
+                top: `${optionsPosition.y}px`,
+              }}>
+              <AddIcon size={15} cursor='pointer' onClick={() => handleOptionClick('add')} />
+              <EditIcon size={15} cursor='pointer' onClick={() => handleOptionClick('edit')} />
+              <DeleteIcon size={15} cursor='pointer' onClick={() => handleOptionClick('delete')} />
+            </div>}
           {option === 'add' &&
             <div className={`fixed rounded-md`}
               style={{
                 fontSize: 9,
                 width: 'auto',
-                left: `${clickedNode.screenX}px`,
-                top: `${(clickedNode.screenY as number) + (clickedNode.height as number) + 15}px`,
+                left: `${optionsPosition.x}px`,
+                top: `${optionsPosition.y}px`,
               }}>
               <div className='hover:cursor-pointer hover:bg-gray-200 px-1'
                 onClick={() => handleAdd('support')}>
@@ -270,6 +268,7 @@ export default function Tree({ data, fontSize = styles.fontSize, layerGap = 100,
               </div>
               <div className='hover:cursor-pointer hover:bg-gray-200 px-1' onClick={() => handleAdd('objection')}> Add objection </div>
               <div className='hover:cursor-pointer hover:bg-gray-200 px-1' onClick={() => handleAdd('premise')}> Add premise </div>
+              <div className='hover:cursor-pointer hover:bg-gray-200 px-1' onClick={() => handleExtend()}> Add peer </div>
             </div>
           }
         </div>

@@ -2,7 +2,7 @@ import MultiSelectCell from "./MultiSelectCell"
 import TextCell from "./TextCell"
 
 export default function TableCell({ itemId, attr, value, onUpdate, suggestions, focused }:
-  DefaultComponentProps & {
+  {
     itemId: number,
     attr: AttrProps,
     value: string | string[],

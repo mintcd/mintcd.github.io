@@ -1,8 +1,8 @@
 import Tag from '@components/atoms/tag';
 import Latex from '@components/atoms/latex';
 import Autocomplete from '@components/molecules/autocomplete/Autocomplete';
-import { useEffect, useState } from 'react';
-import { useClickAway } from "@uidotdev/usehooks";
+import { useEffect, useRef, useState } from 'react';
+import { useClickOutside } from "@hooks";
 
 export default function MultiSelectCell({ itemId, attr, values, onUpdate, suggestions, focused }:
   {
@@ -16,9 +16,9 @@ export default function MultiSelectCell({ itemId, attr, values, onUpdate, sugges
 ) {
   const [mode, setMode] = useState<"view" | "edit">("view");
 
-  const ref = useClickAway(() => {
-    setMode("view");
-  }) as any;
+  const ref = useRef<(HTMLDivElement | null)>(null)
+  useClickOutside(ref, () => setMode("view"))
+
 
   const handleTagClick = (event: React.MouseEvent) => {
     // event.stopPropagation();

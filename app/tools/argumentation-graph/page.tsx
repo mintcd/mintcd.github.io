@@ -68,8 +68,6 @@ export default function ArgumentationGraph() {
     setMermaidCode(treeToMermaid(tree));
   }, [tree])
 
-  console.log(mermaidCode)
-
   return (
     <div className="flex flex-col items-center space-y-4">
       <Tree onUpdate={(value) => setTree(value)} />

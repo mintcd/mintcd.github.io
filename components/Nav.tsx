@@ -10,7 +10,7 @@ import GitHubIcon from '@public/github.png';
 import Email from '@public/email.png';
 import Cv from '@public/cv.png';
 
-import { ListIcon, AddCircleIcon } from './atoms/icons';
+import { ListIcon, AddCircleIcon } from '../public/icons';
 
 export default function Nav() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

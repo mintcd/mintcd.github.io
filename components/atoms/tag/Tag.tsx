@@ -1,5 +1,5 @@
 import { MouseEventHandler, ReactElement } from "react";
-import CloseIcon from '@mui/icons-material/Close';
+import { CloseIcon } from '@public/icons';
 
 export default function Tag({ value, onClick, onClose, style }:
   {
@@ -22,9 +22,9 @@ export default function Tag({ value, onClick, onClose, style }:
         {value}
       </span>
       <CloseIcon
+        size={9}
         onClick={onClose}
         className="cursor-pointer"
-        sx={{ fontSize: 13 }}
       />
     </div>
   )

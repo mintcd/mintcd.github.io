@@ -1,10 +1,10 @@
 import TableCell from "./table-cell";
-import { useEffect, useState } from "react";
-import { useClickAway } from "@uidotdev/usehooks";
-import { DragIndicatorOutlined } from "@mui/icons-material";
+import { useEffect, useRef, useState } from "react";
+import { useClickOutside } from "@hooks";
+import { DragIcon } from "@public/icons";
 import TextCell from "./table-cell/TextCell";
 
-import { OpenIcon, CloseIcon } from "@components/atoms/icons";
+import { OpenIcon, CloseIcon } from "@public/icons";
 
 type Props = {
   item: DataItem,
@@ -20,17 +20,20 @@ export default function TableRow({ item, attrsByName, onUpdate }: Props) {
   const [focusedCell, setFocusedCell] = useState(-1);
   const [opened, setOpened] = useState(false);
 
-  const ref = useClickAway(() => {
-    setFocusedCell(-1);
-  }) as any;
+  const ref = useRef<(HTMLDivElement | null)>(null)
+  useClickOutside(ref, () => setFocusedCell(-1))
 
-  const openedRef = useClickAway(() => {
-    setOpened(false);
-  }) as any
+  const openedRef = useRef<(HTMLDivElement | null)>(null)
+  useClickOutside(openedRef, () => setOpened(false))
+
+
+  function handleCellClick(index: number) {
+    console.log(index)
+    setFocusedCell(index)
+  }
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      console.log(e.key);
       if (e.key === 'Tab' && focusedCell !== -1 && focusedCell !== attrs.length - 1) {
         e.preventDefault();
         setFocusedCell((prev) => prev + 1);
@@ -72,7 +75,7 @@ export default function TableRow({ item, attrsByName, onUpdate }: Props) {
               <span
                 className={``}
               >
-                <DragIndicatorOutlined className="icon hover:cursor-grab" />
+                <DragIcon className="icon hover:cursor-grab" />
               </span>
 
               {attrs.some(attr => attr.newWindow) && <OpenIcon
@@ -89,7 +92,7 @@ export default function TableRow({ item, attrsByName, onUpdate }: Props) {
         </div>}
 
         {regularAttrs.sort((x, y) => x.order - y.order).map((attr, index) => (
-          <span onClick={() => setFocusedCell(index)}>
+          <span key={`table-cell-${item.id}-${index + 1}`} onClick={() => handleCellClick(index)}>
             <TableCell
               key={`table-cell-${item.id}-${index + 1}`}
               itemId={item.id}

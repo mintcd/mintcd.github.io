@@ -2,7 +2,7 @@ import { useCallback, useRef, useState } from "react"
 import { updateFilter } from "../functions";
 import { Dropdown } from "@components/molecules";
 
-import { ArrowDownIcon, ArrowUpIcon, FilterIcon, AdjustmentsIcon } from "@components/atoms/icons"
+import { ArrowDownIcon, ArrowUpIcon, FilterIcon, AdjustmentsIcon } from "@public/icons"
 
 export default function TableHeaderGroup({ factory }: {
   factory: Factory<TableProps>
@@ -33,8 +33,8 @@ export default function TableHeaderGroup({ factory }: {
     name: "Filter",
     icon: <FilterIcon className="icon" />,
     handler: (attr: AttrProps) => {
-      factory.set('menu', 'filter')
-      factory.set('attrsByName', updateFilter(factory.attrsByName, { name: attr.name }))
+      factory.setMenu('filter')
+      factory.setAttrsByName(updateFilter(factory.attrsByName, { name: attr.name }))
     }
   },
   {
@@ -53,7 +53,7 @@ export default function TableHeaderGroup({ factory }: {
           if (attrName) {
             const delta = e.clientX - startX;
             const newWidth = Math.max(factory.style?.cellMinWidth || 100, startWidth + delta);
-            factory.set("attrsByName", {
+            factory.setAttrsByName({
               ...factory.attrsByName,
               [attrName]: { ...factory.attrsByName[attrName], width: newWidth },
             });
@@ -117,14 +117,14 @@ export default function TableHeaderGroup({ factory }: {
           });
         }
         newAttrsByName[dragColumns.source].order = targetOrder;
-        factory.set('attrsByName', newAttrsByName);
+        factory.setAttrsByName(newAttrsByName);
       }
       setDragColumns({ source: null, target: null })
     }
   })
 
-  const handleSort = (attr: AttrProps, order: string | undefined = undefined) => {
-    let nextOrder: string
+  const handleSort = (attr: AttrProps, order: Order | undefined = undefined) => {
+    let nextOrder: Order
     if (order) {
       nextOrder = order
     } else {
@@ -138,10 +138,10 @@ export default function TableHeaderGroup({ factory }: {
       }
     }
 
-    factory.set('attrsByName', ({
+    factory.setAttrsByName({
       ...factory.attrsByName,
       [attr.name]: { ...attr, sort: nextOrder }
-    }))
+    })
   }
 
   return (
@@ -150,8 +150,8 @@ export default function TableHeaderGroup({ factory }: {
       {
         normalAttrs.map((attr, index) =>
           <div className={`header-cell-${attr.name} flex`} key={index}>
-            <Dropdown
-              toggler={
+            <Dropdown>
+              <Dropdown.Toggler>
                 <div
                   className={`py-1 flex justify-between items-center pl-2 text-[16px]
                                 hover:cursor-pointer hover:bg-blue-100`}
@@ -161,8 +161,8 @@ export default function TableHeaderGroup({ factory }: {
                 >
                   {attr.display}
                 </div>
-              }
-              content={
+              </Dropdown.Toggler>
+              <Dropdown.Content>
                 <div className="w-[175px]">
                   {options.map(option => (
                     <div className="p-3 hover:bg-gray-200 flex items-center cursor-pointer"
@@ -177,7 +177,7 @@ export default function TableHeaderGroup({ factory }: {
                     </div>
                   ))}
                 </div>
-              }>
+              </Dropdown.Content>
             </Dropdown>
             <div className={`column-separator w-[3px] hover:cursor-col-resize hover:bg-[#4672b0]
             ${attr.name === dragColumns.target && 'bg-[#4672b0]'}`}

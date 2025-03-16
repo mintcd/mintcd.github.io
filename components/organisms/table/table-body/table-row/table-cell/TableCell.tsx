@@ -21,7 +21,7 @@ export default function TableCell({ itemId, attr, value, onUpdate, suggestions, 
     >
       {
         attr.type === 'text' &&
-        <TextCell itemId={itemId} attr={attr} value={value as string} onUpdate={onUpdate} />
+        <TextCell itemId={itemId} attr={attr} value={value as string} onUpdate={onUpdate} focused={focused} />
       }
       {
         attr.type === 'multiselect' && Array.isArray(value) &&

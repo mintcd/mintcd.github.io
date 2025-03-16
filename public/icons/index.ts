@@ -4,7 +4,8 @@ import {
   IoMdDownload as DownloadIcon,
   IoIosSearch as SearchIcon,
   IoIosArrowRoundDown as ArrowDownIcon,
-  IoIosArrowRoundUp as ArrowUpIcon
+  IoIosArrowRoundUp as ArrowUpIcon,
+  IoIosArrowRoundBack as ArrowLeftIcon
 } from "react-icons/io";
 
 import { BsList as ListIcon } from 'react-icons/bs';
@@ -22,10 +23,15 @@ import {
   MdFirstPage as FirstPageIcon,
   MdFilterAlt as FilterIcon,
   MdDelete as DeleteIcon,
-  MdEdit as EditIcon
+  MdEdit as EditIcon,
+  MdDragIndicator as DragIcon,
+  MdFilterCenterFocus as CenterFocusIcon,
 } from "react-icons/md";
 
-import { FaAngleDown as AngleDownIcon } from "react-icons/fa";
+import {
+  FaAngleDown as AngleDownIcon,
+  FaCheckSquare as CheckIcon,
+} from "react-icons/fa";
 
 import {
   HiMiniViewColumns as ViewColumnsIcon,
@@ -52,5 +58,9 @@ export {
   ArrowUpIcon,
   AdjustmentsIcon,
   DeleteIcon,
-  EditIcon
+  EditIcon,
+  CheckIcon,
+  DragIcon,
+  ArrowLeftIcon,
+  CenterFocusIcon
 };

@@ -1,9 +1,15 @@
 type Factory<T extends object> = {
-  [key in keyof T]: T[key];
+  [key in keyof T]: T[key]; // Include the properties of T
+} & {
+  // Dynamically add a setter for each key
+  [key in keyof T as `set${Capitalize<string & key>}`]: (
+    value: T[key] | ((prev: T[key]) => T[key])
+  ) => void;
 } & {
   get: () => T
-  set: (key: keyof T, value: T[key]) => void;
+  set: <K extends keyof T>(key: K, value: T[K] | ((prev: T[K]) => T[K])) => void;
 };
+
 
 type ComponentAction = 'change' | 'submit'
 
@@ -30,3 +36,15 @@ type Coordinate = {
   x: number;
   y: number;
 }
+
+type IconStyle = {
+  width?: number
+  height?: number,
+  backgroundColor?: string,
+}
+
+type IconListeners<T extends HTMLElement = HTMLElement> = {
+  onClick?: React.MouseEventHandler<SVGSVGElement>
+  onMouseEnter?: React.MouseEventHandler<SVGSVGElement>
+  onMouseLeave?: React.MouseEventHandler<SVGSVGElement>
+};

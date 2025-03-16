@@ -9,9 +9,9 @@ type Post = {
   id: string;
   slug: string;
   title: string;
+  image?: string
   metadata: {
     published_date: string;
-    content: string;
     hero?: {
       imgix_url?: string;
     };
@@ -30,6 +30,7 @@ type Post = {
       title: string;
     }[];
   };
+  content: string;
 }
 
 type Author = {

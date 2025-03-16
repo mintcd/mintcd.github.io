@@ -6,15 +6,14 @@ import { getEdges, createNode, getLayout } from './functions';
 import Node from '../Node';
 import Edge from '../Edge';
 
-import { AddIcon, EditIcon, DeleteIcon } from '@components/atoms/icons';
+import { AddIcon, EditIcon, DeleteIcon } from '@public/icons';
 
 import styles from '@styles/styles'
 import "./styles.css"
 
 import GraphStyles from './styles';
 import Loading from '@components/atoms/loading';
-import { useOnClickOutside } from '@node_modules/usehooks-ts/dist';
-import { useSize } from '@hooks';
+import { useSize, useClickOutside } from '@hooks';
 
 type ArgumentType = 'contention' | 'support' | 'objection' | 'premise'
 
@@ -55,13 +54,12 @@ export default function Tree({ data, fontSize = styles.fontSize, layerGap = 100,
   const environmentRef = useRef<HTMLDivElement>(null);
   const nodeOptionsRef = useRef<HTMLDivElement>(null);
 
-  useOnClickOutside(nodeOptionsRef, () => {
+  useClickOutside(nodeOptionsRef, () => {
     setOption(null)
     setSelectedNode(null);
   })
 
-
-  const [selectedNode, setSelectedNode] = useState<TreeNode & { order?: number } | null>(null)
+  const [selectedNode, setSelectedNode] = useState<TreeNode & { subnodeOrder?: number } | null>(null)
   const [option, setOption] = useState<Option | null>(null)
 
   const view = useSize(environmentRef)
@@ -129,30 +127,31 @@ export default function Tree({ data, fontSize = styles.fontSize, layerGap = 100,
   function handleUpdateNode(value: string) {
     setNodes(prev => {
       // First update the node with new values
+      console.log(value, selectedNode?.subnodeOrder)
       const updatedNodes = prev.map(node =>
         node.id === selectedNode?.id
           ? (
-            selectedNode.order
+            selectedNode.subnodeOrder
               ? {
                 ...node,
                 content: node.content.map((subnode, index) =>
-                  index === selectedNode.order
-                    ? createNode(value, maxNodeWidth)
-                    : subnode)
+                  index === selectedNode.subnodeOrder
+                    ? value
+                    : subnode
+                )
               }
               : {
                 ...node,
-                content: [createNode(value, maxNodeWidth)]
+                content: [value]
               }
           )
           : node
       );
 
-      return {
-        ...prev,
-        nodes: updatedNodes
-      }
+      return updatedNodes
     });
+
+    setSelectedNode(null)
   }
 
   useEffect(() => {
@@ -180,7 +179,7 @@ export default function Tree({ data, fontSize = styles.fontSize, layerGap = 100,
     });
   }, [selectedNode, layout]);
 
-  console.log(nodes, layout)
+  console.log(nodes)
 
   return (
     <div ref={environmentRef} className={`nodes flex flex-col items-center justify-center w-full`}>

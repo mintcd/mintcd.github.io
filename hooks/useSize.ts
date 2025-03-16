@@ -4,7 +4,7 @@ type View = {
   width: number,
   height: number,
 }
-export default function useSize(ref: React.RefObject<HTMLElement>): View {
+export default function useSize(ref: React.RefObject<HTMLElement | null>): View {
   const [size, setSize] = useState<View>({ width: 0, height: 0 });
 
   useEffect(() => {

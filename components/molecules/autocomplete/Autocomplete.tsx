@@ -1,7 +1,7 @@
 import zIndices from '@styles/z-indices';
 import TextField from '@components/atoms/text-field';
 import Fuse from 'fuse.js';
-import { useClickAway } from "@uidotdev/usehooks";
+import { useClickOutside } from "@hooks";
 import { useState, useRef, useMemo, useEffect } from 'react'
 
 export default function Autocomplete({
@@ -39,7 +39,9 @@ export default function Autocomplete({
   const [_mode, setMode] = useState<"view" | "edit">(mode);
 
   const suggestionRefs = useRef<(HTMLLIElement | null)[]>([]); // Reference to each suggestion item
-  const ref = useClickAway(() => setMode("view")) as any
+
+  const ref = useRef<(HTMLDivElement | null)>(null)
+  useClickOutside(ref, () => setMode("view"))
 
 
   const fuse = useMemo(() => new Fuse(suggestions, {
@@ -102,7 +104,6 @@ export default function Autocomplete({
       ref={ref}>
       <TextField
         style={{ width: style?.width, height: style?.height }}
-        mode={mode}
         value={inputValue}
 
         onSubmit={(value) => {

@@ -29,6 +29,7 @@ export default function Latex({ children, style }: {
   return (
     <span
       className="__latex"
+      contentEditable
       style={{
         ...style,
         display: 'inline-block', // Added to ensure the span respects width and height

@@ -22,10 +22,11 @@ export default function TextCell({
   }
 
   return (
-    <TextField
-      value={String(value)}
-      onSubmit={handleUpdate}
-      render={(value) => <Latex>{value}</Latex>}
-    />
+    focused
+      ? <TextField
+        value={String(value)}
+        onSubmit={handleUpdate}
+      />
+      : <Latex>{value}</Latex>
   );
 }

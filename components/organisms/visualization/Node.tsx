@@ -29,12 +29,6 @@ export default function Node({
   onUpdate = () => { }
 }: VertexRendering) {
 
-  // function handleKeyDown(e: React.KeyboardEvent, value: string) {
-  //   if (e.key === 'Enter') {
-  //     onUpdate({ content: [value] });
-  //   }
-  // }
-
 
   return (
     <g
@@ -68,14 +62,15 @@ export default function Node({
         x={shape === 'circ' ? -radius : 0}
         y={shape === 'circ' ? -radius : 0}
       >
-        {editing ?
-          <TextField
-            mode='edit'
+        {editing
+          ? <TextField
             value={label}
-            // onKeyDown={(e, value) => handleKeyDown(e, value)}
             onSubmit={(value) => onUpdate(value)}
+            style={{
+              color: 'white',
+              textAlign: 'center'
+            }}
           />
-
           : <div className={``}
             style={{
               display: 'flex',

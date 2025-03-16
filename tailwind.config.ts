@@ -32,6 +32,9 @@ module.exports = {
       animation: {
         fadeIn: 'fadeIn 0.3s ease-out',
       },
+      size: {
+        default: '14px'
+      }
     },
   },
   blocklist: ['table', 'table-header-group', 'table-row', 'table-cell'],

@@ -2,9 +2,9 @@
 
 import { useEffect } from "react"
 
-export default function Chocomint() {
+export default function GetKey() {
   useEffect(() => {
-    window.localStorage.setItem("timeKeyGot", Date.now().toString())
+    window.localStorage.setItem("timeKeyGot", String(Date.now()))
   })
   return (
     <div>

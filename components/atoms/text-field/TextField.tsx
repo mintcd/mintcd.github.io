@@ -8,44 +8,48 @@
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { getAllIndices, breakLines } from "@functions/text-analysis";
 import { getCaretCoordinates } from "@functions/elements";
-import { useOnClickOutside } from "@node_modules/usehooks-ts";
+import { useClickOutside } from "@hooks";
 export default function TextField(
   {
     className = "",
-    style = {},
+    style = {
+      textAlign: "left",
+      color: "var(--text-color)"
+    },
 
-    mode = "view",
+    // mode = "view",
     value = "",
 
     onSubmit,
     onChange,
 
-    render
+    // render
   }: {
     className?: string,
     style?: React.CSSProperties,
-    mode?: "view" | "edit",
+    // mode?: "view" | "edit",
     value?: string,
     onSubmit: (value: string) => void,
     onChange?: (value: string) => void
-    render?: (value: string) => JSX.Element
+    // render?: (value: string) => JSX.Element
   }
 
 ) {
 
-  const [_mode, setMode] = useState<"view" | "edit">(mode)
+  // const [_mode, setMode] = useState<"view" | "edit">(mode)
   const [_value, setValue] = useState<string>(value)
   const [lastValue, setLastValue] = useState<string>("")
   const [selection, setSelection] = useState<[number, number]>([0, 0])
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  useOnClickOutside(textareaRef, () => onSubmit(_value))
+  useClickOutside(textareaRef, () => onSubmit(_value))
 
   const [caretPosition, setCaretPosition] = useState<number | null>(null);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter") {
+      e.preventDefault()
       if (e.shiftKey) {
         e.preventDefault();
         const textarea = textareaRef.current;
@@ -61,9 +65,8 @@ export default function TextField(
           setCaretPosition(caretPosition + 1);
         }
       } else {
+        console.log("submit")
         onSubmit(_value)
-
-        setMode("view")
       }
     }
   };
@@ -84,7 +87,7 @@ export default function TextField(
       textarea.style.height = `${Math.min(height, breakLines(_value, textarea.clientWidth).length * 21)}px`;
     }
 
-  });
+  }, []);
 
   // Whenever mode changes, update the caret position
   useEffect(() => {
@@ -100,7 +103,7 @@ export default function TextField(
       textarea.scrollIntoView({ block: "nearest", inline: "nearest" });
     }
 
-  }, [mode, _value.length])
+  }, [_value.length])
 
   useEffect(() => {
     const textarea = textareaRef.current;
@@ -111,43 +114,43 @@ export default function TextField(
     }
   }, [caretPosition]);
 
-  useEffect(() => {
-    setValue(value)
-  }, [value])
+  // useEffect(() => {
+  //   setValue(value)
+  // }, [value])
 
-  useEffect(() => {
-    onChange?.(_value)
-  }, [_value, onChange])
+  // useEffect(() => {
+  //   onChange?.(_value)
+  // }, [_value, onChange])
 
   return (
     <div className={`text-field flex items-center ${className}`}
-      onClick={(e) => {
-        setMode("edit")
-      }}
       style={{
         width: style?.width || '100%',
         height: style?.height || '100%',
         border: style?.border,
-        padding: style?.padding
+        padding: style?.padding,
       }}>
-      {mode === "edit" ?
+      {
+        // mode === "edit" ?
         <textarea
           aria-label="text-field-input"
           ref={textareaRef}
           style={{
             padding: 0,
             width: '100%',
+            color: style.color,
+            textAlign: style.textAlign
           }}
           className="focus:outline-none border-none resize-none bg-inherit textarea-no-scrollbar"
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           autoFocus
-          value={value}
+          value={_value}
         />
-        :
-        <div className="h-full overflow-ellipsis">
-          {render ? render(_value) : _value}
-        </div>
+        // :
+        // <div className="h-full overflow-ellipsis">
+        //   {render ? render(_value) : _value}
+        // </div>
       }
     </div>
   );

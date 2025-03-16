@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { useClickAway } from "@uidotdev/usehooks";
+import { useRef, useState } from "react";
+import { useClickOutside } from "@hooks";
 import { updateFilter } from "../functions";
 
-import { SettingsIcon, DownloadIcon, SearchIcon, CloseIcon, AngleDownIcon, ViewColumnsIcon, FilterIcon } from "@components/atoms/icons";
+import { SettingsIcon, DownloadIcon, SearchIcon, CloseIcon, AngleDownIcon, ViewColumnsIcon, FilterIcon } from "@public/icons";
 
 import { Dropdown } from "@components/molecules";
 import { Checkbox, TextField } from "@components/atoms";
@@ -34,18 +34,19 @@ export default function TableExtension({
 
   const [searchValue, setSearchValue] = useState("")
 
-  const menuRef = useClickAway(() => factory.set('menu', undefined)) as any
+  const menuRef = useRef<(HTMLDivElement | null)>(null)
+  useClickOutside(menuRef, () => factory.setMenu(null))
 
   function handleDeleteFilter(attr: AttrProps) {
     console.log(attr)
-    factory.set('attrsByName', {
+    factory.setAttrsByName({
       ...factory.attrsByName,
       [attr.name]: {
         ...attr,
         filter: {
           enabled: false,
           predicates: {
-            contained: "",
+            contains: "",
             is: [],
           }
         }
@@ -54,24 +55,24 @@ export default function TableExtension({
   }
 
   function handleFilter(action: FilterAction) {
-    factory.menu !== "filter" && factory.set("menu", "filter")
-    factory.set('attrsByName', updateFilter(factory.attrsByName, action))
+    factory.menu !== "filter" && factory.setMenu("filter")
+    factory.setAttrsByName(updateFilter(factory.attrsByName, action))
   }
 
   function handleSearch(searchString: string) {
-    factory.set('searchString', searchString)
-    factory.set("currentPage", 1)
+    factory.setSearchString(searchString)
+    factory.setCurrentPage(1)
   }
 
   function handlePagination(itemsPerPage: number) {
-    factory.set('itemsPerPage', itemsPerPage)
-    factory.set('currentPage', 1)
+    factory.setItemsPerPage(itemsPerPage)
+    factory.setCurrentPage(1)
   }
 
   function handleColumnVisibility(columnName: string) {
     const newAttrsByName = { ...factory.attrsByName }
     newAttrsByName[columnName] = { ...newAttrsByName[columnName], hidden: !factory.attrsByName[columnName].hidden }
-    factory.set('attrsByName', newAttrsByName)
+    factory.setAttrsByName(newAttrsByName)
   }
 
   function handleDownload(fileType: 'json' | 'csv') {
@@ -93,7 +94,6 @@ export default function TableExtension({
             value={searchValue}
             suggestions={data.map(item => item.name)}
             onSubmit={(value) => {
-              console.log(value)
               setSearchValue(value)
               handleSearch(value)
             }}
@@ -112,15 +112,15 @@ export default function TableExtension({
         <div className="table-menu-icons flex space-x-3">
           {options.columnVisibility && <ViewColumnsIcon
             className="icon"
-            onClick={() => factory.set("menu", factory.menu === "columnVisibility" ? undefined : "columnVisibility")}
+            onClick={() => factory.setMenu(factory.menu === "columnVisibility" ? null : "columnVisibility")}
           />}
           {options.filter && <FilterIcon className="icon"
-            onClick={() => factory.set("menu", factory.menu === "filter" ? undefined : "filter")} />}
+            onClick={() => factory.setMenu(factory.menu === "filter" ? null : "filter")} />}
           {options.pagination && <SettingsIcon className="icon"
-            onClick={() => factory.set("menu", factory.menu === "settings" ? undefined : "settings")}
+            onClick={() => factory.setMenu(factory.menu === "settings" ? null : "settings")}
           />}
           {options.download && <DownloadIcon className="icon"
-            onClick={() => factory.set("menu", factory.menu === "download" ? undefined : "download")}
+            onClick={() => factory.setMenu(factory.menu === "download" ? null : "download")}
           />}
         </div>
 
@@ -155,9 +155,8 @@ export default function TableExtension({
                 : Object.values(factory.attrsByName)
                   .filter(attr => factory.attrsByName[attr.name].filter.enabled)
                   .map((attr) => (
-                    <Dropdown
-                      key={attr.name}
-                      toggler={
+                    <Dropdown key={attr.name}>
+                      <Dropdown.Toggler>
                         <span className=" bg-slate-300 rounded-full py-[2px] px-[8px] flex items-center justify-between">
                           <span>
                             {factory.attrsByName[attr.name].display}
@@ -173,8 +172,8 @@ export default function TableExtension({
 
                           <AngleDownIcon fontSize={14} />
                         </span>
-                      }
-                      content={
+                      </Dropdown.Toggler>
+                      <Dropdown.Content>
                         <div className="filter-options">
                           {
                             factory.attrsByName[attr.name].type === 'multiselect' &&
@@ -225,8 +224,8 @@ export default function TableExtension({
                             </div>
                           }
                         </div>
-                      }
-                    />
+                      </Dropdown.Content>
+                    </Dropdown>
                   ))}
 
             </div>

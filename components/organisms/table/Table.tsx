@@ -2,10 +2,10 @@
 
 import { useEffect, useMemo } from "react";
 import { initializeAttrsByName, sortData, updateFilter } from "./functions.ts";
-import { useMediaQuery } from "@uidotdev/usehooks";
-import { createFactory } from "@functions/objects.ts";
+import useMediaQuery from "@hooks/useMediaQuery";
+import { createFactory } from "@functions/objects";
 
-import { AddIcon, NavigateNextIcon, NavigateBeforeIcon, LastPageIcon, FirstPageIcon } from "@components/atoms/icons";
+import { AddIcon, NavigateNextIcon, NavigateBeforeIcon, LastPageIcon, FirstPageIcon } from "@public/icons/index.ts";
 
 import TableHeaderGroup from "./table-header-group/TableHeaderGroup.tsx";
 import TableBody from "./table-body/TableBody.tsx";
@@ -27,17 +27,17 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
 
   const factory: Factory<TableProps> = createFactory(() => {
     const storeProps = localStorage.getItem('tableProps')
-    return (storeProps
-      ? JSON.parse(storeProps)
-      : {
-        name: name,
-        itemsPerPage: 10,
-        currentPage: 1,
-        upToDate: upToDate,
-        searchString: "",
-        attrsByName: initializeAttrsByName(attrs, data),
-        style: { cellMinWidth: 100, optionsColumnWidth: 75 }
-      }) as TableProps
+    if (storeProps) return JSON.parse(storeProps) as TableProps
+    return {
+      name: name,
+      itemsPerPage: 10,
+      currentPage: 1,
+      upToDate: upToDate,
+      searchString: "",
+      attrsByName: initializeAttrsByName(attrs, data),
+      style: { cellMinWidth: 100, optionsColumnWidth: 75 },
+      menu: null
+    } as TableProps
   })
 
   const processedData = useMemo(() => {
@@ -111,7 +111,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
 
   useEffect(() => {
     // Refetch suggestions every time data changes
-    factory.set('attrsByName', function () {
+    factory.setAttrsByName(() => {
       let newAttrsByName = { ...factory.attrsByName }
       Object.values(factory.attrsByName).filter(attr => attr.type !== 'text').forEach(attr => {
         newAttrsByName[attr.name].suggestions =
@@ -121,7 +121,7 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
             .sort()
       })
       return newAttrsByName
-    }())
+    })
   }, [data])
 
   return (
@@ -188,8 +188,8 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
         <div className="flex items-center rounded-md hover:bg-[#f0f0f0] py-1 px-2 cursor-pointer"
           onClick={() => {
             onCreateItem()
-            factory.set("searchString", "")
-            factory.set("currentPage", totalPages)
+            factory.setSearchString("")
+            factory.setCurrentPage(totalPages)
           }}>
           <AddIcon className={`icon`} />
           <span> New </span>
@@ -199,12 +199,12 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
           <FirstPageIcon
             className="icon"
             opacity={factory.currentPage > 1 ? 1 : 0.6}
-            onClick={() => factory.currentPage > 1 && factory.set("currentPage", 1)}
+            onClick={() => factory.currentPage > 1 && factory.setCurrentPage(1)}
           />
           <NavigateBeforeIcon
             className="icon"
             opacity={factory.currentPage > 1 ? 1 : 0.6}
-            onClick={() => factory.currentPage > 1 && factory.set("currentPage", factory.currentPage - 1)}
+            onClick={() => factory.currentPage > 1 && factory.setCurrentPage(factory.currentPage - 1)}
           />
           <span className="pagination-info">
             {(factory.currentPage - 1) * factory.itemsPerPage + 1} - {Math.min(factory.currentPage * factory.itemsPerPage, processedData.length)} of {processedData.length}
@@ -212,12 +212,12 @@ export default function Table({ name, upToDate, data, attrs, onUpdateCell, onCre
           <NavigateNextIcon
             className="icon"
             opacity={factory.currentPage < totalPages ? 1 : 0.6}
-            onClick={() => factory.currentPage < totalPages && factory.set("currentPage", factory.currentPage + 1)}
+            onClick={() => factory.currentPage < totalPages && factory.setCurrentPage(factory.currentPage + 1)}
           />
           <LastPageIcon
             className="icon"
             opacity={factory.currentPage < totalPages ? 1 : 0.6}
-            onClick={() => factory.currentPage < totalPages && factory.set("currentPage", totalPages)}
+            onClick={() => factory.currentPage < totalPages && factory.setCurrentPage(totalPages)}
           />
         </div>
       </div>

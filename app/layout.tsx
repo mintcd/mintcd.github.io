@@ -14,7 +14,7 @@ export default function RootLayout({ children }: {
   return (
     <StrictMode>
       <html lang="en">
-        <body className="bg-white text-[14px] text-gray-700">
+        <body className="bg-white text-[14px] text-gray-600">
           <Nav />
           <main className="mt-4 mx-2 sm:mx-10">
             {children}

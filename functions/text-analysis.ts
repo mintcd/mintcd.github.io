@@ -1,4 +1,3 @@
-import { createCanvas } from 'canvas';
 import Fuse from 'fuse.js';
 import styles from '@styles/styles'
 
@@ -16,14 +15,16 @@ export function capitalizeFirstLetter(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1)
 }
 
-export function getTextWidth(text: string, fontSize: number = styles.fontSize, fontFamily: string = "Arial") {
-  const canvas = createCanvas(200, 200); // Adjust dimensions as needed
-  const context = canvas.getContext('2d');
-  if (context) {
-    context.font = `${fontSize}px ${fontFamily}`;
-    return context.measureText(text).width;
-  }
-  return 0;
+export function getTextWidth(text: string, fontSize: number = 14, fontFamily: string = "Arial") {
+  const div = document.createElement('div');
+  div.style.position = 'absolute';
+  div.style.visibility = 'hidden';
+  div.style.font = `${fontSize}px ${fontFamily}`;
+  div.textContent = text;
+  document.body.appendChild(div);
+  const width = div.getBoundingClientRect().width;
+  document.body.removeChild(div);
+  return width;
 }
 
 export function getBoundingRect(text: string, maxWidth: number, fontSize: number = styles.fontSize) {
@@ -37,26 +38,26 @@ export function getBoundingRect(text: string, maxWidth: number, fontSize: number
 
 }
 
-export function getCharacterOffsetWidths(text: string, fontSize: number = 14, fontFamily: string = "Arial") {
-  const canvas = createCanvas(200, 200); // Adjust dimensions as needed
-  const context = canvas.getContext('2d');
-  if (!context) {
-    return [];
-  }
+// export function getCharacterOffsetWidths(text: string, fontSize: number = 14, fontFamily: string = "Arial") {
+//   const canvas = createCanvas(200, 200); // Adjust dimensions as needed
+//   const context = canvas.getContext('2d');
+//   if (!context) {
+//     return [];
+//   }
 
-  context.font = `${fontSize}px ${fontFamily}`;
-  const offsets: number[] = [0];
-  let currentOffset = 0;
+//   context.font = `${fontSize}px ${fontFamily}`;
+//   const offsets: number[] = [0];
+//   let currentOffset = 0;
 
-  for (let i = 0; i < text.length; i++) {
-    const char = text[i];
-    const charWidth = context.measureText(char).width;
-    currentOffset += charWidth;
-    offsets.push(currentOffset);
-  }
+//   for (let i = 0; i < text.length; i++) {
+//     const char = text[i];
+//     const charWidth = context.measureText(char).width;
+//     currentOffset += charWidth;
+//     offsets.push(currentOffset);
+//   }
 
-  return offsets;
-}
+//   return offsets;
+// }
 
 export function filterOnQuery(query: string, data: Term[], keys: string[] = ['name']) {
   return data.filter(term => {

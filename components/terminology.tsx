@@ -6,7 +6,7 @@ import { filterOnQuery } from '@functions/text-analysis'
 import { GoSearch } from 'react-icons/go';
 import Fuse from 'fuse.js';
 import Latex from '@components/atoms/latex';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import { ArrowDownIcon } from '@public/icons';
 
 export default function Terminology({ data, field }: { data: Term[], field?: Field | 'all-fields' }) {
   const fields = [
@@ -82,7 +82,7 @@ export default function Terminology({ data, field }: { data: Term[], field?: Fie
             <span>
               {fields.find(f => f.value === selectedField)?.label}
             </span>
-            <ArrowDropDownIcon className={`transition-transform duration-300 ${isOpen ? 'transform rotate-180' : ''}`} />
+            <ArrowDownIcon className={`transition-transform duration-300 ${isOpen ? 'transform rotate-180' : ''}`} />
           </div>
 
           {isOpen && (

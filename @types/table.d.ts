@@ -14,7 +14,7 @@ type TableStyle = {
   cellMinWidth?: number;
 }
 
-type MenuState = "filter" | "sorts" | "columnVisibility" | "download" | "settings" | "search" | undefined
+type MenuState = "filter" | "sorts" | "columnVisibility" | "download" | "settings" | "search" | null
 
 type AttrProps = {
   name: string,
@@ -39,3 +39,5 @@ type AttrProps = {
     [tag: string]: string
   }
 }
+
+type Order = "asc" | "desc" | "none"

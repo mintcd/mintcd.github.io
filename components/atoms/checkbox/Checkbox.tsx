@@ -1,6 +1,6 @@
 'use client';
 
-import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
+import { CheckIcon } from '@public/icons';
 
 export default function Checkbox({ checked, onChange }: {
   checked: boolean;
@@ -18,7 +18,7 @@ export default function Checkbox({ checked, onChange }: {
         peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300
         rounded-sm relative dark:border-gray-600 peer-checked:bg-[#1b4683]
         transition-all duration-300 ease-in-out`}>
-        <CheckRoundedIcon className='text-white opacity-100'
+        <CheckIcon className='text-white opacity-100'
           style={{ fontSize: '14px' }} />
       </div>
     </label>

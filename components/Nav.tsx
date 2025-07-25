@@ -36,7 +36,7 @@ export default function Nav() {
   };
 
   return (
-    <nav className="bg-inherit mt-3">
+    <nav className="bg-transparent mt-3">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-center">
           <Link href="/" className="flex items-center">

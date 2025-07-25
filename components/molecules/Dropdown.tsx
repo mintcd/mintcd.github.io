@@ -1,10 +1,10 @@
 'use client'
-import { ReactNode, useState, useRef, createContext, useContext } from "react";
+import { ReactNode, useState, useRef, createContext, useContext, ReactElement, Children, isValidElement, PropsWithChildren } from "react";
 import { useClickOutside } from '@hooks';
 
-type DropdownProps = {
-  children: ReactNode;
-}
+type DropdownProps = PropsWithChildren<{
+  // No specific props needed here, just children
+}>;
 
 type DropdownContextType = {
   isOpen: boolean;
@@ -13,6 +13,29 @@ type DropdownContextType = {
 
 const DropdownContext = createContext<DropdownContextType | undefined>(undefined);
 
+/**
+ * Dropdown component.
+ * 
+ * **Usage:**
+ *
+ * ```tsx
+ * <Dropdown>
+ *   <Dropdown.Toggler>Toggle Me</Dropdown.Toggler>
+ *   <Dropdown.Content>
+ *     <ul>
+ *       <li>Item 1</li>
+ *       <li>Item 2</li>
+ *     </ul>
+ *   </Dropdown.Content>
+ * </Dropdown>
+ * ```
+ *
+ * **Important:**
+ *
+ * -   This component *must* contain exactly one `Dropdown.Toggler` and one `Dropdown.Content` as direct children.
+ * -   `Dropdown.Toggler` defines the trigger element.
+ * -   `Dropdown.Content` defines the content that will be shown/hidden.
+ */
 export default function Dropdown({ children }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -23,6 +46,9 @@ export default function Dropdown({ children }: DropdownProps) {
 
   useClickOutside(dropdownRef, () => setIsOpen(false));
 
+  // Validate children when they change.
+  Dropdown.validateChildren(children);
+
   return (
     <DropdownContext.Provider value={{ isOpen, handleToggle }}>
       <div className="drop-down" ref={dropdownRef}>
@@ -32,7 +58,11 @@ export default function Dropdown({ children }: DropdownProps) {
   );
 }
 
-Dropdown.Toggler = function Toggler({ children }: { children: ReactNode }) {
+type TogglerProps = {
+  children: ReactNode;
+};
+
+Dropdown.Toggler = function Toggler({ children }: TogglerProps) {
   const context = useContext(DropdownContext);
 
   if (!context) {
@@ -48,7 +78,11 @@ Dropdown.Toggler = function Toggler({ children }: { children: ReactNode }) {
   );
 };
 
-Dropdown.Content = function Content({ children }: { children: ReactNode }) {
+type ContentProps = {
+  children: ReactNode;
+};
+
+Dropdown.Content = function Content({ children }: ContentProps) {
   const context = useContext(DropdownContext);
 
   if (!context) {
@@ -65,4 +99,31 @@ Dropdown.Content = function Content({ children }: { children: ReactNode }) {
       {children}
     </div>
   );
+};
+
+// Ensure only Dropdown.Toggler and Dropdown.Content are used as children
+Dropdown.validateChildren = function (children: ReactNode) {
+  let hasToggler = false;
+  let hasContent = false;
+  const directChildren = Children.toArray(children);
+  if (directChildren.length > 2 || directChildren.length < 2) {
+    throw new Error('Dropdown must contain exactly Dropdown.Toggler and Dropdown.Content as direct children.');
+  }
+  Children.forEach(children, (child) => {
+    if (!isValidElement(child) || (child.type !== Dropdown.Toggler && child.type !== Dropdown.Content)) {
+      throw new Error('Dropdown must contain only Dropdown.Toggler and Dropdown.Content as direct children.');
+    }
+    if (isValidElement(child) && child.type === Dropdown.Toggler) {
+      hasToggler = true
+    }
+    if (isValidElement(child) && child.type === Dropdown.Content) {
+      hasContent = true;
+    }
+  });
+  if (!hasToggler) {
+    throw new Error('Dropdown must contain Dropdown.Toggler as direct children.');
+  }
+  if (!hasContent) {
+    throw new Error('Dropdown must contain Dropdown.Content as direct children.');
+  }
 };

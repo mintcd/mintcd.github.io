@@ -19,5 +19,10 @@ module.exports = {
   },
   plugins: [
     new CaseSensitivePathsPlugin()
-  ]
+  ],
+  resolve: {
+    alias: {
+      react: path.resolve(__dirname, './node_modules/react'),
+    },
+  },
 };

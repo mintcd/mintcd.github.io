@@ -15,7 +15,6 @@ import {
   IoOpenOutline as OpenIcon,
   IoClose as CloseIcon
 } from "react-icons/io5";
-
 import {
   MdNavigateNext as NavigateNextIcon,
   MdNavigateBefore as NavigateBeforeIcon,
@@ -31,6 +30,7 @@ import {
 import {
   FaAngleDown as AngleDownIcon,
   FaCheckSquare as CheckIcon,
+  FaLightbulb as LightbulbIcon
 } from "react-icons/fa";
 
 import {
@@ -62,5 +62,6 @@ export {
   CheckIcon,
   DragIcon,
   ArrowLeftIcon,
-  CenterFocusIcon
+  CenterFocusIcon,
+  LightbulbIcon
 };

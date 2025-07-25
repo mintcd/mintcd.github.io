@@ -24,7 +24,7 @@ type GraphData = {
 
 let cachedAuthorNames: Record<string, string> = {};
 
-export default function ForceGraph({ dbName }: { dbName: string }) {
+export default function PaperGraph() {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [data, setData] = useState<GraphData | null>(null);
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
@@ -89,7 +89,7 @@ export default function ForceGraph({ dbName }: { dbName: string }) {
     }
 
     fetchData();
-  }, [dbName]);
+  }, []);
 
   //Render
   useEffect(() => {

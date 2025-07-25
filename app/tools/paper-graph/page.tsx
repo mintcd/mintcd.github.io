@@ -309,7 +309,7 @@ export default function PaperGraph() {
     <div className="relative w-full h-full overflow-hidden flex">
 
       <div className='w-[20%]  border-gray-300 '>
-        <div className='flex m-3 justify-between'>
+        <div className='flex m-3 justify-between items-center'>
           <Search
             knownIds={new Set(data?.nodes.map(n => n.id))}
             onSelect={async (paperNode) => {
@@ -322,7 +322,7 @@ export default function PaperGraph() {
               });
             }}
           />
-
+          {!data && <span>Fetching graph...</span>}
           {suggestionLoading && <span>Loading suggestions...</span>}
 
         </div>

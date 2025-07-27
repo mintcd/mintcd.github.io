@@ -2,7 +2,6 @@
 
 import { useRef, useState } from 'react';
 import {
-  sleep,
   searchFromSemanticScholar,
   fetchFromSemanticScholar,
   addToNotionDatabase,
@@ -20,10 +19,10 @@ type Suggestion = {
 };
 
 export default function Search({
-  knownIds,
+  knownPapers,
   onSelect,
 }: {
-  knownIds: Set<string>;
+  knownPapers: Paper[];
   onSelect: (paper: any) => void;
 }) {
   const [modalOpen, setModalOpen] = useState(false);
@@ -36,6 +35,7 @@ export default function Search({
   const ref = useRef<HTMLDivElement>(null);
   useClickOutside(ref, () => setModalOpen(false));
 
+  const knownIds = new Set(knownPapers.map(p => p.id))
 
   async function handleSearch() {
     if (!query.trim()) {
@@ -54,49 +54,44 @@ export default function Search({
 
     setQuery('');
     setSuggestions([]);
-    setStatus('Fetching selected paper...');
+    setStatus('Fetching paper...');
     const paper = await fetchFromSemanticScholar(id);
 
-    setStatus('Adding selected paper to database...');
-    const returnedPaper = await addToNotionDatabase({ ...paper, status: 'shown' });
-    if (!returnedPaper) return;
+    setStatus('Adding paper to database...');
+    const returnedPaper = await addToNotionDatabase(paper) as Paper
+    if (!returnedPaper) {
+      setStatus('Failed to add paper to database.');
+      return;
+    }
 
-    knownIds.add(paper.paperId);
+    returnedPaper.authors = paper.authors
+    returnedPaper.references = []
+    returnedPaper.citations = []
 
-    returnedPaper.authors = paper.authors.map((a: any) => a.name);
+
+    setStatus('Adjusting links...')
+    const referencesScidSet = new Set(paper.references?.map(ref => ref.scid))
+    const citationsScidSet = new Set(paper.citations?.map(ref => ref.scid))
+    for (const notionPaper of knownPapers) {
+      if (referencesScidSet.has(notionPaper.scid)
+        || notionPaper.citationScids.includes(paper.scid)) {
+        await updateNotionPage(notionPaper.id, {
+          citations: [...notionPaper.references ?? [], { id: returnedPaper.id }],
+        })
+        returnedPaper.references?.push({ id: notionPaper.id } as any)
+      }
+      if (citationsScidSet.has(notionPaper.scid)
+        || notionPaper.referenceScids.includes(paper.scid)) {
+        await updateNotionPage(notionPaper.id, {
+          references: [...notionPaper.citations ?? [], { id: returnedPaper.id }],
+        })
+        returnedPaper.citations?.push({ id: notionPaper.id } as any)
+      }
+    }
+
     onSelect(returnedPaper);
-
-    const referenceIds: string[] = [];
-    const citationIds: string[] = [];
-
-    setStatus('Adding references...');
-    for (const [index, ref] of (paper.references ?? []).entries()) {
-      if (ref.paperId && !knownIds.has(ref.paperId)) {
-        const returnedRef = await addToNotionDatabase({ ...ref, status: 'suggested' });
-        if (!returnedRef) continue;
-        knownIds.add(ref.paperId);
-        referenceIds.push(returnedRef.id);
-        await sleep(200);
-        setStatus(`Added references ${index + 1}/${paper.references.length}...`);
-      }
-    }
-
-    setStatus('Adding citations...');
-    for (const [index, cite] of (paper.citations ?? []).entries()) {
-      if (cite.paperId && !knownIds.has(cite.paperId)) {
-        const returnedCite = await addToNotionDatabase({ ...cite, status: 'suggested' });
-        if (!returnedCite) continue;
-        knownIds.add(cite.paperId);
-        citationIds.push(returnedCite.id);
-        await sleep(2000);
-        setStatus(`Added citations ${index + 1}/${paper.citations.length}...`);
-      }
-    }
-
-    await updateNotionPage(returnedPaper.id, {
-      references: referenceIds,
-      citations: citationIds,
-    });
+    knownIds.add(paper.id);
+    knownPapers.push(returnedPaper);
 
     setStatus('');
     setModalOpen(false);
@@ -104,17 +99,16 @@ export default function Search({
 
   return (
     <>
-      <div className='search flex justify-between'>
+      <div className='search flex items-center justify-between'>
         <button
           onClick={() => setModalOpen(true)}
           className="p-2 rounded-full bg-gray-100 hover:bg-gray-200"
         >
           <SearchIcon className="w-5 h-5 text-gray-700" />
         </button>
-        {status !== "" &&
-          <span>
-            {status}
-          </span>}
+        <span>
+          {status}
+        </span>
       </div>
 
 

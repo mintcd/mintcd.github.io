@@ -12,10 +12,33 @@ export async function searchFromSemanticScholar(query: string) {
   return data;
 }
 
-export async function fetchFromSemanticScholar(id: string) {
+export async function fetchFromSemanticScholar(id: string): Promise<Paper> {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/semantic-scholar/paper?id=${id}`);
   if (!res.ok) throw res; // ← throw entire Response object
   return res.json();
+}
+
+export async function findWithScid(scid: string, db: 'papers' | 'authors'): Promise<Paper | _Author | null> {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_ENDPOINT}/notion/databases/${db}?action=get`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        filter: {
+          property: 'scid',
+          rich_text: {
+            equals: scid,
+          },
+        },
+      }),
+    }
+  );
+
+  if (!res.ok) throw res;
+
+  const data = await res.json();
+  return data.length > 0 ? data[0] : null;
 }
 
 export async function updateNotionPage(id: string, properties: { [key: string]: any }) {
@@ -59,14 +82,13 @@ export async function fetchNotionBlock(id: string) {
   return res.json();
 }
 
-export async function fetchFromNotionDatabase(database: string, filter?: any) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/notion/databases/${database}`, {
+export async function fetchFromNotionDatabase(db: 'papers' | 'authors', filter?: any) {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/notion/databases/${db}?action=get`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      action: 'get',
       ...(filter && { filter }),
     }),
   });
@@ -75,121 +97,89 @@ export async function fetchFromNotionDatabase(database: string, filter?: any) {
   return res.json();
 }
 
-export async function addToNotionDatabase(paper: any) {
-  // First check if paper already exists
-  const searchPaperRes = await fetch(
-    `${process.env.NEXT_PUBLIC_API_ENDPOINT}/notion/databases/papers`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'get',
-        filter: {
-          property: 'scid',
-          rich_text: {
-            equals: paper.paperId,
-          },
-        },
-      }),
-    }
-  );
+export async function fetchPapers() {
+  let papers = await fetchFromNotionDatabase('papers');
 
-  if (!searchPaperRes.ok) throw searchPaperRes;
+  papers = await Promise.all(papers.map(async (paper: any) => {
+    const contents = await fetchNotionBlock(paper.id);
+    paper.abstract = contents?.abstract ?? null;
+    paper.referenceScids = contents?.referenceScids ?? [];
+    paper.citationScids = contents?.citationScids ?? [];
+    return paper;
+  }));
 
-  const existingPapers = await searchPaperRes.json();
-  if (existingPapers.length > 0) return;
+  return papers;
+}
+
+export async function addToNotionDatabase(paper: Paper) {
+  const paperInNotion = await findWithScid(paper.scid, 'papers');
+  if (paperInNotion) return paperInNotion;
 
   const authors = paper.authors ?? [];
-  const authorPageIds: string[] = [];
+  const notionAuthors: { id: string }[] = [];
 
   for (const author of authors) {
-    const authorData = {
-      scid: author.authorId,
-      name: author.name,
-    };
-
-    const searchRes = await fetch(
-      `${process.env.NEXT_PUBLIC_API_ENDPOINT}/notion/databases/authors`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'get',
-          filter: {
-            property: 'scid',
-            rich_text: {
-              equals: authorData.scid,
-            },
-          },
-        }),
-      }
-    );
-
-    if (!searchRes.ok) throw searchRes;
-
-    const existingAuthors = await searchRes.json();
+    const notionAuthor = await findWithScid(author.scid, 'authors');
     let authorPageId: string;
 
-    if (existingAuthors.length > 0) {
-      authorPageId = existingAuthors[0].id;
+    if (notionAuthor) {
+      authorPageId = notionAuthor.id;
     } else {
-      const createRes = await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/notion/databases/authors`, {
+      const createRes = await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/notion/databases/authors?action=add`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'add',
-          ...authorData,
-        }),
+        body: JSON.stringify(author),
       });
 
       if (!createRes.ok) throw createRes;
-
       authorPageId = (await createRes.json()).id;
     }
 
-    authorPageIds.push(authorPageId);
+    notionAuthors.push({ id: authorPageId });
   }
 
-  // Construct paper object and send "add" request
   const paperNode = {
-    scid: paper.paperId,
-    doi: paper.externalIds?.DOI ?? '',
-    arxivId: paper.externalIds?.ArXiv ?? '',
-    aclId: paper.externalIds?.ACL ?? '',
-    dblpId: paper.externalIds?.DBLP ?? '',
-
     title: paper.title,
     year: paper.year,
     citationCount: paper.citationCount,
     referenceCount: paper.referenceCount,
-    status: paper.status,
-    authors: authorPageIds,
+    doi: paper.doi,
+    arxivId: paper.arxivId,
+    aclId: paper.aclId,
+    dblpId: paper.dblpId,
+    scid: paper.scid,
+    authors: notionAuthors,
   };
 
-  const dbRes = await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/notion/databases/papers`, {
+  const dbRes = await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/notion/databases/papers?action=add`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      action: 'add',
-      ...paperNode,
-    }),
+    body: JSON.stringify(paperNode),
   });
-
   if (!dbRes.ok) throw dbRes;
 
-  const { id: pageId } = await dbRes.json();
+  const addedPaper = await dbRes.json();
 
-  if (paper.abstract?.length > 0) {
-    const contentRes = await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/notion/blocks/${pageId}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: paper.abstract }),
-    });
+  console.log(addedPaper)
 
-    if (!contentRes.ok) throw contentRes;
-  }
+  const referenceScids = paper.references?.map(ref => ref.scid) ?? []
+  const citationScids = paper.citations?.map(ref => ref.scid) ?? []
 
-  return { id: pageId, ...paperNode };
+  const blockContent = JSON.stringify({
+    abstract: paper.abstract ?? null,
+    referenceScids, citationScids
+  }, null, 2);
+
+
+  const contentRes = await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/notion/blocks/${addedPaper.id}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ content: blockContent }),
+  });
+
+  console.log(await contentRes.json())
+
+  return { ...paper, id: addedPaper.id, referenceScids, citationScids };
 }
 
 export function getOpenUrl(paper: any): string | null {

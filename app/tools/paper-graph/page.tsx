@@ -3,85 +3,39 @@
 import { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import Search from './Search';
-import { fetchFromNotionDatabase, fetchNotionBlock, fetchNotionPage, getOpenUrl } from './utils';
-import { OpenIcon, LightbulbIcon } from '@public/icons';
-import PaperCard from './PaperCard';
-import { useClickOutside } from '@hooks';
-
-type GraphNode = Paper & {
-  x: number, y: number, fx: number | null, fy: number | null
-}
-
-type Link = {
-  source: string;
-  target: string;
-};
-
-type GraphData = {
-  nodes: GraphNode[];
-  links: Link[];
-};
-
-let cachedAuthorNames: Record<string, string> = {};
+import { fetchFromNotionDatabase, fetchNotionBlock, fetchNotionPage, fetchPapers } from './utils';
+import PaperDetail from './PaperDetail';
 
 export default function PaperGraph() {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [data, setData] = useState<GraphData | null>(null);
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
   const [clickedNode, setClickedNode] = useState<GraphNode | null>(null);
-  const [abstracts, setAbstracts] = useState<Record<string, string>>({});
-  const [abstractExpanded, setAbstractExpanded] = useState(false)
-  const [citationCache, setCitationCache] = useState<{
-    [paperId: string]: {
-      references: any[],
-      citations: any[],
-    }
-  }>({});
-  const [lightbulbData, setLightbulbData] = useState<{
-    references: any[],
-    citations: any[],
-    open: boolean,
-  }>({ references: [], citations: [], open: false });
-  const [suggestionLoading, setSuggestionLoading] = useState(false);
-
-  const suggestionRef = useRef<HTMLDivElement>(null);
-  useClickOutside(suggestionRef, () => setLightbulbData(d => ({ ...d, open: false })))
 
   useEffect(() => {
     async function fetchData() {
-      const paperFilter = { property: "status", select: { equals: "shown" } };
-      const nodes: GraphNode[] = await fetchFromNotionDatabase("papers", paperFilter);
+      let nodes: GraphNode[] = await fetchPapers();
 
-      // Collect all unique author IDs
-      const authorIds = new Set<string>();
+      console.log(nodes)
+
+      const authors = await fetchFromNotionDatabase("authors") as _Author[];;
+
+      const authorsById = authors.reduce((acc, author) => {
+        acc[author.id] = author;
+        return acc;
+      }, {} as { [id: string]: _Author });
+
+      // Adjust authors
       for (const node of nodes) {
-        if (Array.isArray(node.authors)) {
-          node.authors.forEach((id: string) => authorIds.add(id));
+        for (const author of node.authors ?? []) {
+          author.name = authorsById[author.id]?.name;
         }
       }
 
-      // Fetch author pages in bulk
-      if (authorIds.size > 0) {
-        const authors = await fetchFromNotionDatabase("authors");
-
-        cachedAuthorNames = Object.fromEntries(
-          authors.map((a: any) => [a.id, a.name ?? a.title ?? ""])
-        );
-      }
-
-      // Replace author IDs with names
-      for (const node of nodes) {
-        if (Array.isArray(node.authors)) {
-          node.authors = node.authors.map((id: string) => cachedAuthorNames[id] ?? id);
-        }
-      }
-
-      const links: Link[] = [];
+      const links: GraphLink[] = [];
       for (const item of nodes) {
-        const sourceId = item.id;
-        const references: string[] = item.references ?? [];
-        for (const targetId of references) {
-          links.push({ source: sourceId, target: targetId });
+        for (const target of item.references ?? []) {
+          links.push({ source: item.id, target: target.id });
         }
       }
       console.log(nodes)
@@ -252,58 +206,30 @@ export default function PaperGraph() {
       return;
     }
 
-    setClickedNode(node);
-    if (!(node.id in abstracts)) {
-      const abs = await fetchNotionBlock(node.id);
-      setAbstracts(prev => ({ ...prev, [node.id]: abs.data }));
-    }
   }
 
-  async function handleSuggest() {
-    if (!clickedNode) return;
-
-    const paperId = clickedNode.id;
-
-    // Use cached data if available
-    if (citationCache[paperId]) {
-      setLightbulbData({
-        ...citationCache[paperId],
-        open: true,
-      });
-      return;
-    }
-
-    setSuggestionLoading(true);
-
-    // Otherwise, fetch
-    const referenceIds = clickedNode.references ?? [];
-    const references = await Promise.all(referenceIds.map(async (refId) => {
-      const result = await fetchNotionPage(refId);
-      return result;
-    }));
-
-    const citationIds = clickedNode.citations ?? [];
-    const citations = await Promise.all(citationIds.map(async (refId) => {
-      const result = await fetchNotionPage(refId);
-      return result;
-    }));
-
-    const newEntry = { references, citations };
-
-    // Cache it
-    setCitationCache(prev => ({
-      ...prev,
-      [paperId]: newEntry,
-    }));
-
-    // Show modal
-    setLightbulbData({
-      ...newEntry,
-      open: true,
+  async function handlePaperSelect(paperNode: GraphNode) {
+    console.log(paperNode)
+    setData(oldData => {
+      if (!oldData) return { nodes: [paperNode], links: [] };
+      const newNodes = [...oldData.nodes, paperNode]
+      const newLinks: GraphLink[] = [...oldData.links,
+      ...(paperNode.references ?? []).map(ref => ({
+        source: paperNode.id,
+        target: ref.id,
+      })),
+      ...(paperNode.citations ?? []).map(cite => ({
+        source: cite.id,
+        target: paperNode.id,
+      }))]
+      return {
+        nodes: newNodes,
+        links: newLinks
+      };
     });
 
-    setSuggestionLoading(false)
   }
+
 
   return (
     <div className="relative w-full h-full overflow-hidden flex">
@@ -311,19 +237,10 @@ export default function PaperGraph() {
       <div className='w-[20%]  border-gray-300 '>
         <div className='flex m-3 justify-between items-center'>
           <Search
-            knownIds={new Set(data?.nodes.map(n => n.id))}
-            onSelect={async (paperNode) => {
-              setData(oldData => {
-                if (!oldData) return { nodes: [paperNode], links: [] };
-                return {
-                  ...oldData,
-                  nodes: [...oldData.nodes, paperNode],
-                };
-              });
-            }}
+            knownPapers={data?.nodes ?? []}
+            onSelect={handlePaperSelect}
           />
           {!data && <span>Fetching graph...</span>}
-          {suggestionLoading && <span>Loading suggestions...</span>}
 
         </div>
         {data?.nodes.map((node) => (
@@ -345,84 +262,7 @@ export default function PaperGraph() {
         <svg ref={svgRef} width="100%" height={600}></svg>
       </div>
 
-      {clickedNode &&
-        <div className="w-[30%] bg-slate-100 rounded-md p-2 h-full overflow-auto scrollbar-thin scrollbar-thumb-slate-400 scrollbar-track-slate-200">
-          <div className='flex justify-between'>
-            <span className="font-semibold text-sm text-blue-700 truncate">
-              {clickedNode.title}
-            </span>
-            <span className='flex'>
-              <LightbulbIcon className='mr-2 cursor-pointer' size={18} onClick={(e) => {
-                e.stopPropagation();
-                handleSuggest()
-              }} />
-              <OpenIcon size={18} className='cursor-pointer' onClick={(e) => {
-                e.stopPropagation();
-                const url = getOpenUrl(clickedNode);
-                if (url) window.open(url, '_blank');
-              }} />
-            </span>
-
-          </div>
-          <div className='flex justify-between'>
-            {clickedNode.authors && clickedNode.authors.length > 0 && (
-              <span className="text-xs text-gray-600 mt-1">
-                {Array.isArray(clickedNode.authors)
-                  ? clickedNode.authors.join(', ')
-                  : String(clickedNode.authors)}
-              </span>
-            )}
-            {typeof clickedNode.citationCount === 'number' && (
-              <span className="text-xs text-gray-600 mt-1">
-                {clickedNode.citationCount} citations
-              </span>
-            )}
-          </div>
-
-          {abstracts[clickedNode.id] &&
-            <div onClick={() => setAbstractExpanded(!abstractExpanded)}>
-              <strong>Abstract. </strong>
-              {
-                abstractExpanded
-                  ? abstracts[clickedNode.id]
-                  : abstracts[clickedNode.id].slice(0, 200) + '...'
-              }
-            </div>
-          }
-        </div>}
-
-      {lightbulbData.open && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div ref={suggestionRef} className="bg-white w-[1/2] max-h-[80vh] p-6 rounded shadow overflow-y-auto">
-            <div className="mb-4">
-              <h3 className="font-semibold text-gray-700">References</h3>
-              {lightbulbData.references.length === 0 ? (
-                <p className="text-sm text-gray-500"> No references found.</p>
-              ) : (
-                <>
-                  {lightbulbData.references
-                    .sort((a, b) => b.citationCount - a.citationCount)
-                    .map((paper) => <PaperCard key={paper.id} paper={paper} />)}
-                </>
-              )}
-            </div>
-
-            <div>
-              <h3 className="font-semibold text-gray-700">Citations</h3>
-              {lightbulbData.citations.length === 0 ? (
-                <p className="text-sm text-gray-500">No citations found.</p>
-              ) : (
-                <>
-                  {lightbulbData.citations
-                    .sort((a, b) => b.citationCount - a.citationCount)
-                    .map((paper) =>
-                      <PaperCard key={paper.id} paper={paper} />)}
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      <PaperDetail paper={clickedNode} />
     </div>
   );
 }

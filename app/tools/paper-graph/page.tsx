@@ -55,8 +55,9 @@ export default function PaperGraph() {
         .distance(150)
         .strength(0.7)
       )
-      .force('charge', d3.forceManyBody().strength(-30))
-      .force('center', d3.forceCenter(GRAPH_WIDTH / 2, GRAPH_HEIGHT / 2));
+      // .force('charge', d3.forceManyBody().strength(-30))
+      .force('center', d3.forceCenter(GRAPH_WIDTH / 2, GRAPH_HEIGHT / 2))
+      .force('collide', d3.forceCollide().radius(30).strength(1));
 
     const link = zoomGroup
       .append('g')

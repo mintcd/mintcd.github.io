@@ -12,7 +12,7 @@ import { Loading } from '@components/atoms';
 import useClickOutside from '@hooks/useClickOutside';
 
 type Suggestion = {
-  id: string;
+  scid: string;
   title: string;
   authorsYear: string;
 };
@@ -134,12 +134,12 @@ export default function Search({
                 <ul className=" max-h-60 overflow-auto">
                   {suggestions.map((s) => (
                     <li
-                      key={s.id}
-                      className={`p-2 ${knownIds.has(s.id)
+                      key={s.scid}
+                      className={`p-2 ${knownIds.has(s.scid)
                         ? 'bg-gray-100 text-gray-400 cursor-default'
                         : 'hover:bg-blue-100 cursor-pointer'
                         } border-b-[1px] border-b-gray-200`}
-                      onClick={() => !knownIds.has(s.id) && handleSelect(s.id)}
+                      onClick={() => !knownIds.has(s.scid) && handleSelect(s.scid)}
                     >
                       <div className='text-[14px]'>
                         {s.title}

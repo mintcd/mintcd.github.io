@@ -76,14 +76,14 @@ export default function Search({
       if (referencesScidSet.has(notionPaper.scid)
         || notionPaper.citationScids.includes(paper.scid)) {
         await updateNotionPage(notionPaper.id, {
-          citations: [...notionPaper.references ?? [], { id: returnedPaper.id }],
+          citations: [...(notionPaper.citations ?? []), { id: returnedPaper.id }],
         })
         returnedPaper.references?.push({ id: notionPaper.id } as any)
       }
       if (citationsScidSet.has(notionPaper.scid)
         || notionPaper.referenceScids.includes(paper.scid)) {
         await updateNotionPage(notionPaper.id, {
-          references: [...notionPaper.citations ?? [], { id: returnedPaper.id }],
+          references: [...(notionPaper.references ?? []), { id: returnedPaper.id }],
         })
         returnedPaper.citations?.push({ id: notionPaper.id } as any)
       }

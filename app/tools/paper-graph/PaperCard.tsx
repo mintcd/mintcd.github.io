@@ -20,6 +20,9 @@ export default function PaperCard({ paper }: { paper: Paper }) {
       </div>
       <div>
         <span className="mr-3">
+          {paper.authors.map(author => author.name).join(', ')}
+        </span>
+        <span className="mr-3">
           {paper.year}
         </span>
         <span className="">

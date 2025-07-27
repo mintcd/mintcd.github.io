@@ -1,6 +1,6 @@
 import { LightbulbIcon, OpenIcon } from "@public/icons";
-import { useEffect, useRef, useState } from "react";
-import { fetchFromSemanticScholar, fetchNotionBlock, fetchNotionPage, getOpenUrl } from "./utils";
+import { useRef, useState } from "react";
+import { fetchFromSemanticScholar, getOpenUrl } from "./utils";
 import { useClickOutside } from "@hooks";
 import PaperCard from "./PaperCard";
 
@@ -13,20 +13,22 @@ export default function PaperDetail({ paper }: { paper: Paper | null }) {
       citations: RelatedPaper[],
     }
   }>({});
-  const [lightbulbData, setLightbulbData] = useState<{
+  const [suggestions, setSuggestions] = useState<{
     references: any[],
     citations: any[],
     open: boolean,
   }>({ references: [], citations: [], open: false });
+  const [visibleReferenceCount, setVisibleReferenceCount] = useState(10);
+  const [visibleCitationCount, setVisibleCitationCount] = useState(10);
   const [suggestionLoading, setSuggestionLoading] = useState(false);
   const suggestionRef = useRef<HTMLDivElement>(null);
-  useClickOutside(suggestionRef, () => setLightbulbData(d => ({ ...d, open: false })))
+  useClickOutside(suggestionRef, () => setSuggestions(d => ({ ...d, open: false })))
 
   async function handleSuggest() {
     if (!paper) return;
 
     if (cachedRelatedPapers[paper.id]) {
-      setLightbulbData({
+      setSuggestions({
         ...cachedRelatedPapers[paper.id],
         open: true,
       });
@@ -47,7 +49,7 @@ export default function PaperDetail({ paper }: { paper: Paper | null }) {
     }));
 
     // Show modal
-    setLightbulbData({
+    setSuggestions({
       ...newEntry,
       open: true,
     });
@@ -59,7 +61,7 @@ export default function PaperDetail({ paper }: { paper: Paper | null }) {
     paper
       ?
       <>
-        <div className="paper-detail w-[30%] bg-slate-100 rounded-md p-2 h-full overflow-auto scrollbar-thin scrollbar-thumb-slate-400 scrollbar-track-slate-200">
+        <div className="paper-detail bg-slate-100 rounded-md p-2 h-full overflow-auto scrollbar-thin scrollbar-thumb-slate-400 scrollbar-track-slate-200">
           <div className='flex justify-between'>
             <span className="font-semibold text-sm text-blue-700 truncate">
               {paper.title}
@@ -101,38 +103,63 @@ export default function PaperDetail({ paper }: { paper: Paper | null }) {
             }
           </div>
           }
-          {lightbulbData.open && (
+          {suggestions.open && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div ref={suggestionRef} className="bg-white w-[1/2] max-h-[80vh] p-6 rounded shadow overflow-y-auto">
-                <div className="mb-4">
-                  <h3 className="font-semibold text-gray-700">References</h3>
-                  {lightbulbData.references.length === 0 ? (
-                    <p className="text-sm text-gray-500"> No references found.</p>
+              <div ref={suggestionRef} className="bg-white w-[50vw] max-h-[80vh] p-6 rounded shadow overflow-y-auto">
+
+                {/* References Section */}
+                <div className="mb-6">
+                  <h3 className="font-semibold text-gray-700 mb-2">References</h3>
+                  {suggestions.references.length === 0 ? (
+                    <p className="text-sm text-gray-500">No references found.</p>
                   ) : (
                     <>
-                      {lightbulbData.references
+                      {suggestions.references
                         .sort((a, b) => b.citationCount - a.citationCount)
-                        .map((paper) => <PaperCard key={paper.id} paper={paper} />)}
+                        .slice(0, visibleReferenceCount)
+                        .map((paper) => (
+                          <PaperCard key={paper.scid} paper={paper} />
+                        ))}
+                      {visibleReferenceCount < suggestions.references.length && (
+                        <button
+                          className="text-blue-600 text-sm mt-2"
+                          onClick={() => setVisibleReferenceCount(c => c + 10)}
+                        >
+                          Show 10 more
+                        </button>
+                      )}
                     </>
                   )}
                 </div>
 
+                {/* Citations Section */}
                 <div>
-                  <h3 className="font-semibold text-gray-700">Citations</h3>
-                  {lightbulbData.citations.length === 0 ? (
+                  <h3 className="font-semibold text-gray-700 mb-2">Citations</h3>
+                  {suggestions.citations.length === 0 ? (
                     <p className="text-sm text-gray-500">No citations found.</p>
                   ) : (
                     <>
-                      {lightbulbData.citations
+                      {suggestions.citations
                         .sort((a, b) => b.citationCount - a.citationCount)
-                        .map((paper) =>
-                          <PaperCard key={paper.scid} paper={paper} />)}
+                        .slice(0, visibleCitationCount)
+                        .map((paper) => (
+                          <PaperCard key={paper.scid} paper={paper} />
+                        ))}
+                      {visibleCitationCount < suggestions.citations.length && (
+                        <button
+                          className="text-blue-600 text-sm mt-2"
+                          onClick={() => setVisibleCitationCount(c => c + 10)}
+                        >
+                          Show 10 more
+                        </button>
+                      )}
                     </>
                   )}
                 </div>
               </div>
             </div>
           )}
+
         </div>
       </>
       : <></>

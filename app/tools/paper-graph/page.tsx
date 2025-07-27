@@ -3,49 +3,20 @@
 import { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import Search from './Search';
-import { fetchFromNotionDatabase, fetchNotionBlock, fetchNotionPage, fetchPapers } from './utils';
 import PaperDetail from './PaperDetail';
+import { useFetchData } from './useFetchData';
+import PaperList from './PaperList';
+import { Loading } from '@components/atoms';
+
+const MIN_SIZE = 5;
+const MAX_SIZE = 20;
 
 export default function PaperGraph() {
   const svgRef = useRef<SVGSVGElement | null>(null);
-  const [data, setData] = useState<GraphData | null>(null);
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
   const [clickedNode, setClickedNode] = useState<GraphNode | null>(null);
+  const { data, loading, setData } = useFetchData();
 
-  useEffect(() => {
-    async function fetchData() {
-      let nodes: GraphNode[] = await fetchPapers();
-
-      console.log(nodes)
-
-      const authors = await fetchFromNotionDatabase("authors") as _Author[];;
-
-      const authorsById = authors.reduce((acc, author) => {
-        acc[author.id] = author;
-        return acc;
-      }, {} as { [id: string]: _Author });
-
-      // Adjust authors
-      for (const node of nodes) {
-        for (const author of node.authors ?? []) {
-          author.name = authorsById[author.id]?.name;
-        }
-      }
-
-      const links: GraphLink[] = [];
-      for (const item of nodes) {
-        for (const target of item.references ?? []) {
-          links.push({ source: item.id, target: target.id });
-        }
-      }
-      console.log(nodes)
-      setData({ nodes, links });
-    }
-
-    fetchData();
-  }, []);
-
-  //Render
   useEffect(() => {
     if (!data || !svgRef.current) return;
 
@@ -61,70 +32,83 @@ export default function PaperGraph() {
 
     const radiusScale = d3.scaleSqrt()
       .domain([minCite, maxCite])
-      .range([30, 60]);
+      .range([MIN_SIZE, MAX_SIZE]);
+
+    // Zoom group (wrap all visuals)
+    const zoomGroup = svg.append('g');
+
+    // Attach zoom behavior
+    svg.call(
+      d3.zoom<SVGSVGElement, unknown>()
+        .scaleExtent([0.2, 5])
+        .wheelDelta((event: any) => -event.deltaY * 0.001)
+        .on('zoom', (event: any) => {
+          zoomGroup.attr('transform', event.transform);
+        })
+    );
 
     const simulation = d3
       .forceSimulation(data.nodes)
-      .force('link', d3.forceLink(data.links).id((d: any) => d.id).distance(20))
-      .force('charge', d3.forceManyBody().strength(-50))
+      .alphaDecay(0.08)
+      .force('link', d3.forceLink(data.links)
+        .id((d: any) => d.id)
+        .distance(80)
+        .strength(0.7)
+      )
+      .force('charge', d3.forceManyBody().strength(-30))
       .force('center', d3.forceCenter(width / 2, height / 2));
 
-    const link = svg
+    const link = zoomGroup
       .append('g')
       .attr('stroke', '#999')
       .attr('stroke-opacity', 0.6)
       .selectAll('line')
       .data(data.links)
       .join('line')
-      .attr('stroke-width', 1.5)
+      .attr('stroke-width', 1);
 
-    const node = svg
+    const node = zoomGroup
       .append('g')
       .attr('stroke', '#fff')
       .attr('stroke-width', 1.5)
       .selectAll<SVGCircleElement, GraphNode>('circle')
       .data(data.nodes)
       .join('circle')
+      .on('mouseover', (_, d: any) => setHoveredNodeId(d.id))
+      .on('mouseout', () => setHoveredNodeId(null))
+      .on('click', (_, d: any) => setClickedNode(prev => (prev?.id === d.id ? null : d)))
       .attr('r', (d) => radiusScale(d.citationCount ?? 0) as number)
       .attr('fill', 'steelblue')
       .attr('opacity', 0.8)
       .attr('data-id', d => d.id)
-
       .call(d3.drag<SVGCircleElement, GraphNode>()
-        .on('start', (event: any, data) => {
-          const d = data as unknown as GraphNode
+        .on('start', (event: any, d: any) => {
           if (!event.active) {
             simulation.alphaTarget(0.3).restart();
-            simulation.force('center', null)
-          };
+            simulation.force('center', null);
+          }
           d.fx = d.x;
           d.fy = d.y;
         })
-        .on('drag', (event, data) => {
-          const d = data as unknown as GraphNode
+        .on('drag', (event, d: any) => {
           d.fx = event.x;
           d.fy = event.y;
         })
-        .on('end', (event: any, data) => {
+        .on('end', (event: any, d: any) => {
           if (!event.active) simulation.alphaTarget(0);
-          const d = data as unknown as GraphNode
           d.fx = null;
           d.fy = null;
         })
       );
 
-    const label = svg
+    const label = zoomGroup
       .append('g')
       .selectAll('text')
       .data(data.nodes)
       .join('text')
-      .text(d => d.title.length > 8 ? d.title.slice(0, 6) + '…' : d.title)
-      .attr('text-anchor', 'middle')             // center horizontally
-      .attr('dominant-baseline', 'middle')       // center vertically
+      .text(d => `${d.authors[0].name}, ${d.year}`)
       .attr('font-size', 10)
-      .attr('fill', '#fff')
-      .attr('pointer-events', 'none');           // prevent interfering with dragging
-
+      .attr('fill', '#000');
 
     simulation.on('tick', () => {
       link
@@ -135,16 +119,14 @@ export default function PaperGraph() {
 
       node.attr('cx', d => d.x!).attr('cy', d => d.y!);
       label.attr('x', d => d.x! + 12).attr('y', d => d.y! + 4);
-
-      label
-        .attr('x', d => d.x!)
-        .attr('y', d => d.y!);
     });
+
     return () => {
       simulation.stop();
     };
   }, [data]);
 
+  // Highlighting on hover
   useEffect(() => {
     if (!svgRef.current) return;
 
@@ -155,114 +137,65 @@ export default function PaperGraph() {
       if (!id) return;
 
       if (hoveredNodeId) {
-        if (id === hoveredNodeId) {
-          el.setAttribute('opacity', '1');
-        } else {
-          el.setAttribute('opacity', '0.3');
-        }
+        el.setAttribute('opacity', id === hoveredNodeId ? '1' : '0.3');
       } else {
         el.setAttribute('opacity', '0.8');
       }
     });
   }, [hoveredNodeId]);
 
-
-  useEffect(() => {
-    if (!svgRef.current) return;
-
-    const svg = svgRef.current;
-
-    function handleMouseOver(event: MouseEvent) {
-      // event.target might be a <circle> or something else
-      const target = event.target as Element;
-      if (target.tagName === 'circle') {
-        const id = target.getAttribute('data-id');
-        if (id) setHoveredNodeId(id);
-      } else {
-        setHoveredNodeId(null);
-      }
-    }
-
-    function handleMouseOut(event: MouseEvent) {
-      // If leaving a circle, clear hover state
-      const related = event.relatedTarget as Element | null;
-      if (!related || (related.tagName !== 'circle')) {
-        setHoveredNodeId(null);
-      }
-    }
-
-    svg.addEventListener('mouseover', handleMouseOver);
-    svg.addEventListener('mouseout', handleMouseOut);
-
-    return () => {
-      svg.removeEventListener('mouseover', handleMouseOver);
-      svg.removeEventListener('mouseout', handleMouseOut);
-    };
-  });
-
   async function handlePaperClick(node: GraphNode) {
-    if (clickedNode?.id === node.id) {
-      setClickedNode(null);
-      return;
-    }
-
+    setClickedNode(prev => (prev?.id === node.id ? null : node));
   }
 
   async function handlePaperSelect(paperNode: GraphNode) {
-    console.log(paperNode)
     setData(oldData => {
       if (!oldData) return { nodes: [paperNode], links: [] };
-      const newNodes = [...oldData.nodes, paperNode]
-      const newLinks: GraphLink[] = [...oldData.links,
-      ...(paperNode.references ?? []).map(ref => ({
-        source: paperNode.id,
-        target: ref.id,
-      })),
-      ...(paperNode.citations ?? []).map(cite => ({
-        source: cite.id,
-        target: paperNode.id,
-      }))]
-      return {
-        nodes: newNodes,
-        links: newLinks
-      };
+      const newNodes = [...oldData.nodes, paperNode];
+      const newLinks: GraphLink[] = [
+        ...oldData.links,
+        ...(paperNode.references ?? []).map(ref => ({
+          source: paperNode.id,
+          target: ref.id,
+        })),
+        ...(paperNode.citations ?? []).map(cite => ({
+          source: cite.id,
+          target: paperNode.id,
+        }))
+      ];
+      return { nodes: newNodes, links: newLinks };
     });
-
   }
 
-
   return (
-    <div className="relative w-full h-full overflow-hidden flex">
+    loading
+      ? <Loading />
+      :
+      <div className="paper-graph relative w-full h-full overflow-hidden flex">
 
-      <div className='w-[20%]  border-gray-300 '>
-        <div className='flex m-3 justify-between items-center'>
+        <div className='w-[25%] border-gray-300'>
           <Search
             knownPapers={data?.nodes ?? []}
             onSelect={handlePaperSelect}
           />
-          {!data && <span>Fetching graph...</span>}
-
+          <PaperList
+            nodes={data?.nodes ?? []}
+            hoveredNodeId={hoveredNodeId}
+            onHover={setHoveredNodeId}
+            onClick={handlePaperClick}
+          />
         </div>
-        {data?.nodes.map((node) => (
-          <div
-            key={node.id}
-            className={`p-3 border border-b-gray-300 
-              bg-${hoveredNodeId === node.id ? 'gray-100' : 'white'} 
-              rounded-lg shadow-sm`}
-            onMouseOver={() => setHoveredNodeId(node.id)}
-            onMouseLeave={() => setHoveredNodeId(null)}
-            onClick={() => handlePaperClick(node)}
-          >
-            <span className="text-sm">{node.title}</span>
-          </div>
-        ))}
-      </div>
 
-      <div className='w-[50%]'>
-        <svg ref={svgRef} width="100%" height={600}></svg>
-      </div>
+        <div className='w-[75%]'>
+          <svg ref={svgRef} width="100%" height={800}></svg>
+        </div>
 
-      <PaperDetail paper={clickedNode} />
-    </div>
+        <div
+          className="absolute top-0 right-0 z-50 w-[30%] overflow-auto"
+          style={{ maxHeight: 600 }}
+        >
+          <PaperDetail paper={clickedNode} />
+        </div>
+      </div>
   );
 }

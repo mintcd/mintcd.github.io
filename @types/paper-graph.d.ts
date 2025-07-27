@@ -6,6 +6,8 @@ type Paper = {
   aclId: string | null,
   dblpId: string | null,
 
+  tags: { name: string, color: string }[]
+
   title: string,
   year: number,
   authors: _Author[],

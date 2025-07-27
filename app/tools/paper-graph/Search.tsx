@@ -14,8 +14,7 @@ import useClickOutside from '@hooks/useClickOutside';
 type Suggestion = {
   id: string;
   title: string;
-  abstract: string;
-  year: string;
+  authorsYear: string;
 };
 
 export default function Search({
@@ -54,6 +53,7 @@ export default function Search({
 
     setQuery('');
     setSuggestions([]);
+    setModalOpen(false);
     setStatus('Fetching paper...');
     const paper = await fetchFromSemanticScholar(id);
 
@@ -99,7 +99,7 @@ export default function Search({
 
   return (
     <>
-      <div className='search flex items-center justify-between'>
+      <div className='search flex items-center justify-between w-full'>
         <button
           onClick={() => setModalOpen(true)}
           className="p-2 rounded-full bg-gray-100 hover:bg-gray-200"
@@ -113,25 +113,16 @@ export default function Search({
 
 
       {modalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
-          <div ref={ref} className="bg-white rounded-lg shadow-lg w-full max-w-md p-4 relative">
-            <button
-              onClick={() => setModalOpen(false)}
-              className="absolute top-2 right-3 text-gray-400 hover:text-gray-600 text-xl"
-            >
-              ×
-            </button>
-
+        <div className="fixed inset-0 z-200 bg-black/40 flex items-center justify-center">
+          <div ref={ref} className="bg-white rounded-lg shadow-lg w-[50%] p-4 relative">
             <h2 className="text-lg font-semibold mb-1">Search Paper</h2>
-            <p className="text-sm text-gray-500 mb-3">{status}</p>
-
             <input
               type="search"
               value={query}
               placeholder="Type paper title and press Enter..."
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              className="border p-2 w-full rounded mb-2"
+              className="border p-2 w-full rounded mb-2 text-[20px]"
               autoFocus
             />
 
@@ -140,17 +131,22 @@ export default function Search({
               : suggestions.length === 0 && query.trim() !== '' ? (
                 searched && <p className="text-sm text-gray-500 mt-2">No results</p>
               ) : (
-                <ul className="border max-h-60 overflow-auto rounded bg-white">
+                <ul className=" max-h-60 overflow-auto">
                   {suggestions.map((s) => (
                     <li
                       key={s.id}
                       className={`p-2 ${knownIds.has(s.id)
                         ? 'bg-gray-100 text-gray-400 cursor-default'
                         : 'hover:bg-blue-100 cursor-pointer'
-                        }`}
+                        } border-b-[1px] border-b-gray-200`}
                       onClick={() => !knownIds.has(s.id) && handleSelect(s.id)}
                     >
-                      {s.title}
+                      <div className='text-[14px]'>
+                        {s.title}
+                      </div>
+                      <div className='text-[12px]'>
+                        {s.authorsYear}
+                      </div>
                     </li>
                   ))}
                 </ul>

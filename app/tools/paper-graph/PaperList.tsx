@@ -10,20 +10,20 @@ interface Props {
 
 export default function PaperList({ nodes, hoveredNodeId, onHover, onClick }: Props) {
   return (
-    <div className='border-gray-300'>
+    <div className='h-[650px] overflow-auto shadow-gray-500 shadow-sm'>
       {nodes.map((node) => (
         <div
           key={node.id}
-          className={`p-3 border border-b-gray-300 
+          className={`p-3
             ${hoveredNodeId === node.id ? 'bg-gray-100' : 'bg-white'} 
-            rounded-lg shadow-sm cursor-pointer`}
+            cursor-pointer border-b-gray-300 border-b-[1px]`}
           onMouseOver={() => onHover(node.id)}
           onMouseLeave={() => onHover(null)}
           onClick={() => onClick(node)}
         >
           <div className="text-sm">{node.title}</div>
           <div>
-            {node.tags.map((tag) =>
+            {(node.tags ?? []).map((tag) =>
               <span key={tag.name} style={{ backgroundColor: tag.color }} className='mt-2 mr-1 p-1 text-[10px] rounded-sm text-white opacity-60'>
                 {tag.name}
               </span>)}

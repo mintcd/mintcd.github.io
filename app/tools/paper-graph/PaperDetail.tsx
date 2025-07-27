@@ -125,7 +125,7 @@ export default function PaperDetail({ paper }: { paper: Paper | null }) {
                           className="text-blue-600 text-sm mt-2"
                           onClick={() => setVisibleReferenceCount(c => c + 10)}
                         >
-                          Show 10 more
+                          More
                         </button>
                       )}
                     </>
@@ -150,7 +150,7 @@ export default function PaperDetail({ paper }: { paper: Paper | null }) {
                           className="text-blue-600 text-sm mt-2"
                           onClick={() => setVisibleCitationCount(c => c + 10)}
                         >
-                          Show 10 more
+                          More
                         </button>
                       )}
                     </>

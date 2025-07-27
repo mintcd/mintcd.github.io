@@ -10,6 +10,9 @@ import { Loading } from '@components/atoms';
 
 const MIN_SIZE = 5;
 const MAX_SIZE = 20;
+const GRAPH_WIDTH = 800;
+const GRAPH_HEIGHT = 700;
+
 
 export default function PaperGraph() {
   const svgRef = useRef<SVGSVGElement | null>(null);
@@ -22,9 +25,6 @@ export default function PaperGraph() {
 
     const svg = d3.select(svgRef.current);
     svg.selectAll('*').remove(); // Clear previous renders
-
-    const width = 800;
-    const height = 600;
 
     const citationCounts = data.nodes.map(d => d.citationCount ?? 0);
     const minCite = d3.min(citationCounts) ?? 0;
@@ -52,11 +52,11 @@ export default function PaperGraph() {
       .alphaDecay(0.08)
       .force('link', d3.forceLink(data.links)
         .id((d: any) => d.id)
-        .distance(80)
+        .distance(150)
         .strength(0.7)
       )
       .force('charge', d3.forceManyBody().strength(-30))
-      .force('center', d3.forceCenter(width / 2, height / 2));
+      .force('center', d3.forceCenter(GRAPH_WIDTH / 2, GRAPH_HEIGHT / 2));
 
     const link = zoomGroup
       .append('g')
@@ -85,7 +85,8 @@ export default function PaperGraph() {
         .on('start', (event: any, d: any) => {
           if (!event.active) {
             simulation.alphaTarget(0.3).restart();
-            simulation.force('center', null);
+            simulation.force('center', null)
+              .force('charge', null)
           }
           d.fx = d.x;
           d.fy = d.y;
@@ -107,7 +108,7 @@ export default function PaperGraph() {
       .data(data.nodes)
       .join('text')
       .text(d => `${d.authors[0].name}, ${d.year}`)
-      .attr('font-size', 10)
+      .attr('font-size', 9)
       .attr('fill', '#000');
 
     simulation.on('tick', () => {
@@ -187,7 +188,7 @@ export default function PaperGraph() {
         </div>
 
         <div className='w-[75%]'>
-          <svg ref={svgRef} width="100%" height={800}></svg>
+          <svg ref={svgRef} width="100%" height={GRAPH_HEIGHT}></svg>
         </div>
 
         <div

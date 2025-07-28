@@ -34,12 +34,18 @@ import {
 } from "react-icons/fa";
 
 import {
+  LuArrowDownUp as ArrowDownUpIcon
+
+} from "react-icons/lu";
+
+import {
   HiMiniViewColumns as ViewColumnsIcon,
   HiAdjustmentsHorizontal as AdjustmentsIcon
 } from "react-icons/hi2";
 
 export {
   AddIcon,
+  ArrowDownUpIcon,
   ListIcon,
   AddCircleIcon,
   NavigateNextIcon,

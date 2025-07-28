@@ -93,7 +93,7 @@ Dropdown.Content = function Content({ children }: ContentProps) {
 
   return (
     <div
-      className={`absolute z-[10] mt-1 w-fit bg-white border border-gray-200 shadow-lg rounded-lg
+      className={`absolute z-[10] mt-1 w-fit
         transition-all duration-300 ease-out ${isOpen ? 'translate-y-0 opacity-100' : 'translate-y-[-10px] opacity-0 pointer-events-none'}`}
     >
       {children}

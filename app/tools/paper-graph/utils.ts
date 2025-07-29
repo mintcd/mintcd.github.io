@@ -201,6 +201,19 @@ export function getOpenUrl(paper: any): string | null {
   return null;
 }
 
+export function getPdf(paper: any): string | null {
+  if (paper.arxivId) {
+    return `https://arxiv.org/pdf/${paper.arxivId}.pdf`;
+  }
+  if (paper.aclId) {
+    return `https://aclanthology.org/${paper.aclId}.pdf`;
+  }
+  if (paper.doi) {
+    return `https://dl.acm.org/doi/pdf/${paper.doi}`
+  }
+  return null;
+}
+
 export function sleep(time: number) {
   return new Promise((resolve) => setTimeout(resolve, time));
 }

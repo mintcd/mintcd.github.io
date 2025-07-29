@@ -1,8 +1,10 @@
-import { LightbulbIcon, OpenIcon } from "@public/icons";
+import { EditIcon, LightbulbIcon, OpenIcon } from "@public/icons";
 import { useRef, useState } from "react";
-import { fetchFromSemanticScholar, getOpenUrl } from "./utils";
+import { fetchFromSemanticScholar, getOpenUrl, getPdf } from "./utils";
 import { useClickOutside } from "@hooks";
 import PaperCard from "./PaperCard";
+import PaperSuggestions from "./PaperSuggestions";
+import { Loading } from "@components/atoms";
 
 
 export default function PaperDetail({ paper }: { paper: Paper | null }) {
@@ -18,8 +20,6 @@ export default function PaperDetail({ paper }: { paper: Paper | null }) {
     citations: any[],
     open: boolean,
   }>({ references: [], citations: [], open: false });
-  const [visibleReferenceCount, setVisibleReferenceCount] = useState(10);
-  const [visibleCitationCount, setVisibleCitationCount] = useState(10);
   const [suggestionLoading, setSuggestionLoading] = useState(false);
   const suggestionRef = useRef<HTMLDivElement>(null);
   useClickOutside(suggestionRef, () => setSuggestions(d => ({ ...d, open: false })))
@@ -62,22 +62,25 @@ export default function PaperDetail({ paper }: { paper: Paper | null }) {
       ?
       <>
         <div className="paper-detail bg-slate-100 rounded-md p-2 h-full overflow-auto scrollbar-thin scrollbar-thumb-slate-400 scrollbar-track-slate-200">
-          <div className='flex justify-between'>
-            <span className="font-semibold text-sm text-blue-700 truncate">
-              {paper.title}
-            </span>
-            <span className='flex'>
-              <LightbulbIcon className='mr-2 cursor-pointer' size={18} onClick={(e) => {
+          <div className="font-semibold text-sm text-blue-700">
+            {paper.title}
+          </div>
+          <div className='flex'>
+            {suggestionLoading
+              ? <span className="mr-2"><Loading size={18} /></span>
+              : <LightbulbIcon className='mr-2 cursor-pointer' size={18} onClick={(e) => {
                 e.stopPropagation();
                 handleSuggest()
-              }} />
-              <OpenIcon size={18} className='cursor-pointer' onClick={(e) => {
-                e.stopPropagation();
-                const url = getOpenUrl(paper);
-                if (url) window.open(url, '_blank');
-              }} />
-            </span>
-
+              }} />}
+            {getPdf(paper) &&
+              <EditIcon size={18} className='mr-2 cursor-pointer' onClick={(e) => {
+                window.open(`${process.env.NEXT_PUBLIC_APP_URL}/pdf?url=${getPdf(paper)}`, '_blank')
+              }} />}
+            <OpenIcon size={18} className='cursor-pointer' onClick={(e) => {
+              e.stopPropagation();
+              const url = getOpenUrl(paper);
+              if (url) window.open(url, '_blank');
+            }} />
           </div>
           <div className='flex justify-between'>
             {paper.authors && (
@@ -104,62 +107,8 @@ export default function PaperDetail({ paper }: { paper: Paper | null }) {
           </div>
           }
           {suggestions.open && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div ref={suggestionRef} className="bg-white w-[50vw] max-h-[80vh] p-6 rounded shadow overflow-y-auto">
-
-                {/* References Section */}
-                <div className="mb-6">
-                  <h3 className="font-semibold text-gray-700 mb-2">References</h3>
-                  {suggestions.references.length === 0 ? (
-                    <p className="text-sm text-gray-500">No references found.</p>
-                  ) : (
-                    <>
-                      {suggestions.references
-                        .sort((a, b) => b.citationCount - a.citationCount)
-                        .slice(0, visibleReferenceCount)
-                        .map((paper) => (
-                          <PaperCard key={paper.scid} paper={paper} />
-                        ))}
-                      {visibleReferenceCount < suggestions.references.length && (
-                        <button
-                          className="text-blue-600 text-sm mt-2"
-                          onClick={() => setVisibleReferenceCount(c => c + 10)}
-                        >
-                          More
-                        </button>
-                      )}
-                    </>
-                  )}
-                </div>
-
-                {/* Citations Section */}
-                <div>
-                  <h3 className="font-semibold text-gray-700 mb-2">Citations</h3>
-                  {suggestions.citations.length === 0 ? (
-                    <p className="text-sm text-gray-500">No citations found.</p>
-                  ) : (
-                    <>
-                      {suggestions.citations
-                        .sort((a, b) => b.citationCount - a.citationCount)
-                        .slice(0, visibleCitationCount)
-                        .map((paper) => (
-                          <PaperCard key={paper.scid} paper={paper} />
-                        ))}
-                      {visibleCitationCount < suggestions.citations.length && (
-                        <button
-                          className="text-blue-600 text-sm mt-2"
-                          onClick={() => setVisibleCitationCount(c => c + 10)}
-                        >
-                          More
-                        </button>
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
+            <PaperSuggestions suggestions={suggestions} ref={suggestionRef} />
           )}
-
         </div>
       </>
       : <></>

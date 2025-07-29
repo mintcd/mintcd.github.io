@@ -181,7 +181,7 @@ export default function PaperGraph() {
             onSelect={handlePaperSelect}
           />
           <PaperList
-            nodes={data?.nodes ?? []}
+            papers={data?.nodes ?? []}
             hoveredNodeId={hoveredNodeId}
             onHover={setHoveredNodeId}
             onClick={handlePaperClick}

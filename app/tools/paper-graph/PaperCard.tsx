@@ -3,7 +3,7 @@ import { getOpenUrl } from "./utils";
 
 export default function PaperCard({ paper }: { paper: Paper }) {
   return (
-    <div key={paper.id} className='shadow-sm p-2'>
+    <div className='shadow-sm p-2'>
       <div className='flex justify-between items-start gap-2'>
         <span className='font-semibold break-words w-[90%]'>
           {paper.title}

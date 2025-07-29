@@ -4,10 +4,10 @@ import { ArrowDownIcon, ArrowDownUpIcon, ArrowUpIcon } from '@public/icons';
 import { useState } from 'react';
 
 interface Props {
-  nodes: GraphNode[];
+  papers: GraphNode[];
   hoveredNodeId: string | null;
   onHover: (id: string | null) => void;
-  onClick: (node: GraphNode) => void;
+  onClick: (paper: GraphNode) => void;
 }
 
 const FIELDS: { [key in 'title' | 'year' | 'citationCount']: string } = {
@@ -16,7 +16,7 @@ const FIELDS: { [key in 'title' | 'year' | 'citationCount']: string } = {
   citationCount: 'Citations',
 }
 
-export default function PaperList({ nodes, hoveredNodeId, onHover, onClick }: Props) {
+export default function PaperList({ papers, hoveredNodeId, onHover, onClick }: Props) {
   const [sort, setSort] = useState<{
     open: boolean,
     field: keyof typeof FIELDS,
@@ -24,7 +24,7 @@ export default function PaperList({ nodes, hoveredNodeId, onHover, onClick }: Pr
   }
   >({ open: false, field: 'title', direction: 'asc' })
 
-  const sortedNodes = [...nodes].sort((a, b) => {
+  const sortedPapers = papers.sort((a, b) => {
     const field = sort.field;
     const dir = sort.direction === 'asc' ? 1 : -1;
 
@@ -45,7 +45,7 @@ export default function PaperList({ nodes, hoveredNodeId, onHover, onClick }: Pr
     <div className='paper-list overflow-auto max-h-[80vh] shadow-gray-500 shadow-sm'>
       <div className={`paper-list-options flex items-center justify-between`}>
         <span className='font-semibold'>
-          {nodes.length} documents
+          {papers.length} documents
         </span>
         <span className='sort-filter flex items-center gap-2 mx-2'>
           <Dropdown>
@@ -81,21 +81,21 @@ export default function PaperList({ nodes, hoveredNodeId, onHover, onClick }: Pr
           </Dropdown>
         </span>
       </div>
-      {sortedNodes.map((node) => (
+      {sortedPapers.map((paper) => (
         <div
-          key={node.id}
+          key={paper.id}
           className={`p-3
-            ${hoveredNodeId === node.id ? 'bg-gray-100' : 'bg-white'} 
+            ${hoveredNodeId === paper.id ? 'bg-gray-100' : 'bg-white'} 
             cursor-pointer border-b-gray-300 border-b-[1px]`}
-          onMouseOver={() => onHover(node.id)}
+          onMouseOver={() => onHover(paper.id)}
           onMouseLeave={() => onHover(null)}
-          onClick={() => onClick(node)}
+          onClick={() => onClick(paper)}
         >
           <div className="text-sm">
-            {node.title}
+            {paper.title}
           </div>
           <div>
-            {(node.tags ?? []).map((tag) =>
+            {(paper.tags ?? []).map((tag) =>
               <span key={tag.name} style={{ backgroundColor: tag.color }}
                 className='mt-2 mr-1 p-1 text-[10px] rounded-sm text-white opacity-60'>
                 {tag.name}

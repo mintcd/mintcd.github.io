@@ -97,7 +97,7 @@ export async function fetchFromNotionDatabase(db: 'papers' | 'authors', filter?:
   return res.json();
 }
 
-export async function fetchPapers(): Promise<Paper[]> {
+export async function fetchPapers(): Promise<GraphNode[]> {
   let papers = await fetchFromNotionDatabase('papers');
 
   // papers = await Promise.all(papers.map(async (paper: any) => {

@@ -1,7 +1,7 @@
 import { OpenIcon } from "@public/icons";
 import { getOpenUrl } from "./utils";
 
-export default function PaperCard({ paper }: { paper: Paper }) {
+export default function PaperCard({ paper }: { paper: RelatedPaper }) {
   return (
     <div className='shadow-sm p-2'>
       <div className='flex justify-between items-start gap-2'>

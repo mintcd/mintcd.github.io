@@ -20,6 +20,8 @@ type Paper = {
   citations: RelatedPaper[] | null,
   referenceScids: string[],
   citationScids: string[],
+
+  relatedPapers: { references: RelatedPaper[], citations: RelatedPaper[] },
 }
 
 type RelatedPaper = Omit<Paper, 'abstract' | 'references' | 'citations'>

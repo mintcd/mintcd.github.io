@@ -3,9 +3,8 @@ import PaperCard from './PaperCard';
 
 export default function PaperSuggestions({ suggestions, ref }: {
   suggestions: {
-    references: Paper[],
-    citations: Paper[],
-    open: boolean,
+    references: RelatedPaper[],
+    citations: RelatedPaper[],
   },
   ref: RefObject<HTMLDivElement | null>
 }) {

@@ -97,16 +97,16 @@ export async function fetchFromNotionDatabase(db: 'papers' | 'authors', filter?:
   return res.json();
 }
 
-export async function fetchPapers() {
+export async function fetchPapers(): Promise<Paper[]> {
   let papers = await fetchFromNotionDatabase('papers');
 
-  papers = await Promise.all(papers.map(async (paper: any) => {
-    const contents = await fetchNotionBlock(paper.id);
-    paper.abstract = contents?.abstract ?? null;
-    paper.referenceScids = contents?.referenceScids ?? [];
-    paper.citationScids = contents?.citationScids ?? [];
-    return paper;
-  }));
+  // papers = await Promise.all(papers.map(async (paper: any) => {
+  //   const contents = await fetchNotionBlock(paper.id);
+  //   paper.abstract = contents?.abstract ?? null;
+  //   paper.referenceScids = contents?.referenceScids ?? [];
+  //   paper.citationScids = contents?.citationScids ?? [];
+  //   return paper;
+  // }));
 
   return papers;
 }
@@ -159,9 +159,6 @@ export async function addToNotionDatabase(paper: Paper) {
   if (!dbRes.ok) throw dbRes;
 
   const addedPaper = await dbRes.json();
-
-  console.log(addedPaper)
-
   const referenceScids = paper.references?.map(ref => ref.scid) ?? []
   const citationScids = paper.citations?.map(ref => ref.scid) ?? []
 
@@ -216,4 +213,26 @@ export function getPdf(paper: any): string | null {
 
 export function sleep(time: number) {
   return new Promise((resolve) => setTimeout(resolve, time));
+}
+
+let cachedSchema: { [key: string]: any } | null = null;
+
+export async function getCachedSchema(collection: string) {
+  if (cachedSchema) return cachedSchema;
+
+  const schema = await getSchema(collection);
+  cachedSchema = schema;
+  return schema;
+}
+
+export async function getSchema(dbName: string) {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/notion/databases/${dbName}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!res.ok) throw res;
+  return res.json();
 }

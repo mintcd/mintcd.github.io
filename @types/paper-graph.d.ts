@@ -11,15 +11,16 @@ type Paper = {
   title: string,
   year: number,
   authors: _Author[],
-  abstract: string | null
+  abstract?: string | null
 
   referenceCount: number,
   citationCount: number,
 
   references: RelatedPaper[] | null,
   citations: RelatedPaper[] | null,
-  referenceScids: string[],
-  citationScids: string[],
+
+  referenceScids?: string[],
+  citationScids?: string[],
 
   relatedPapers: { references: RelatedPaper[], citations: RelatedPaper[] },
 }

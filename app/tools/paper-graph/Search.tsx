@@ -6,6 +6,7 @@ import {
   fetchFromSemanticScholar,
   addToNotionDatabase,
   updateNotionPage,
+  fetchNotionBlock,
 } from './utils';
 import { SearchIcon } from '@public/icons';
 import { Loading } from '@components/atoms';
@@ -73,15 +74,22 @@ export default function Search({
     const referencesScidSet = new Set(paper.references?.map(ref => ref.scid))
     const citationsScidSet = new Set(paper.citations?.map(ref => ref.scid))
     for (const notionPaper of knownPapers) {
+      if (notionPaper.citationScids === undefined || notionPaper.referenceScids === undefined) {
+        const fetchedPaper = await fetchNotionBlock(notionPaper.id)
+        notionPaper.abstract = fetchedPaper.abstract
+        notionPaper.citationScids = fetchedPaper.citationScids
+        notionPaper.referenceScids = fetchedPaper.referenceScids
+      }
+
       if (referencesScidSet.has(notionPaper.scid)
-        || notionPaper.citationScids.includes(paper.scid)) {
+        || notionPaper.citationScids?.includes(paper.scid)) {
         await updateNotionPage(notionPaper.id, {
           citations: [...(notionPaper.citations ?? []), { id: returnedPaper.id }],
         })
         returnedPaper.references?.push({ id: notionPaper.id } as any)
       }
       if (citationsScidSet.has(notionPaper.scid)
-        || notionPaper.referenceScids.includes(paper.scid)) {
+        || notionPaper.referenceScids?.includes(paper.scid)) {
         await updateNotionPage(notionPaper.id, {
           references: [...(notionPaper.references ?? []), { id: returnedPaper.id }],
         })

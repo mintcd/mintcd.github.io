@@ -68,8 +68,19 @@ jobs:
       - name: Install dependencies
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
 
-      - name: Build with Next.js
-        run: ${{ steps.detect-package-manager.outputs.runner }} next build
+      - name: Build
+        run: ${{ steps.detect-package-manager.outputs.manager }} run build
+
+      - name: Copy notes to /notes
+        run: |
+          mkdir -p out/notes
+          for d in slides/*; do
+            if [ -d "$d" ]; then
+              name=$(basename "$d")
+              mkdir -p out/notes/$name
+              cp "$d/main.html" "out/notes/$name/index.html"
+            fi
+          done
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
